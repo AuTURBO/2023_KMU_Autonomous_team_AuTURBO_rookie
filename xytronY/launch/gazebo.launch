@@ -1,0 +1,14 @@
+<launch>
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find xytronY)/worlds/plane_track.world"/>
+    <arg name="paused" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="true"/>
+    <arg name="headless" value="false"/>
+    <arg name="debug" value="false"/>
+  </include>
+  <node name="spawn_model" pkg="gazebo_ros" type="spawn_model" args="-file $(find xytronY)/urdf/xytronY.urdf -urdf -model xytronY" output="screen" />
+  <node name="fake_joint_calibration" pkg="rostopic" type="rostopic" args="pub /calibrated std_msgs/Bool true" />
+  <include file="$(find xytronY)/launch/display.launch"/>
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find xytronY)/rviz/urdf.rviz"/>
+</launch>
