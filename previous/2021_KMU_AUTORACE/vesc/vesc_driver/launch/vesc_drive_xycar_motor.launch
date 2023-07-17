@@ -1,0 +1,8 @@
+<!-- -*- mode: XML -*- -->
+<launch>
+  <rosparam file="$(find vesc_driver)/yaml/vesc.yaml" command="load" />
+  <node pkg="vesc_ackermann" type="ackermann_to_vesc_node" name="ackermann_to_vesc">
+    <remap from="ackermann_cmd" to="/ackermann_cmd" />
+  </node>
+  <node pkg="vesc_driver" type="vesc_driver_node" name="vesc_driver" />
+</launch>

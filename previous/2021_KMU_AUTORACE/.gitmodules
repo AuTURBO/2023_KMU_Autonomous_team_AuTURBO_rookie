@@ -1,0 +1,6 @@
+[submodule "obstacle_detector"]
+	path = obstacle_detector
+	url = https://github.com/tysik/obstacle_detector
+[submodule "ar_track_alvar"]
+	path = ar_track_alvar
+	url = https://github.com/ros-perception/ar_track_alvar.git

@@ -1,0 +1,186 @@
+<?xml version="1.0" ?>
+<robot name="xycar" xmlns:xacro="http://www.ros.org/wiki/xacro">
+ <link name="base_link"/>
+  <link name="baseplate">
+    <visual>
+      <material name="acrylic"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <box size="0.5 0.2 0.07"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="base_link_to_baseplate" type="fixed">
+    <parent link="base_link"/>
+    <child link="baseplate"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+  </joint>
+  <link name="front_mount">
+    <visual>
+      <material name="blue"/>
+      <origin rpy="0 0.0 0" xyz="-0.105 0 0"/>
+      <geometry>
+        <box size="0.50 0.12 0.01"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="baseplate_to_front_mount" type="fixed">
+    <parent link="baseplate"/>
+    <child link="front_mount"/>
+    <origin rpy="0 0 0" xyz="0.105 0 -0.059"/>
+  </joint>
+
+  <link name="front_shaft">
+    <visual>
+      <material name="black"/>
+      <origin rpy="1.57 0 0" xyz="0 0 0"/>
+      <geometry>
+        <cylinder length="0.285" radius="0.018"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="front_mount_to_front_shaft" type="fixed">
+    <parent link="front_mount"/>
+    <child link="front_shaft"/>
+    <origin rpy="0 0 0" xyz="0.105 0 -0.059"/>
+  </joint>
+  <link name="rear_shaft">
+    <visual>
+      <material name="black"/>
+      <origin rpy="1.57 0 0" xyz="0 0 0"/>
+      <geometry>
+        <cylinder length="0.285" radius="0.018"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="rear_mount_to_rear_shaft" type="fixed">
+    <parent link="front_mount"/>
+    <child link="rear_shaft"/>
+    <origin rpy="0 0 0" xyz="-0.305 0 -0.059"/>
+  </joint>
+  <link name="front_right_hinge">
+    <visual>
+      <material name="white"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <sphere radius="0.015"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="front_right_hinge_joint" type="revolute">
+    <parent link="front_shaft"/>
+    <child link="front_right_hinge"/>
+    <origin rpy="0 0 0" xyz="0 -0.1425 0"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="10" lower="-0.34" 
+                       upper="0.34" velocity="100"/>
+  </joint>
+  <link name="front_left_hinge">
+    <visual>
+      <material name="white"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <sphere radius="0.015"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="front_left_hinge_joint" type="revolute">
+    <parent link="front_shaft"/>
+    <child link="front_left_hinge"/>
+    <origin rpy="0 0 0" xyz="0 0.14 0"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="10" lower="-0.34" upper="0.34" velocity="100"/>
+  </joint>
+  <link name="front_right_wheel">
+    <visual>
+      <material name="black"/>
+      <origin rpy="1.57 0 0" xyz="0 0 0"/>
+      <geometry>
+        <cylinder length="0.064" radius="0.07"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="front_right_wheel_joint" type="continuous">
+    <parent link="front_right_hinge"/>
+    <child link="front_right_wheel"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="10" velocity="100"/>
+  </joint>
+  <link name="front_left_wheel">
+    <visual>
+      <material name="black"/>
+      <origin rpy="1.57 0 0" xyz="0 0 0"/>
+      <geometry>
+        <cylinder length="0.064" radius="0.07"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="front_left_wheel_joint" type="continuous">
+    <parent link="front_left_hinge"/>
+    <child link="front_left_wheel"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="10" velocity="100"/>
+  </joint>
+  <link name="rear_right_wheel">
+    <visual>
+      <material name="black"/>
+      <origin rpy="1.57 0 0" xyz="0 0 0"/>
+      <geometry>
+        <cylinder length="0.064" radius="0.07"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="rear_right_wheel_joint" type="continuous">
+    <parent link="rear_shaft"/>
+    <child link="rear_right_wheel"/>
+    <origin rpy="0 0 0" xyz="0 -0.14 0"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="10" velocity="100"/>
+  </joint>
+  <link name="rear_left_wheel">
+    <visual>
+      <material name="black"/>
+      <origin rpy="1.57 0 0" xyz="0 0 0"/>
+      <geometry>
+        <cylinder length="0.064" radius="0.07"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="rear_left_wheel_joint" type="continuous">
+    <parent link="rear_shaft"/>
+    <child link="rear_left_wheel"/>
+    <origin rpy="0 0 0" xyz="0 0.14 0"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="10" velocity="100"/>
+  </joint>
+  <material name="black">
+    <color rgba="0.0 0.0 0.0 1.0"/>
+  </material>
+  <material name="blue">
+    <color rgba="0.0 0.0 0.8 1.0"/>
+  </material>
+  <material name="green">
+    <color rgba="0.0 0.8 0.0 1.0"/>
+  </material>
+  <material name="grey">
+    <color rgba="0.2 0.2 0.2 1.0"/>
+  </material>
+  <material name="orange">
+    <color rgba="1.0 0.423529411765 0.0392156862745 1.0"/>
+  </material>
+  <material name="brown">
+    <color rgba="0.870588235294 0.811764705882 0.764705882353 1.0"/>
+  </material>
+  <material name="red">
+    <color rgba="0.8 0.0 0.0 1.0"/>
+  </material>
+  <material name="white">
+    <color rgba="1.0 1.0 1.0 1.0"/>
+  </material>
+  <material name="acrylic">
+    <color rgba="1.0 1.0 1.0 0.4"/>
+  </material>
+</robot>
+
