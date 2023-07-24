@@ -8,6 +8,11 @@ import os
 import numpy as np
 from matplotlib import pyplot as plt
 from preprocessor import PreProcessor
+from xycar_msgs.msg import xycar_motor
+
+ack_msg = xycar_motor()
+ack_publisher = None
+
 
 lane_bin_th = 120 #145
 frameWidth = 0
@@ -23,7 +28,42 @@ roi_width = 640
 
 pre_module = PreProcessor(roi_height, roi_width)
 
+def map(x,input_min,input_max,output_min,output_max):
+    return (x-input_min)*(output_max-output_min)/(input_max-input_min)+output_min #map()함수 정의.
+
+def LowPassFilter(alpha, prev, x):
+    """
+    (param) alpha : weight for previous estimation
+            prev : previous estimation
+            x : new data
+    (return) estimation
+    """
+    return alpha * prev + (1 - alpha) * x
+
+def simple_controller(lx, ly, mx, my, rx, ry):
+    target = 320
+    side_margin = 200
+
+    if lx != None and rx != None and len(lx) > 5 and len(rx) > 5:
+        # print("ALL!!!")
+        target = (lx[0] + rx[0]) // 2
+    elif mx != None and len(mx) > 3:
+        # print("Mid!!!")
+        target = mx[0]
+    elif lx != None and len(lx) > 3:
+        # print("Left!!!")
+        #print(f"val: {lx[0]}")
+        target = lx[0] +side_margin
+    elif rx != None and len(rx) > 3:
+        # print("Right!!!")
+        target = rx[0] - side_margin
+
+    print(f"target: {target}")
+    return int(target)
+
 def main(frame):
+        global ack_publisher
+        prev_target = 320
         frameRate = 11 #33
 
         gblur_img  = cv2.GaussianBlur(frame, (3, 3), sigmaX = 0, sigmaY = 0)
@@ -36,7 +76,7 @@ def main(frame):
         warped_img = pre_module.warp_perspect(adaptive_binary)
         # cv2.imshow('warped_img', warped_img)	
 
-        edge = canny(warped_img, 70, 210, show=True)
+        edge = canny(warped_img, 70, 210, show=False)
 
         kernel_close = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(13,13))
         kernel_erosion = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(5,5))
@@ -45,12 +85,31 @@ def main(frame):
         # cv2.imshow('closing', closing)	# 프레임 보여주기
 
         edge_to_closing = cv2.morphologyEx(edge, cv2.MORPH_CLOSE,kernel_close)
-        cv2.imshow('edge_to_closing', edge_to_closing)	# 프레임 보여주기
+        #cv2.imshow('edge_to_closing', edge_to_closing)	# 프레임 보여주기
 
         msk, lx, ly, mx, my, rx, ry = pre_module.sliding_window(edge_to_closing)
 
         filtered_lx, filtered_ly, filtered_mx, filtered_my, filtered_rx, filtered_ry = pre_module.filtering_lane(msk, lx, ly, mx, my, rx, ry)
         pre_module.drawing_lane(msk, filtered_lx, filtered_ly, filtered_mx, filtered_my, filtered_rx, filtered_ry)
+
+        target = simple_controller(filtered_lx, filtered_ly, filtered_mx, filtered_my, filtered_rx, filtered_ry)
+
+        target = LowPassFilter(0.3, prev_target, target)
+        prev_target = target
+        #print(f"filtered_target: {target}")
+
+        angle = (target - 320)
+        angle = map(angle, -100, 100, -50, 50)
+        angle = angle * 0.9
+        print(f"angle: {angle}")
+        ack_msg.speed = int(20)
+        ack_msg.angle = int(angle)
+
+        ack_publisher.publish(ack_msg)
+
+
+        cv2.circle(frame, (int(target), int(480-135)), 1, (120,0 ,255), 10)
+
         cv2.imshow("Lane Detection - Sliding Windows", msk)
         # erosion = cv2.erode(closing,kernel_erosion,iterations = 1)
 
@@ -286,19 +345,21 @@ def image_callback(msg):
     except CvBridgeError as e:
         print(e)
     else:
-        #main(cv_image)
+        main(cv_image)
         #cv2.imshow("Image window", cv_image)
         cv2.waitKey(1)
 
 def start():
+    global ack_publisher
     rospy.init_node('image_listener')
     image_topic = "/usb_cam/image_raw"
 
     rospy.Subscriber(image_topic, Image, image_callback)
-    #rospy.spin()
+    ack_publisher = rospy.Publisher('xycar_motor', xycar_motor, queue_size=1)
+    rospy.spin()
 
 
-    video_read('xycar_track2.mp4')
+    #video_read('xycar_track2.mp4')
 
 if __name__ == '__main__':
     start()
