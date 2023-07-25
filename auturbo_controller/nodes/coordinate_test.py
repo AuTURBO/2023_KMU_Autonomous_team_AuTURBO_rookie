@@ -2,15 +2,16 @@ import rospy
 from std_msgs.msg import Int32
 import math
 
+
 class PurePursuitNode:
     def __init__(self):
-        rospy.init_node('pure_pursuit_node', anonymous=True)
+        rospy.init_node("pure_pursuit_node", anonymous=True)
         rospy.Subscriber("xycar_angle", Int32, self.angle_callback, queue_size=10)
         self.pub_steering_angle = rospy.Publisher("steering_angle", Int32, queue_size=10)
-        
+
         # 경로 좌표를 설정합니다. (경로 좌표는 필요에 따라 변경 가능합니다)
         self.path_points = [(0, 0), (1, 1), (2, 3), (4, 6), (5, 7), (6, 8)]
-        
+
     def angle_callback(self, msg):
         current_angle = msg.data
         # Pure Pursuit 알고리즘을 구현합니다.
@@ -38,11 +39,11 @@ class PurePursuitNode:
         steering_msg = Int32()
         steering_msg.data = diff_angle
         self.pub_steering_angle.publish(steering_msg)
-    
+
     def find_closest_point(self, current_pose):
         # 경로 상에서 가장 가까운 지점을 계산합니다.
         closest_point = None
-        min_distance = float('inf')
+        min_distance = float("inf")
         for point in self.path_points:
             distance = self.calculate_distance(current_pose, point)
             if distance < min_distance:
@@ -86,10 +87,11 @@ class PurePursuitNode:
     def rad_to_degrees(self, rad):
         # 라디안을 각도로 변환합니다.
         return rad * 180.0 / math.pi
-    
+
     def run(self):
         rospy.spin()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     node = PurePursuitNode()
     node.run()
