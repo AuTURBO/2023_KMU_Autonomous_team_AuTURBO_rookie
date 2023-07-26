@@ -62,7 +62,10 @@ catkin_package(
 ## Install ##
 #############
 catkin_install_python(PROGRAMS
-  nodes/sub_val_pub_angle_node.py
+  nodes/pid.py
+  nodes/pursuit.py
+  nodes/stanley.py
+  
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

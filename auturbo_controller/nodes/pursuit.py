@@ -11,7 +11,7 @@ class PurePursuitNode:
         rospy.init_node("pure_pursuit_node", anonymous=True)
         rospy.Subscriber("xycar_angle", Int32, self.angle_callback, queue_size=10)
 
-        self.pub_steering_angle = rospy.Publisher("steering_angle", xycar_motor, queue_size=10)
+        self.pub_steering_angle = rospy.Publisher("xycar_cmd", xycar_motor, queue_size=10)
 
         # Tkinter 창 설정
         self.root = tk.Tk()
