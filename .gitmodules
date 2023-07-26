@@ -1,0 +1,3 @@
+[submodule "Imgang-labelImg-yolo"]
+	path = Imgang-labelImg-yolo
+	url = https://github.com/DrawingProcess/Imgang-labelImg-yolo
