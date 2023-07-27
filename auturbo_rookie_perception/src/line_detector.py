@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import rospy
-from std_msgs.msg import Int32
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 import cv2
@@ -18,7 +17,6 @@ ack_publisher = None
 steer_angle = Int32()
 steer_angle_publisher = None
 
-
 lane_bin_th = 120  # 145
 frameWidth = 0
 frameHeight = 0
@@ -33,9 +31,52 @@ roi_width = 640
 
 pre_module = PreProcessor(roi_height, roi_width)
 
-<<<<<<< HEAD
+
+def map(x, input_min, input_max, output_min, output_max):
+    return (x - input_min) * (output_max - output_min) / (
+        input_max - input_min
+    ) + output_min  # map()함수 정의.
+
+
+def LowPassFilter(alpha, prev, x):
+    """
+    (param) alpha : weight for previous estimation
+            prev : previous estimation
+            x : new data
+    (return) estimation
+    """
+    return alpha * prev + (1 - alpha) * x
+
+
+def simple_controller(lx, ly, mx, my, rx, ry):
+    target = 320
+    side_margin = 200
+
+    if lx != None and rx != None and len(lx) > 5 and len(rx) > 5:
+        # print("ALL!!!")
+        target = (lx[0] + rx[0]) // 2
+    elif mx != None and len(mx) > 3:
+        # print("Mid!!!")
+        target = mx[0]
+    elif lx != None and len(lx) > 3:
+        # print("Left!!!")
+        # print(f"val: {lx[0]}")
+        target = lx[0] + side_margin
+    elif rx != None and len(rx) > 3:
+        # print("Right!!!")
+        target = rx[0] - side_margin
+
+    print(f"target: {target}")
+    return int(target)
+
 
 def main(frame):
+    global ack_publisher
+    global steer_angle_publisher
+
+    global steer_angle
+
+    prev_target = 320
     frameRate = 11  # 33
 
     gblur_img = cv2.GaussianBlur(frame, (3, 3), sigmaX=0, sigmaY=0)
@@ -50,62 +91,18 @@ def main(frame):
     warped_img = pre_module.warp_perspect(adaptive_binary)
     # cv2.imshow('warped_img', warped_img)
 
-    edge = canny(warped_img, 70, 210, show=True)
+    edge = canny(warped_img, 70, 210, show=False)
 
     kernel_close = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (13, 13))
     kernel_erosion = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
 
     closing = cv2.morphologyEx(warped_img, cv2.MORPH_CLOSE, kernel_close)
     # cv2.imshow('closing', closing)	# 프레임 보여주기
-=======
-def map(x,input_min,input_max,output_min,output_max):
-    return (x-input_min)*(output_max-output_min)/(input_max-input_min)+output_min #map()함수 정의.
-
-def LowPassFilter(alpha, prev, x):
-    """
-    (param) alpha : weight for previous estimation
-            prev : previous estimation
-            x : new data
-    (return) estimation
-    """
-    return alpha * prev + (1 - alpha) * x
-
-def simple_controller(lx, ly, mx, my, rx, ry):
-    target = 320
-    side_margin = 200
-
-    if lx != None and rx != None and len(lx) > 5 and len(rx) > 5:
-        # print("ALL!!!")
-        target = (lx[0] + rx[0]) // 2
-    elif mx != None and len(mx) > 3:
-        # print("Mid!!!")
-        target = mx[0]
-    elif lx != None and len(lx) > 3:
-        # print("Left!!!")
-        #print(f"val: {lx[0]}")
-        target = lx[0] + side_margin
-    elif rx != None and len(rx) > 3:
-        # print("Right!!!")
-        target = rx[0] - side_margin
-
-    print(f"target: {target}")
-    return int(target)
-
-def main(frame):
-        global ack_publisher
-        global steer_angle_publisher
-
-        global steer_angle
-
-        prev_target = 320
-        frameRate = 11 #33
->>>>>>> origin/feature/first_1
 
     edge_to_closing = cv2.morphologyEx(edge, cv2.MORPH_CLOSE, kernel_close)
-    cv2.imshow("edge_to_closing", edge_to_closing)  # 프레임 보여주기
+    # cv2.imshow('edge_to_closing', edge_to_closing)	# 프레임 보여주기
 
     msk, lx, ly, mx, my, rx, ry = pre_module.sliding_window(edge_to_closing)
-    # filtered_lx[], filtered_ly[], filtered_mx[], filtered_my[], filtered_rx[], filtered_ry[]
 
     (
         filtered_lx,
@@ -115,75 +112,39 @@ def main(frame):
         filtered_rx,
         filtered_ry,
     ) = pre_module.filtering_lane(msk, lx, ly, mx, my, rx, ry)
-
-<<<<<<< HEAD
-    flag = pre_module.drawing_lane(
+    pre_module.drawing_lane(
         msk, filtered_lx, filtered_ly, filtered_mx, filtered_my, filtered_rx, filtered_ry
     )
-    if flag:
-        pub = rospy.Publisher("xycar_angle", Int32, queue_size=10)
-        # 인식된 차선의 중앙값을 계산
-        centor = pre_module.m_left + pre_module.m_right / 2
-        # 차선 중앙값과 이미지 중앙값의 차이를 계산
-        # 0~640 -> -320 ~ 320 -> -15 ~ 15
-=======
-        edge = canny(warped_img, 70, 210, show=False)
->>>>>>> origin/feature/first_1
 
-        diff = 320 - centor
-        # 차선 중앙값과 이미지 중앙값의 차이를 통해 조향각을 계산
-        # 정규화 과정 -15 ~ 15
-        angle = diff / 320 * 15
-        print("angle", angle)
-        # 조향각을 퍼블리시
-        msg = Int32()
-        msg.data = int(angle)
+    target = simple_controller(
+        filtered_lx, filtered_ly, filtered_mx, filtered_my, filtered_rx, filtered_ry
+    )
 
-        pub.publish(msg)
+    target = LowPassFilter(0.3, prev_target, target)
+    prev_target = target
+    # print(f"filtered_target: {target}")
 
-<<<<<<< HEAD
-        # print("left", pre_module.m_left, "right", pre_module.m_right)
+    angle = target - 320
+    angle = map(angle, -100, 100, -50, 50)
+    angle = angle * 0.9
+    print(f"angle: {angle}")
+    ack_msg.speed = int(20)
+    ack_msg.angle = int(angle)
+
+    # ack_publisher.publish(ack_msg)
+
+    steer_angle.data = int(angle)
+
+    steer_angle_publisher.publish(steer_angle)
+
+    cv2.circle(frame, (int(target), int(480 - 135)), 1, (120, 0, 255), 10)
+
     cv2.imshow("Lane Detection - Sliding Windows", msk)
     # erosion = cv2.erode(closing,kernel_erosion,iterations = 1)
-=======
-        edge_to_closing = cv2.morphologyEx(edge, cv2.MORPH_CLOSE,kernel_close)
-        #cv2.imshow('edge_to_closing', edge_to_closing)	# 프레임 보여주기
->>>>>>> origin/feature/first_1
 
     # opeing = cv2.morphologyEx(closing, cv2.MORPH_OPEN,kernel_erosion)
 
-<<<<<<< HEAD
     cv2.imshow("frame", frame)  # 프레임 보여주기
-=======
-        filtered_lx, filtered_ly, filtered_mx, filtered_my, filtered_rx, filtered_ry = pre_module.filtering_lane(msk, lx, ly, mx, my, rx, ry)
-        pre_module.drawing_lane(msk, filtered_lx, filtered_ly, filtered_mx, filtered_my, filtered_rx, filtered_ry)
-
-        target = simple_controller(filtered_lx, filtered_ly, filtered_mx, filtered_my, filtered_rx, filtered_ry)
-
-        target = LowPassFilter(0.3, prev_target, target)
-        prev_target = target
-        #print(f"filtered_target: {target}")
-
-        angle = (target - 320)
-        angle = map(angle, -100, 100, -50, 50)
-        angle = angle * 0.9
-        print(f"angle: {angle}")
-        ack_msg.speed = int(20)
-        ack_msg.angle = int(angle)
-
-        #ack_publisher.publish(ack_msg)
-
-        steer_angle.data = int(angle)
-
-
-        steer_angle_publisher.publish(steer_angle)
-
-
-        cv2.circle(frame, (int(target), int(480-135)), 1, (120,0 ,255), 10)
-
-        cv2.imshow("Lane Detection - Sliding Windows", msk)
-        # erosion = cv2.erode(closing,kernel_erosion,iterations = 1)
->>>>>>> origin/feature/first_1
 
     key = cv2.waitKey(frameRate)  # frameRate msec동안 한 프레임을 보여준다
 
@@ -432,36 +393,23 @@ def image_callback(msg):
     except CvBridgeError as e:
         print(e)
     else:
-<<<<<<< HEAD
-        # main(cv_image)
-        # cv2.imshow("Image window", cv_image)
-=======
         main(cv_image)
-        #cv2.imshow("Image window", cv_image)
->>>>>>> origin/feature/first_1
+        # cv2.imshow("Image window", cv_image)
         cv2.waitKey(1)
 
 
 def start():
-<<<<<<< HEAD
+    global ack_publisher
+    global steer_angle_publisher
     rospy.init_node("image_listener")
     image_topic = "/usb_cam/image_raw"
 
     rospy.Subscriber(image_topic, Image, image_callback)
-=======
-    global ack_publisher
-    global steer_angle_publisher
-    rospy.init_node('image_listener')
-    image_topic = "/usb_cam/image_raw"
-
-    rospy.Subscriber(image_topic, Image, image_callback)
-    ack_publisher = rospy.Publisher('xycar_motor', xycar_motor, queue_size=1)
-    steer_angle_publisher = rospy.Publisher('xycar_angle', Int32, queue_size=1)
-    #rospy.spin()
->>>>>>> origin/feature/first_1
+    ack_publisher = rospy.Publisher("xycar_motor", xycar_motor, queue_size=1)
+    steer_angle_publisher = rospy.Publisher("xycar_angle", Int32, queue_size=1)
+    # rospy.spin()
 
     video_read("xycar_track2.mp4")
-    # rospy.spin()
 
 
 if __name__ == "__main__":
