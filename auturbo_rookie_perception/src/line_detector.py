@@ -9,10 +9,13 @@ import numpy as np
 from matplotlib import pyplot as plt
 from preprocessor import PreProcessor
 from xycar_msgs.msg import xycar_motor
+from std_msgs.msg import Int32
 
 ack_msg = xycar_motor()
 ack_publisher = None
 
+steer_angle = Int32()
+steer_angle_publisher = None
 
 lane_bin_th = 120 #145
 frameWidth = 0
@@ -53,7 +56,7 @@ def simple_controller(lx, ly, mx, my, rx, ry):
     elif lx != None and len(lx) > 3:
         # print("Left!!!")
         #print(f"val: {lx[0]}")
-        target = lx[0] +side_margin
+        target = lx[0] + side_margin
     elif rx != None and len(rx) > 3:
         # print("Right!!!")
         target = rx[0] - side_margin
@@ -63,6 +66,10 @@ def simple_controller(lx, ly, mx, my, rx, ry):
 
 def main(frame):
         global ack_publisher
+        global steer_angle_publisher
+
+        global steer_angle
+
         prev_target = 320
         frameRate = 11 #33
 
@@ -105,7 +112,12 @@ def main(frame):
         ack_msg.speed = int(20)
         ack_msg.angle = int(angle)
 
-        ack_publisher.publish(ack_msg)
+        #ack_publisher.publish(ack_msg)
+
+        steer_angle.data = int(angle)
+
+
+        steer_angle_publisher.publish(steer_angle)
 
 
         cv2.circle(frame, (int(target), int(480-135)), 1, (120,0 ,255), 10)
@@ -351,15 +363,17 @@ def image_callback(msg):
 
 def start():
     global ack_publisher
+    global steer_angle_publisher
     rospy.init_node('image_listener')
     image_topic = "/usb_cam/image_raw"
 
     rospy.Subscriber(image_topic, Image, image_callback)
     ack_publisher = rospy.Publisher('xycar_motor', xycar_motor, queue_size=1)
-    rospy.spin()
+    steer_angle_publisher = rospy.Publisher('xycar_angle', Int32, queue_size=1)
+    #rospy.spin()
 
 
-    #video_read('xycar_track2.mp4')
+    video_read('xycar_track2.mp4')
 
 if __name__ == '__main__':
     start()
