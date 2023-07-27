@@ -18,11 +18,6 @@ class PidNode:
         # prev_error : 이전 오차값
         self.prev_error = 0
         self.sum_error = 0
-
-        # Tkinter 창 설정
-        self.root = tk.Tk()
-        self.root.title("Yaw Value Simulator")
-
         self.diff_angle = 0
 
     previous_angle = 0
