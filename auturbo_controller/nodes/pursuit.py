@@ -11,7 +11,7 @@ class PurePursuitNode:
         rospy.init_node("pure_pursuit_node", anonymous=True)
         rospy.Subscriber("xycar_angle", Int32, self.angle_callback, queue_size=10)
 
-        self.pub_steering_angle = rospy.Publisher("xycar_cmd", xycar_motor, queue_size=10)
+        self.pub_steering_angle = rospy.Publisher("xycar_motor", xycar_motor, queue_size=10)
 
         # Tkinter 창 설정
         self.root = tk.Tk()
@@ -72,7 +72,7 @@ class PurePursuitNode:
         # 계산된 조향각을 메시지에 담아 발행합니다.
         xycar_motor_msg = xycar_motor()
         xycar_motor_msg.angle = int(delta)
-
+        xycar_motor_msg.speed = 4
         self.pub_steering_angle.publish(xycar_motor_msg)
 
         print("steering_msg.data: ", xycar_motor_msg.angle)
