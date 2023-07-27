@@ -25,7 +25,11 @@ class PurePursuitNode:
         self.canvas.pack()
 
         # 이미지 로드
+<<<<<<< HEAD
         self.car_image = Image.open("car.png")
+=======
+        self.car_image = Image.open("./car.png")
+>>>>>>> origin/feature/first_1
         self.car_photo = ImageTk.PhotoImage(self.car_image)
 
         # 이미지 초기 위치
@@ -56,7 +60,11 @@ class PurePursuitNode:
         # 여기에 Pure Pursuit 알고리즘을 구현합니다.
         # 현재 조향각인 current_angle과 목표값(0으로 가정)을 이용하여 알고리즘을 적용합니다.
         # 다음 줄을 알고리즘에 맞게 수정해주세요.
+<<<<<<< HEAD
         target_angle = -5  # 여기에 Pure Pursuit 알고리즘을 적용하여 목표 조향각을 계산합니다.
+=======
+        target_angle = 0 #-5  # 여기에 Pure Pursuit 알고리즘을 적용하여 목표 조향각을 계산합니다.
+>>>>>>> origin/feature/first_1
 
         # 현재 조향각과 목표 조향각과의 차이를 계산합니다.
         self.diff_angle = target_angle - current_angle
@@ -86,7 +94,12 @@ class PurePursuitNode:
             # 캔버스 클리어
             self.canvas.delete("all")
             # 차량 이미지 그리기
+<<<<<<< HEAD
             self.draw_car(self.car_x, self.car_y, -1 * xycar_motor_msg.angle)
+=======
+            self.draw_car(self.car_x, self.car_y, 1 * xycar_motor_msg.angle)
+            # self.draw_car(self.car_x, self.car_y, -1 * xycar_motor_msg.angle)
+>>>>>>> origin/feature/first_1
 
         # 경로 그리기
         # 경로를 그리는 로직을 추가하세요.
