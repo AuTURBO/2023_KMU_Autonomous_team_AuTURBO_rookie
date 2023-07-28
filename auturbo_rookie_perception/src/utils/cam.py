@@ -55,6 +55,8 @@ while True:
     if not (retval):  # 프레임정보를 정상적으로 읽지 못하면
         break  # while문을 빠져나가기
 
+    frame = cv2.resize(frame, dsize=(640, 480), interpolation=cv2.INTER_AREA)
+
     h, w = frame.shape[:2]
     newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (w, h), 0)
     ## mtx = getOptimalNewCameraMatrix parameter alpha

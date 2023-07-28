@@ -86,5 +86,5 @@ for fname in images:
         #cv2.imshow('num1', dst)
         cv2.imshow('num2', dst2)
 
-        cv2.waitKey(0)
+        #cv2.waitKey(0)
 cv2.destroyAllWindows()

@@ -2,9 +2,9 @@
 
 <launch>
 
-  <include file="$(find usb_cam)/launch/xycar_cam.launch" />
+  <!-- <include file="$(find usb_cam)/launch/xycar_cam.launch" /> -->
   <include file="$(find xycar_motor)/launch/xycar_motor.launch" />
-  <!-- <include file="$(find xycar_lidar)/launch/xycar_lidar.launch" /> -->
+  <include file="$(find xycar_lidar)/launch/xycar_lidar.launch" />
 
  <node type="rviz" name="rviz" pkg="rviz" args="-d $(find auturbo_rookie_bringup)/rviz/config_file.rviz"/>
  

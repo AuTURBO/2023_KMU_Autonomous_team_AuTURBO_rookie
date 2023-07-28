@@ -91,7 +91,7 @@ class PreProcessor:
 
         roi = img[280 : (280 + self.roi_height - 50), 0 : self.roi_width]  # ROI 적용
 
-        # cv2.imshow("roi", roi)
+        cv2.imshow("roi", roi)
 
         warped_img = cv2.warpPerspective(
             roi, M, (self.roi_width, self.roi_height - 50), flags=cv2.INTER_LINEAR
@@ -135,12 +135,12 @@ class PreProcessor:
 
     def hist_line_peak(self, img):
         # print(img.shape)
-        histogram = np.sum(img[130:, :], axis=0)  # X축 히스토그램 계산
+        histogram = np.sum(img[90:, :], axis=0)  # X축 히스토그램 계산
         # print(histogram.shape)
         midpoint = np.int(histogram.shape[0] / 2)  # 중앙점 계산
         # print(f"midpoint: {midpoint}")
-        hist_find_margin = 70
-        mid_hist_find_margin = 40
+        hist_find_margin = 60
+        mid_hist_find_margin = 5
 
         left_hist_result = np.argmax(
             histogram[: midpoint - hist_find_margin]
@@ -171,7 +171,7 @@ class PreProcessor:
         right_base = right_hist_result
         left_base = left_hist_result
         mid_base = mid_hist_result
-        # print(left_base, right_base)
+        print(left_base, right_base)
         return left_base, mid_base, right_base
 
     # =============================================
@@ -192,15 +192,15 @@ class PreProcessor:
         )  # hist_line_peak 함수로 슬라이딩 윈도우의 초기 탐색점 결정
 
         # Sliding Window
-        y = 130  # 탐색 시작 Y좌표 결정
+        y = 120  # 탐색 시작 Y좌표 결정
         lx = []  # 왼쪽 차선 X좌표 저장 리스트
         ly = []  # 왼쪽 차선 Y좌표 저장 리스트
         rx = []  # 오른쪽 차선 X좌표 저장 리스트
         ry = []  # 오른쪽 차선 Y좌표 저장 리스트
         mx = []  # 중간 차선 X좌표 저장 리스트
         my = []  # 중간 차선 Y좌표 저장 리스트
-        self.window_width = 15  # window 폭
-        self.window_height = 5  # window 높이
+        self.window_width = 35  # window 폭
+        self.window_height = 3  # window 높이
         self.left_window_n = 0
         self.right_window_n = 0
         self.mid_window_n = 0
@@ -209,7 +209,7 @@ class PreProcessor:
         msk = cv2.cvtColor(msk, cv2.COLOR_GRAY2BGR)  # 컬러 표시를 위해 색공간을 Gray에서 BGR로 변환
 
         while y > 0:  # window가 이미지 상단에 도달할때까지 반복
-            if self.left_window_n < 20:  # 왼쪽 차선 검출을 위한 window를 5개까지만 허용
+            if self.left_window_n < 25:  # 왼쪽 차선 검출을 위한 window를 5개까지만 허용
                 window = img[
                     y - self.window_height : y,
                     left_base - self.window_width : left_base + self.window_width,
@@ -238,7 +238,7 @@ class PreProcessor:
                         1,
                     )
 
-                if line_detect_fail_count_left < 5:  # 차선 검출 실패 카운트가 5 이하일떄 차선으로 판단
+                if line_detect_fail_count_left < 10:  # 차선 검출 실패 카운트가 5 이하일떄 차선으로 판단
                     cv2.circle(
                         msk,
                         (left_base - self.window_width, y - (self.window_height // 2)),
@@ -273,7 +273,7 @@ class PreProcessor:
                     # print("Left line No")
                     self.left_line_detect_flag = False  # 왼쪽 차선 검출 성공 플래그 False로 세팅
 
-            if self.mid_window_n < 20:  # 왼쪽 차선 검출을 위한 window를 5개까지만 허용
+            if self.mid_window_n < 0:  # 중앙 차선 검출을 위한 window를 5개까지만 허용
                 window = img[
                     y - self.window_height : y,
                     mid_base - self.window_width : mid_base + self.window_width,
@@ -333,7 +333,7 @@ class PreProcessor:
                             self.mid_line_detect_flag = True  # 차선 검출 성공 플래그 True로 세팅
                             self.mid_window_n += 1  # 왼쪽 윈도우 개수 증가
 
-            if self.right_window_n < 20:  # 오른쪽 차선 검출을 위한 window를 5개까지만 허용
+            if self.right_window_n < 25:  # 오른쪽 차선 검출을 위한 window를 5개까지만 허용
                 window = img[
                     y - self.window_height : y,
                     right_base - self.window_width : right_base + self.window_width,
@@ -362,7 +362,7 @@ class PreProcessor:
                         1,
                     )
 
-                if line_detect_fail_count_right < 5:  # 차선 검출 실패 카운트가 5 이하일떄 차선으로 판단
+                if line_detect_fail_count_right < 10:  # 차선 검출 실패 카운트가 5 이하일떄 차선으로 판단
                     cv2.circle(
                         msk,
                         (right_base - self.window_width, y - (self.window_height // 2)),
@@ -413,7 +413,7 @@ class PreProcessor:
         filtered_mx = []  # 필터링된 중간 차선 X좌표 저장 리스트
         filtered_my = []  # 필터링된 중간 차선 Y좌표 저장 리스트
 
-        threshold_mid_lane_select = 15
+        threshold_mid_lane_select = 5
 
         for i in range(len(lx)):
             cx = lx[i]  # int(LowPassFilter(0.95, self.prev_x_left, lx[i]))

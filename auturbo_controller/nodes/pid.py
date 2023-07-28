@@ -1,7 +1,5 @@
-import tkinter as tk
 from std_msgs.msg import Int32
 import rospy
-from PIL import Image, ImageTk
 import math
 from xycar_msgs.msg import xycar_motor
 
@@ -11,48 +9,16 @@ class PidNode:
         rospy.init_node("pid_node", anonymous=True)
         rospy.Subscriber("xycar_angle", Int32, self.angle_callback, queue_size=10)
 
-        self.pub_steering_angle = rospy.Publisher("xycar_cmd", xycar_motor, queue_size=10)
+        self.pub_steering_angle = rospy.Publisher("xycar_motor", xycar_motor, queue_size=10)
 
-        self.Kp = 0.5
-        self.Ki = 0.01
-        self.Kd = 0.01
+        self.Kp = 0.7
+        self.Ki = 0.0
+        self.Kd = 0.0
 
         # prev_error : 이전 오차값
         self.prev_error = 0
         self.sum_error = 0
-
-        # Tkinter 창 설정
-        self.root = tk.Tk()
-        self.root.title("Yaw Value Simulator")
-
-        # 캔버스 생성
-        self.canvas = tk.Canvas(self.root, width=800, height=600)
-        self.canvas.pack()
-
-        # 이미지 로드
-        self.car_image = Image.open("car.png")
-        self.car_photo = ImageTk.PhotoImage(self.car_image)
-
-        # 이미지 초기 위치
-        self.car_x, self.car_y = 400, 300
-
-        # 라벨을 위한 변수와 라벨 생성
         self.diff_angle = 0
-        self.label = tk.Label(self.root, text="Yaw Value: {}".format(self.diff_angle))
-        self.label.pack(pady=10)
-
-    def draw_car(self, x, y, angle):
-        # 이미지 회전을 위해 이미지 복사
-        rotated_image = self.car_image.copy()
-        rotated_image = rotated_image.rotate(angle)
-
-        # 이미지 크기 조정
-        size = (rotated_image.width // 2, rotated_image.height // 2)
-        rotated_image.thumbnail(size, Image.LANCZOS)
-
-        # 이미지 업데이트
-        self.car_photo = ImageTk.PhotoImage(rotated_image)
-        self.canvas.create_image(x, y, image=self.car_photo)
 
     previous_angle = 0
 
@@ -80,24 +46,7 @@ class PidNode:
 
         print("steering_msg.data: ", xycar_motor_msg.angle)
 
-        # 라벨 업데이트
-        # 이전 값과 받은 값이 다를 시 업데이트
-        if self.previous_angle != xycar_motor_msg.angle:
-            self.label.config(text="Yaw Value: {}".format(xycar_motor_msg.angle))
-            self.previous_angle = xycar_motor_msg.angle
-
-            # 캔버스 클리어
-            self.canvas.delete("all")
-            # 차량 이미지 그리기
-            self.draw_car(self.car_x, self.car_y, -1 * xycar_motor_msg.angle)
-
-        # 경로 그리기
-        # 경로를 그리는 로직을 추가하세요.
-
-    def run(self):
-        self.root.mainloop()
-
 
 if __name__ == "__main__":
     node = PidNode()
-    node.run()
+    rospy.spin()
