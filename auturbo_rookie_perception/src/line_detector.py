@@ -19,7 +19,7 @@ ack_publisher = None
 steer_angle = Int32()
 steer_angle_publisher = None
 
-lane_bin_th = 120 #145
+lane_bin_th = 120  # 145
 frameWidth = 0
 frameHeight = 0
 frame = None
@@ -45,6 +45,7 @@ def LowPassFilter(alpha, prev, x):
     """
     return alpha * prev + (1 - alpha) * x
 
+
 def simple_controller(lx, ly, mx, my, rx, ry):
     target = 320
     side_margin = 140
@@ -66,83 +67,81 @@ def simple_controller(lx, ly, mx, my, rx, ry):
     print(f"target: {target}")
     return int(target)
 
+
 def main(frame):
-        global ack_publisher
-        global steer_angle_publisher
+    global ack_publisher
+    global steer_angle_publisher
 
-        global steer_angle
+    global steer_angle
 
-        prev_target = 320
-        frameRate = 11 #33
+    prev_target = 320
+    frameRate = 11 #33
 
-        frame = undistort.undistort_func(frame)
+    frame = undistort.undistort_func(frame)
 
-        #cv2.imshow("Undistort", frame)
+    #cv2.imshow("Undistort", frame)
 
-        gblur_img  = cv2.GaussianBlur(frame, (3, 3), sigmaX = 0, sigmaY = 0)
-        #cv2.imshow("gblur_img", gblur_img)
+    gblur_img  = cv2.GaussianBlur(frame, (3, 3), sigmaX = 0, sigmaY = 0)
+    #cv2.imshow("gblur_img", gblur_img)
 
-        gray = cv2.cvtColor(gblur_img, cv2.COLOR_BGR2GRAY)
-        adaptive_binary = threshold_binary(gray, lane_bin_th, "adaptive", window_name="adaptive_binary", show=False)
-        #cv2.imshow("adaptive_binary", adaptive_binary)
+    gray = cv2.cvtColor(gblur_img, cv2.COLOR_BGR2GRAY)
+    adaptive_binary = threshold_binary(gray, lane_bin_th, "adaptive", window_name="adaptive_binary", show=False)
+    #cv2.imshow("adaptive_binary", adaptive_binary)
 
-        warped_img = pre_module.warp_perspect(adaptive_binary)
-        # cv2.imshow('warped_img', warped_img)	
+    warped_img = pre_module.warp_perspect(adaptive_binary)
+    # cv2.imshow('warped_img', warped_img)	
 
-        edge = canny(warped_img, 70, 210, show=False)
+    edge = canny(warped_img, 70, 210, show=False)
 
-        kernel_close = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(13,13))
-        kernel_erosion = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(5,5))
+    kernel_close = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(13,13))
+    kernel_erosion = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(5,5))
 
-        closing = cv2.morphologyEx(warped_img, cv2.MORPH_CLOSE,kernel_close)
-        # cv2.imshow('closing', closing)	# 프레임 보여주기
+    closing = cv2.morphologyEx(warped_img, cv2.MORPH_CLOSE,kernel_close)
+    # cv2.imshow('closing', closing)	# 프레임 보여주기
 
-        edge_to_closing = cv2.morphologyEx(edge, cv2.MORPH_CLOSE,kernel_close)
-        #cv2.imshow('edge_to_closing', edge_to_closing)	# 프레임 보여주기
+    edge_to_closing = cv2.morphologyEx(edge, cv2.MORPH_CLOSE,kernel_close)
+    #cv2.imshow('edge_to_closing', edge_to_closing)	# 프레임 보여주기
 
-        edge_to_closing = cv2.medianBlur(edge_to_closing,5)
+    edge_to_closing = cv2.medianBlur(edge_to_closing,5)
 
-        msk, lx, ly, mx, my, rx, ry = pre_module.sliding_window(edge_to_closing)
+    msk, lx, ly, mx, my, rx, ry = pre_module.sliding_window(edge_to_closing)
 
-        filtered_lx, filtered_ly, filtered_mx, filtered_my, filtered_rx, filtered_ry = pre_module.filtering_lane(msk, lx, ly, mx, my, rx, ry)
-        pre_module.drawing_lane(msk, filtered_lx, filtered_ly, filtered_mx, filtered_my, filtered_rx, filtered_ry)
+    filtered_lx, filtered_ly, filtered_mx, filtered_my, filtered_rx, filtered_ry = pre_module.filtering_lane(msk, lx, ly, mx, my, rx, ry)
+    pre_module.drawing_lane(msk, filtered_lx, filtered_ly, filtered_mx, filtered_my, filtered_rx, filtered_ry)
 
-        target = simple_controller(filtered_lx, filtered_ly, filtered_mx, filtered_my, filtered_rx, filtered_ry)
+    target = simple_controller(filtered_lx, filtered_ly, filtered_mx, filtered_my, filtered_rx, filtered_ry)
 
-        #target = LowPassFilter(0.9, prev_target, target)
-        prev_target = target
-        #print(f"filtered_target: {target}")
+    #target = LowPassFilter(0.9, prev_target, target)
+    prev_target = target
+    #print(f"filtered_target: {target}")
 
-        angle = (target - 320)
-        angle = map(angle, -100, 100, -50, 50)
-        angle = angle * 0.9
-        print(f"angle: {angle}")
-        ack_msg.speed = int(20)
-        ack_msg.angle = int(angle)
+    angle = target - 320
+    angle = map(angle, -100, 100, -50, 50)
+    angle = angle * 0.9
+    print(f"angle: {angle}")
+    ack_msg.speed = int(20)
+    ack_msg.angle = int(angle)
 
-        #ack_publisher.publish(ack_msg)
+    # ack_publisher.publish(ack_msg)
 
-        steer_angle.data = int(angle)
+    steer_angle.data = int(angle)
 
+    steer_angle_publisher.publish(steer_angle)
 
-        steer_angle_publisher.publish(steer_angle)
+    cv2.circle(frame, (int(target), int(480 - 135)), 1, (120, 0, 255), 10)
 
+    cv2.imshow("Lane Detection - Sliding Windows", msk)
+    # erosion = cv2.erode(closing,kernel_erosion,iterations = 1)
 
-        cv2.circle(frame, (int(target), int(480-135)), 1, (120,0 ,255), 10)
+    # opeing = cv2.morphologyEx(closing, cv2.MORPH_OPEN,kernel_erosion)
 
-        cv2.imshow("Lane Detection - Sliding Windows", msk)
-        # erosion = cv2.erode(closing,kernel_erosion,iterations = 1)
+    cv2.imshow('frame', frame)	# 프레임 보여주기
 
-        # opeing = cv2.morphologyEx(closing, cv2.MORPH_OPEN,kernel_erosion)
-
-
-        cv2.imshow('frame', frame)	# 프레임 보여주기
- 
-        key = cv2.waitKey(frameRate)  # frameRate msec동안 한 프레임을 보여준다
-        
-        # 키 입력을 받으면 키값을 key로 저장 -> esc == 27(아스키코드)
-        if key == 27:
-            exit(0)
+    key = cv2.waitKey(frameRate)  # frameRate msec동안 한 프레임을 보여준다
+    
+    # 키 입력을 받으면 키값을 key로 저장 -> esc == 27(아스키코드)
+    if key == 27:
+        exit(0)
 
 def video_read(fname):
     global frameWidth, frameHeight
@@ -372,7 +371,7 @@ def image_callback(msg):
 def start():
     global ack_publisher
     global steer_angle_publisher
-    rospy.init_node('image_listener')
+    rospy.init_node("image_listener")
     image_topic = "/usb_cam/image_raw"
 
     rospy.Subscriber(image_topic, Image, image_callback)

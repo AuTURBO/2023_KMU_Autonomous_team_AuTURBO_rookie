@@ -44,8 +44,6 @@ class PreProcessor:
         self.left_window_n = 0
         self.right_window_n = 0
         self.mid_window_n = 0
-        self.m_left = 0
-        self.m_right = 0
 
     # =============================================
     # Bird Eye View 변환 함수
@@ -421,7 +419,7 @@ class PreProcessor:
             filtered_lx.append(cx)
 
         if len(lx) < threshold_mid_lane_select:
-            # print("Left Lane Error")
+            print("Left Lane Error")
             filtered_lx = None
             filtered_ly = None
 
@@ -431,15 +429,13 @@ class PreProcessor:
             filtered_rx.append(cx)
 
         if len(rx) < threshold_mid_lane_select:
-            # print("Right Lane Error")
+            print("Right Lane Error")
             filtered_rx = None
             filtered_ry = None
 
         return filtered_lx, ly, mx, my, filtered_rx, ry
 
     def drawing_lane(self, msk, lx, ly, mx, my, rx, ry):
-        mean_left = []
-        mean_right = []
         if lx != None:
             for i in range(len(lx)):
                 cv2.rectangle(
@@ -449,7 +445,6 @@ class PreProcessor:
                     (255, 0, 0),
                     1,
                 )
-                mean_left.append(lx[i])
         if rx != None:
             for k in range(len(rx)):
                 cv2.rectangle(
@@ -459,7 +454,6 @@ class PreProcessor:
                     (0, 255, 0),
                     1,
                 )
-                mean_right.append(rx[k])
         if mx != None:
             for j in range(len(mx)):
                 cv2.rectangle(
@@ -469,13 +463,6 @@ class PreProcessor:
                     (0, 0, 255),
                     1,
                 )
-        if len(mean_left) != 0 and len(mean_right) != 0:
-            self.m_left = np.mean(mean_left)
-            self.m_right = np.mean(mean_right)
-
-            return True
-
-        return False
 
     # =============================================
     # 검출된 차선을 화면에 표시

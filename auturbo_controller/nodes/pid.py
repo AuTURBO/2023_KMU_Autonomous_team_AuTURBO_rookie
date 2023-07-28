@@ -49,4 +49,8 @@ class PidNode:
 
 if __name__ == "__main__":
     node = PidNode()
+<<<<<<< HEAD
     rospy.spin()
+=======
+    rospy.spin()
+>>>>>>> 57151630f8978dde67b7a4cae64e1a49d1cd3000
