@@ -6,15 +6,15 @@ from cv_bridge import CvBridge
 import cv2
 import os
 import numpy as np
-from matplotlib import pyplot as plt
+#from matplotlib import pyplot as plt
 from preprocessor import PreProcessor
-from xycar_msgs.msg import xycar_motor
+#from xycar_msgs.msg import xycar_motor
 from std_msgs.msg import Int32
 
 from utils import undistort
 
-ack_msg = xycar_motor()
-ack_publisher = None
+#ack_msg = xycar_motor()
+#ack_publisher = None
 
 steer_angle = Int32()
 steer_angle_publisher = None
@@ -51,10 +51,10 @@ def simple_controller(lx, ly, mx, my, rx, ry):
     side_margin = 140
 
     if lx != None and rx != None and len(lx) > 5 and len(rx) > 5:
-        # print("ALL!!!")
+        print("ALL!!!")
         target = (lx[0] + rx[0]) // 2
     elif mx != None and len(mx) > 3:
-        # print("Mid!!!")
+        print("Mid!!!")
         target = mx[0]
     elif lx != None and len(lx) > 3:
         print("Right!!!")
@@ -118,9 +118,9 @@ def main(frame):
     angle = target - 320
     angle = map(angle, -100, 100, -50, 50)
     angle = angle * 0.9
-    print(f"angle: {angle}")
-    ack_msg.speed = int(20)
-    ack_msg.angle = int(angle)
+    #print(f"angle: {angle}")
+    #ack_msg.speed = int(20)
+    #ack_msg.angle = int(angle)
 
     # ack_publisher.publish(ack_msg)
 

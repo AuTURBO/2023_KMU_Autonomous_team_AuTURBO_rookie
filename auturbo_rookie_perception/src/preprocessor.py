@@ -5,7 +5,7 @@
 import numpy as np
 import cv2
 import os
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import queue
 
 
@@ -138,7 +138,7 @@ class PreProcessor:
         midpoint = np.int(histogram.shape[0] / 2)  # 중앙점 계산
         # print(f"midpoint: {midpoint}")
         hist_find_margin = 60
-        mid_hist_find_margin = 5
+        mid_hist_find_margin = 30
 
         left_hist_result = np.argmax(
             histogram[: midpoint - hist_find_margin]
@@ -169,7 +169,7 @@ class PreProcessor:
         right_base = right_hist_result
         left_base = left_hist_result
         mid_base = mid_hist_result
-        print(left_base, right_base)
+        #print(left_base, right_base)
         return left_base, mid_base, right_base
 
     # =============================================
@@ -197,7 +197,7 @@ class PreProcessor:
         ry = []  # 오른쪽 차선 Y좌표 저장 리스트
         mx = []  # 중간 차선 X좌표 저장 리스트
         my = []  # 중간 차선 Y좌표 저장 리스트
-        self.window_width = 35  # window 폭
+        self.window_width = 30  # window 폭
         self.window_height = 3  # window 높이
         self.left_window_n = 0
         self.right_window_n = 0
@@ -207,7 +207,7 @@ class PreProcessor:
         msk = cv2.cvtColor(msk, cv2.COLOR_GRAY2BGR)  # 컬러 표시를 위해 색공간을 Gray에서 BGR로 변환
 
         while y > 0:  # window가 이미지 상단에 도달할때까지 반복
-            if self.left_window_n < 25:  # 왼쪽 차선 검출을 위한 window를 5개까지만 허용
+            if self.left_window_n < 30:  # 왼쪽 차선 검출을 위한 window를 5개까지만 허용
                 window = img[
                     y - self.window_height : y,
                     left_base - self.window_width : left_base + self.window_width,
@@ -271,7 +271,7 @@ class PreProcessor:
                     # print("Left line No")
                     self.left_line_detect_flag = False  # 왼쪽 차선 검출 성공 플래그 False로 세팅
 
-            if self.mid_window_n < 0:  # 중앙 차선 검출을 위한 window를 5개까지만 허용
+            if self.mid_window_n < 10:  # 중앙 차선 검출을 위한 window를 5개까지만 허용
                 window = img[
                     y - self.window_height : y,
                     mid_base - self.window_width : mid_base + self.window_width,
@@ -331,7 +331,7 @@ class PreProcessor:
                             self.mid_line_detect_flag = True  # 차선 검출 성공 플래그 True로 세팅
                             self.mid_window_n += 1  # 왼쪽 윈도우 개수 증가
 
-            if self.right_window_n < 25:  # 오른쪽 차선 검출을 위한 window를 5개까지만 허용
+            if self.right_window_n < 30:  # 오른쪽 차선 검출을 위한 window를 5개까지만 허용
                 window = img[
                     y - self.window_height : y,
                     right_base - self.window_width : right_base + self.window_width,
@@ -411,14 +411,16 @@ class PreProcessor:
         filtered_mx = []  # 필터링된 중간 차선 X좌표 저장 리스트
         filtered_my = []  # 필터링된 중간 차선 Y좌표 저장 리스트
 
-        threshold_mid_lane_select = 5
+        threshold_side_lane_num_error = 25
+        threshold_mid_lane_num_error = 10
+        overlap_dist_threshold = 100
 
         for i in range(len(lx)):
             cx = lx[i]  # int(LowPassFilter(0.95, self.prev_x_left, lx[i]))
             self.prev_x_left = cx
             filtered_lx.append(cx)
 
-        if len(lx) < threshold_mid_lane_select:
+        if len(lx) < threshold_side_lane_num_error:
             print("Left Lane Error")
             filtered_lx = None
             filtered_ly = None
@@ -428,12 +430,31 @@ class PreProcessor:
             self.prev_x_right = cx
             filtered_rx.append(cx)
 
-        if len(rx) < threshold_mid_lane_select:
+        if len(rx) < threshold_side_lane_num_error:
             print("Right Lane Error")
             filtered_rx = None
             filtered_ry = None
 
-        return filtered_lx, ly, mx, my, filtered_rx, ry
+        for i in range(len(mx)):
+            cx = mx[i]  # int(LowPassFilter(0.95, self.prev_x_left, lx[i]))
+            #self.prev_x_left = cx
+            filtered_mx.append(cx)
+
+        if len(mx) > threshold_mid_lane_num_error:
+            print("Mid Lane Error")
+            filtered_mx = None
+            filtered_my = None
+
+        if len(mx) > 0 and len(lx) > 0:
+            overlap_dist = abs(mx[0] - lx[0])
+            print(f"abs: {overlap_dist}")
+            if overlap_dist < overlap_dist_threshold:
+                print("Mid Lane Overlap Error")
+                filtered_mx = None
+                #cv2.waitKey(0)
+                
+
+        return filtered_lx, ly, filtered_mx, my, filtered_rx, ry
 
     def drawing_lane(self, msk, lx, ly, mx, my, rx, ry):
         if lx != None:
