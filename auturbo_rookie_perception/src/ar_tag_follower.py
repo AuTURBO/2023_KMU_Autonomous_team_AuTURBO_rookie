@@ -25,7 +25,8 @@ def start():
     rospy.init_node('ar_tag_follwer')
 
     rate = rospy.Rate(10) # 10hz
-    target = 0.12
+    target = 0.43#0.12
+    ack_msg.speed = int(5)
     while not rospy.is_shutdown():
         markers_x_point_list = []
         # print(len(ar_tag_msg.markers))
@@ -37,14 +38,14 @@ def start():
         
         if len(markers_x_point_list) > 0:
             error = markers_x_point_list[0] - target
-            #print(f"error: {error}")
+            print(f"error: {error}")
             angle = error * 170 
             print(angle)
 
-            ack_msg.speed = int(5)
+            #ack_msg.speed = int(15)
             ack_msg.angle = int(angle)
 
-            ack_publisher.publish(ack_msg)
+        ack_publisher.publish(ack_msg)
 
         rate.sleep()
 

@@ -38,7 +38,7 @@ class PurePursuitNode:
         # 계산된 조향각을 메시지에 담아 발행합니다.
         xycar_motor_msg = xycar_motor()
         xycar_motor_msg.angle = int(-1*delta)
-        xycar_motor_msg.speed = 4
+        xycar_motor_msg.speed = 50
         self.pub_steering_angle.publish(xycar_motor_msg)
 
         print("xycar_angle: ", xycar_motor_msg.angle)

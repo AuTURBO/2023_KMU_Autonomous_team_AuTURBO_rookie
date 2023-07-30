@@ -147,7 +147,7 @@ def video_read(fname):
     global frameWidth, frameHeight
     global frame
 
-    path = '../video/'
+    path = '../video/'  
     filePath = os.path.join(path, fname)
     print(filePath)
 

@@ -536,5 +536,10 @@ class PreProcessor:
             cv2.polylines(
                 warped_img, np.int32([right_points]), isClosed=False, color=(0, 255, 0), thickness=5
             )
+            ploty = np.linspace(0, warped_img.shape[0] - 1, warped_img.shape[0])
+            left_lane_fitx = (
+                left_fit[0] * ploty**3
+                + left_fit[1] * ploty**2
+                + left_fit[2] * ploty
 
         return warped_img

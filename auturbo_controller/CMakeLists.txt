@@ -52,6 +52,7 @@ catkin_package(
   rospy 
   std_msgs
   xycar_msgs
+  sensor_msgs
 )
 
 ###########
@@ -65,6 +66,7 @@ catkin_install_python(PROGRAMS
   nodes/pid.py
   nodes/pursuit.py
   nodes/stanley.py
+  nodes/obstacle_detector.py
   
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
