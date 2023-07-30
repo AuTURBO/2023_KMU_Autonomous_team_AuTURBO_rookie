@@ -11,6 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   xycar_msgs
+  sensor_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -52,6 +53,7 @@ catkin_package(
   rospy 
   std_msgs
   xycar_msgs
+  sensor_msgs
 )
 
 ###########
@@ -65,6 +67,7 @@ catkin_install_python(PROGRAMS
   nodes/pid.py
   nodes/pursuit.py
   nodes/stanley.py
+  nodes/integration.py
   
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
