@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>auturbo_controller</name>
+  <name>auturbo_rookie_controller</name>
   <version>0.0.0</version>
-  <description>The auturbo_controller package</description>
+  <description>The auturbo_rookie_controller package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->
