@@ -1,0 +1,21 @@
+path: ./Imgang-labelImg-yolo/data_augment/
+
+train: # train images (relative to 'path')
+  - avante/train/images
+  - grandeur/train/images
+  - sonata/train/images
+  - real/train/images
+
+val: # valid images (relative to 'path')
+  - avante/valid/images
+  - grandeur/valid/images
+  - sonata/valid/images
+  - real/train/images
+
+# nc: 3
+# names: ['avante','grandeur','sonata']
+
+names:
+  0: grandeur
+  1: avante
+  2: sonata
