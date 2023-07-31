@@ -6,4 +6,20 @@
   <include file="$(find xycar_lidar)/launch/xycar_lidar.launch" />
  <node type="rviz" name="rviz" pkg="rviz" args="-d $(find auturbo_rookie_bringup)/rviz/config_file.rviz"/>
  
+  <!-- ar tag -->
+  <node name="ar_track_alvar" pkg="ar_track_alvar" type="individualMarkersNoKinect" respawn="false" output="screen">
+    <param name="marker_size"                type="double" value="9.0" />
+    <param name="max_new_marker_error"       type="double" value="0.05" />
+    <param name="max_track_error"            type="double" value="0.05" />
+    <param name="output_frame"               type="string" value="usb_cam" />
+    <remap from="camera_image" to="/usb_cam/image_raw"/>
+    <remap from="camera_info" to="/usb_cam/camera_info"/>
+  </node>
+
+
+  <!-- imu -->
+  <node pkg="xycar_imu" type="9dof_imu_node.py" name="xycar_imu" output="screen">
+    <param name="rviz_mode" type="string" value="false" />
+  </node>
+
 </launch>

@@ -8,9 +8,12 @@ from xycar_msgs.msg import xycar_motor
 from std_msgs.msg import Int32
 
 from XycarSensor import XycarSensor
-from Controller.PursuitController import PurePursuitController 
-from Detector.StopLineDetector import StopLineDetector
+
+# from Detector.StopLineDetector import StopLineDetector
 from Detector.ObstacleDetector import ObstacleDetector
+
+
+from Controller.PursuitController import PurePursuitController 
 from Controller.ModeController import ModeController
 from Controller.ARController import ARController
 
@@ -32,7 +35,7 @@ class Xycar(object):
         # 장애물 감지기 생성
         self.obstacle_detector = ObstacleDetector(self.timer)
         # stop line 감지기 생성
-        self.stopline_detector = StopLineDetector()
+        # self.stopline_detector = StopLineDetector()
 
         # 목표 차선 정보 받아오기 & 목표 각도 받아오기 
         rospy.Subscriber("xycar_angle", Int32, self.target_angle_callback, queue_size=10)
@@ -137,7 +140,7 @@ class Xycar(object):
         self.pub.publish(self.msg)
         if self.msg.speed == 0:
             self.mode_controller.set_mode('poweroff')
-            print('King wang zang AuTURBO OK?')
+            print('King wang zzang AuTURBO OK?')
         self.rate.sleep()
     # ================================================================================================#
 
@@ -178,7 +181,7 @@ class Xycar(object):
         if self.stopline_detector(self.sensor.cam):
             self.stop6s()
         else:
-            self.stanley()
+            self.pursuit()
     # 5초 정지 후 3초 이내에 출발 해야합니다. 
     def stop6s(self):
         print("stop for 5s...")
@@ -205,5 +208,5 @@ class Xycar(object):
     def control(self):
         # 어떤 모드인지 확인 후 해당 모드에 맞는 제어 수행
         mode = self.mode_controller(self.sensor.yaw)
-        self.control_dict[mode]()
+        self.control_dict['parallelparking']()
         # cv2.waitKey(1)
