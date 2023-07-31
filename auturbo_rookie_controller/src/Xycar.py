@@ -34,7 +34,7 @@ class Xycar(object):
         yaw0 = self.sensor.init(self.rate)
 
         # 장애물 감지기 생성
-        self.objectparking = ObjectParking(self.timer)
+        # self.obstacle_detector = ObstacleDetector(self.timer)
         # stop line 감지기 생성
         # self.stopline_detector = StopLineDetector()
 
@@ -48,6 +48,7 @@ class Xycar(object):
         self.pursuit_controller = PurePursuitController()
         # AR 컨트롤러 생성
         self.ar_controller = ARController()
+        # AR 컨트롤러 생성
         self.ar_curve_controller = ARCurveController()
     
     
@@ -76,7 +77,7 @@ class Xycar(object):
  
             ## ---- 추가 해주시면 됩니다!---------------------------------------------- ##
             # == 미션 2 ar curve 주행 == # -- 08.08 테스트
-            'ar_curve_controller': self.ar_curve_controller, 
+            'ar_curve': self.ar_curve, 
             # == 미션 3 객체 인식 후 주차 == # -- 07.31 테스트
             'objectparking': self.objectparking,
             # == 미션 4 장애물 회피 == # -- 07.31 테스트
@@ -149,11 +150,12 @@ class Xycar(object):
     # ================================ 미션 2 AR 커브 주행 =============================================#
     # 이 부분을 채워주세요~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     # !!!!!!!
-    def ar_curve_controller(self):
-        self.msg.angle = self.ar_curve_controller(self.sensor.sub_ar)
+    def ar_curve(self):
+        self.msg.angle = self.ar_curve_controller(self.sensor.ar_msg)
         self.pub.publish(self.msg)
-        if self.msg.speed == 0:
-            self.mode_controller.set_mode('curve')
+        if self.msg.angle == 0:
+            print('finish ar_curve')
+            # self.mode_controller.set_mode('curve')
         self.rate.sleep()
         # 다음모드 커브모드 
     # ================================================================================================#
@@ -162,7 +164,6 @@ class Xycar(object):
     # 이 부분을 채워주세요~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     # !!!!!!!
     def objectparking(self):
-        self.objectparking(self.sensor.cam)
         return "help me"
     # ================================================================================================#
 

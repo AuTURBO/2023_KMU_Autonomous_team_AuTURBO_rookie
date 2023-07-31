@@ -1,13 +1,15 @@
 #! /usr/bin/env python
 # -*- coding:utf-8 -*-
 
+from ar_track_alvar_msgs.msg import AlvarMarkers
+from tf.transformations import euler_from_quaternion
+
 class ARCurveController(object):
     '''
     Speed and Steer controller for precise parking using AR tag
     '''
     def __init__(self):
-        self.reverse = False
-        self.offset = 0
+        self.target = 0.43
         self.markers_x_point_list = []
         self.markers_y_point_list = []
         self.markers_yaw_point_list = []
@@ -18,21 +20,21 @@ class ARCurveController(object):
         '''
         for i in ar_msg.markers:     
             pose = i.pose.pose
-            markers_x_point_list.append(pose.position.x)
-            markers_y_point_list.append(pose.position.z)
-            markers_yaw_point_list.append(euler_from_quaternion((pose.orientation.x, pose.orientation.y,
+            self.markers_x_point_list.append(pose.position.x)
+            self.markers_y_point_list.append(pose.position.z)
+            self.markers_yaw_point_list.append(euler_from_quaternion((pose.orientation.x, pose.orientation.y,
                                               pose.orientation.z, pose.orientation.w))[1])
 
         # termination
-        if len(markers_x_point_list) == 0:
+        if len(self.markers_x_point_list) == 0:
             print('there is no detecting AR tag')
             return 0
 
         # direction
-        elif len(markers_x_point_list) > 0:
-            error = markers_x_point_list[0] - target
+        elif len(self.markers_x_point_list) > 0:
+            error = self.markers_x_point_list[0] - self.target
             print(f"error: {error}")
-            angle = error * 170 
+            angle = int(error * 170) 
             print(angle)
 
         return angle

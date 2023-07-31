@@ -33,7 +33,7 @@ class XycarSensor(object):
         self.sub_imu = rospy.Subscriber('imu', Imu, self.callback_imu, queue_size=1)
 
         # ar alvar track
-        self.ar_x, self.ar_y, self.ar_yaw = None, None, None
+        self.ar_msg, self.ar_x, self.ar_y, self.ar_yaw = None, None, None, None
         self.sub_ar = rospy.Subscriber('ar_pose_marker', AlvarMarkers, self.callback_ar, queue_size = 1)
 
     # 카메라 콜백 함수 일단 넣었는데 정지선 인식 부분만 따로 만드시면 사용 안해도 됩니다~ 
@@ -50,6 +50,7 @@ class XycarSensor(object):
         self.yaw = yaw % (2*np.pi)
     # ar 콜백 함수
     def callback_ar(self, msg):
+        self.ar_msg = msg
         for i in msg.markers:     
             pose = i.pose.pose
             self.ar_x = pose.position.x
