@@ -208,5 +208,5 @@ class Xycar(object):
     def control(self):
         # 어떤 모드인지 확인 후 해당 모드에 맞는 제어 수행
         mode = self.mode_controller(self.sensor.yaw)
-        self.control_dict['obstacle']()
+        self.control_dict['long straight']()
         # cv2.waitKey(1)

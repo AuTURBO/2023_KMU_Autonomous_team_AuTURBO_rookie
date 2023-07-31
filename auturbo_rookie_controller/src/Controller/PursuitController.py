@@ -8,9 +8,9 @@ from xycar_msgs.msg import xycar_motor
 class PurePursuitController:
     def __init__(self):
         self.WB = 0.24
-        self.Lf = 0.20
+        self.Lf = 0.15
         self.diff_angle = 0
-        self.speed = 20
+        self.speed = 4
 
 
     def __call__(self, target):
