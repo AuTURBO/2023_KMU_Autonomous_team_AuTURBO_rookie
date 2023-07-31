@@ -2,7 +2,6 @@
 docker/
 yolov5_ros/src/yolov5/Imgang-labelImg-yolo/
 
-CMakeLists.txt
 
 
 # Created by https://www.toptal.com/developers/gitignore/api/visualstudiocode,python
