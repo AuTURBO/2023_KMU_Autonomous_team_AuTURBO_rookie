@@ -11,7 +11,6 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   xycar_msgs
-
 )
 
 ## System dependencies are found with CMake's conventions
@@ -64,11 +63,14 @@ catkin_package(
 catkin_install_python(PROGRAMS
   src/Controller/ModeController.py
   src/Controller/PursuitController.py
+  src/Controller/lava.py
   src/Detector/ObstacleDetector.py
   src/main.py
   src/Xycar.py
   src/XycarSensor.py
   src/Timer.py
+  src/Controller/integration.py
+  
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
