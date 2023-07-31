@@ -490,57 +490,56 @@ class PreProcessor:
     # 3차곡선으로 피팅후 다각형으로 화면에 표시함.
     # =============================================
 
-    def overlay_line(self, warped_img, lx, ly, rx, ry):
-        # Fit a third order polynomial to each
+    # def overlay_line(self, warped_img, lx, ly, rx, ry):
+    #     # Fit a third order polynomial to each
 
-        if len(lx) != 0 and len(ly) != 0:  # 왼쪽 차선이 존재하면
-            left_fit = np.polyfit(ly, lx, 3)  # 3차 곡선 피팅
+    #     if len(lx) != 0 and len(ly) != 0:  # 왼쪽 차선이 존재하면
+    #         left_fit = np.polyfit(ly, lx, 3)  # 3차 곡선 피팅
 
-            # 화면에 오버레이를 위한 X, Y값 생성
-            ploty = np.linspace(0, warped_img.shape[0] - 1, warped_img.shape[0])
-            left_lane_fitx = (
-                left_fit[0] * ploty**3
-                + left_fit[1] * ploty**2
-                + left_fit[2] * ploty
-                + left_fit[3]
-            )
-            # left_lane_fitx = left_fit[0] * ploty ** 2 + left_fit[1] * ploty + left_fit[2] # 2차 곡선일떄
+    #         # 화면에 오버레이를 위한 X, Y값 생성
+    #         ploty = np.linspace(0, warped_img.shape[0] - 1, warped_img.shape[0])
+    #         left_lane_fitx = (
+    #             left_fit[0] * ploty**3
+    #             + left_fit[1] * ploty**2
+    #             + left_fit[2] * ploty
+    #             + left_fit[3]
+    #         )
+    #         # left_lane_fitx = left_fit[0] * ploty ** 2 + left_fit[1] * ploty + left_fit[2] # 2차 곡선일떄
 
-            # 좌우 차선을 연결하기 위해 포인트 생성
-            left_points = np.array([np.transpose(np.vstack([left_lane_fitx, ploty]))])
+    #         # 좌우 차선을 연결하기 위해 포인트 생성
+    #         left_points = np.array([np.transpose(np.vstack([left_lane_fitx, ploty]))])
 
-            # 찾은 라인을 이미지에 그리기
-            cv2.polylines(
-                warped_img, np.int32([left_points]), isClosed=False, color=(255, 0, 0), thickness=5
-            )
+    #         # 찾은 라인을 이미지에 그리기
+    #         cv2.polylines(
+    #             warped_img, np.int32([left_points]), isClosed=False, color=(255, 0, 0), thickness=5
+    #         )
 
-        if len(rx) != 0 and len(ry) != 0:  # 오른쪽 차선이 존재하면
-            right_fit = np.polyfit(ry, rx, 3)  # 3차 곡선 피팅
+    #     if len(rx) != 0 and len(ry) != 0:  # 오른쪽 차선이 존재하면
+    #         right_fit = np.polyfit(ry, rx, 3)  # 3차 곡선 피팅
 
-            # 화면에 오버레이를 위한 X, Y값 생성
-            ploty = np.linspace(0, warped_img.shape[0] - 1, warped_img.shape[0])
-            right_lane_fitx = (
-                right_fit[0] * ploty**3
-                + right_fit[1] * ploty**2
-                + right_fit[2] * ploty
-                + right_fit[3]
-            )
-            # right_lane_fitx = right_fit[0] * ploty ** 2 + right_fit[1] * ploty + right_fit[2] # 2차 곡선일떄
+    #         # 화면에 오버레이를 위한 X, Y값 생성
+    #         ploty = np.linspace(0, warped_img.shape[0] - 1, warped_img.shape[0])
+    #         right_lane_fitx = (
+    #             right_fit[0] * ploty**3
+    #             + right_fit[1] * ploty**2
+    #             + right_fit[2] * ploty
+    #             + right_fit[3]
+    #         )
+    #         # right_lane_fitx = right_fit[0] * ploty ** 2 + right_fit[1] * ploty + right_fit[2] # 2차 곡선일떄
 
-            # return lane_fitx, lane_fit
+    #         # return lane_fitx, lane_fit
 
-            # 좌우 차선을 연결하기 위해 포인트 생성
-            right_points = np.array([np.flipud(np.transpose(np.vstack([right_lane_fitx, ploty])))])
+    #         # 좌우 차선을 연결하기 위해 포인트 생성
+    #         right_points = np.array([np.flipud(np.transpose(np.vstack([right_lane_fitx, ploty])))])
 
-            # 찾은 라인을 이미지에 그리기
-            cv2.polylines(
-                warped_img, np.int32([right_points]), isClosed=False, color=(0, 255, 0), thickness=5
-            )
-            ploty = np.linspace(0, warped_img.shape[0] - 1, warped_img.shape[0])
-            left_lane_fitx = (
-                left_fit[0] * ploty**3
-                + left_fit[1] * ploty**2
-                + left_fit[2] * ploty
-            )
+    #         # 찾은 라인을 이미지에 그리기
+    #         cv2.polylines(
+    #             warped_img, np.int32([right_points]), isClosed=False, color=(0, 255, 0), thickness=5
+    #         )
+    #         ploty = np.linspace(0, warped_img.shape[0] - 1, warped_img.shape[0])
+    #         left_lane_fitx = (
+    #             left_fit[0] * ploty**3
+    #             + left_fit[1] * ploty**2
+    #             + left_fit[2] * ploty
 
-        return warped_img
+    #     return warped_img

@@ -1,14 +1,9 @@
-from typing import Any
-from std_msgs.msg import Int32
-import rospy
 import math
-from xycar_msgs.msg import xycar_motor
 
-
-class PurePursuitController:
+class PurePursuitController(object):
     def __init__(self):
         self.WB = 0.24
-        self.Lf = 0.20
+        self.Lf = 0.15
         self.diff_angle = 0
         self.speed = 4
 
@@ -30,6 +25,6 @@ class PurePursuitController:
 
         # 계산된 조향각을 디그리 투 라디안
         delta = -1 * delta * 180 / math.pi
-        return delta, self.speed
+        return int(delta), int(self.speed)
 
          

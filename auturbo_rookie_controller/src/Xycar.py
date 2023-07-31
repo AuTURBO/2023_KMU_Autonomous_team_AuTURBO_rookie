@@ -5,14 +5,14 @@ import rospy
 import numpy as np
 from Timer import Timer
 from xycar_msgs.msg import xycar_motor
-from std_msgs.msg import Int32
+from std_msgs.msg import Int32, String
 
 from XycarSensor import XycarSensor
 
 # from Detector.StopLineDetector import StopLineDetector
 from Detector.ObstacleDetector import ObstacleDetector
 
-
+from Controller.RubberconController import RubberconController
 from Controller.PursuitController import PurePursuitController 
 from Controller.ModeController import ModeController
 from Controller.ARController import ARController
@@ -41,6 +41,8 @@ class Xycar(object):
         # 목표 차선 정보 받아오기 & 목표 각도 받아오기 
         rospy.Subscriber("xycar_angle", Int32, self.target_angle_callback, queue_size=10)
         self.target_angle = 0
+        # 목표 차선 정보 pub 
+        self.pub_target_lane = rospy.Publisher("/obstacle/info", String,queue_size=10)
 
         # 모드 컨트롤러 생성
         self.mode_controller = ModeController(yaw0, self.timer)
@@ -51,6 +53,10 @@ class Xycar(object):
         # AR 컨트롤러 생성
         self.ar_curve_controller = ARCurveController()
     
+        # 루버콘 컨트롤러 생성 
+        self.rubbercon_controller = RubberconController()
+
+
     
         self.target_lane = 'middle'
         self.control_dict = {
@@ -87,7 +93,7 @@ class Xycar(object):
             'stopline': self.stopline,
             # == 미션 6 라바콘 주행 == # -- 07.31 테스트
             # 라바콘 주행 
-            'labcon': self.labcon
+            'rubbercon': self.rubbercon
             #################################################################################
             
         }
@@ -171,13 +177,11 @@ class Xycar(object):
 
     def obstacle(self):
         self.target_lane = self.obstacle_detector(self.sensor.lidar, self.sensor.angle_increment)
-     
-        print(self.target_lane + ' 를 향해 가야함')
-        # pub target lane 왼, 오, 중 차선으로 가야함
-        # 차선 정보 노드에 보내기 
-
-        # 장애물 회피 이후 스탑라인 찾기 
-        if self.obstacle_detector.obstacle_counter == 4:
+        msg = String()
+        msg.data = self.target_lane
+        self.pub_target_lane.publish(str(msg))
+        # print(self.target_lane + ' 를 향해 가야함')
+        if self.obstacle_detector.obstacle_counter == 5:
             print('detecting stopline...')
             self.obstacle_detector.obstacle_counter = 0
             self.mode_controller.set_mode("stopline")
@@ -206,9 +210,11 @@ class Xycar(object):
     # =====================================================================================================#
 
     # ================================ 미션 6 라바콘 주행 ====================================================#
-    def labcon(self):
-        self.msg.angle, self.msg.speed = self.labcon_controller(self.sensor.yaw)
+    def rubbercon(self):
+        self.msg.angle, self.msg.speed = self.rubbercon_controller(self.sensor.lidar)
         self.pub.publish(self.msg)
+        if self.timer() > self.rubbercon_controller.rubbercon_timer:
+            self.mode_controller.set_mode('short straight')
         self.rate.sleep()
 
 
@@ -216,5 +222,5 @@ class Xycar(object):
     def control(self):
         # 어떤 모드인지 확인 후 해당 모드에 맞는 제어 수행
         mode = self.mode_controller(self.sensor.yaw)
-        self.control_dict['ar_curve']()
+        self.control_dict['long straight']()
         # cv2.waitKey(1)
