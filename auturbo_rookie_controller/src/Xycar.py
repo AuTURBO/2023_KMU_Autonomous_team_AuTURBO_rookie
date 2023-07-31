@@ -12,7 +12,7 @@ from XycarSensor import XycarSensor
 # from Detector.StopLineDetector import StopLineDetector
 from Detector.ObstacleDetector import ObstacleDetector
 
-
+from Controller.RubberconController import RubberconController
 from Controller.PursuitController import PurePursuitController 
 from Controller.ModeController import ModeController
 from Controller.ARController import ARController
@@ -47,7 +47,10 @@ class Xycar(object):
         self.pursuit_controller = PurePursuitController()
         # AR 컨트롤러 생성
         self.ar_controller = ARController()
-    
+        # 루버콘 컨트롤러 생성 
+        self.rubbercon_controller = RubberconController()
+
+
     
         self.target_lane = 'middle'
         self.control_dict = {
@@ -84,7 +87,7 @@ class Xycar(object):
             'stopline': self.stopline,
             # == 미션 6 라바콘 주행 == # -- 07.31 테스트
             # 라바콘 주행 
-            'labcon': self.labcon
+            'rubbercon': self.rubbercon
             #################################################################################
             
         }
@@ -169,7 +172,7 @@ class Xycar(object):
         # 차선 정보 노드에 보내기 
 
         # 장애물 회피 이후 스탑라인 찾기 
-        if self.obstacle_detector.obstacle_counter == 4:
+        if self.obstacle_detector.obstacle_counter == 3:
             print('detecting stopline...')
             self.obstacle_detector.obstacle_counter = 0
             self.mode_controller.set_mode("stopline")
@@ -198,9 +201,11 @@ class Xycar(object):
     # =====================================================================================================#
 
     # ================================ 미션 6 라바콘 주행 ====================================================#
-    def labcon(self):
-        self.msg.angle, self.msg.speed = self.labcon_controller(self.sensor.yaw)
+    def rubbercon(self):
+        self.msg.angle, self.msg.speed = self.rubbercon_controller(self.sensor.lidar)
         self.pub.publish(self.msg)
+        if self.timer() > self.rubbercon_controller.rubbercon_timer:
+            self.mode_controller.set_mode('short straight')
         self.rate.sleep()
 
 

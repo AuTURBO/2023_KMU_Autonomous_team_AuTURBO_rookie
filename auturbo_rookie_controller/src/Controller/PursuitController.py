@@ -1,11 +1,6 @@
-from typing import Any
-from std_msgs.msg import Int32
-import rospy
 import math
-from xycar_msgs.msg import xycar_motor
 
-
-class PurePursuitController:
+class PurePursuitController(object):
     def __init__(self):
         self.WB = 0.24
         self.Lf = 0.20
