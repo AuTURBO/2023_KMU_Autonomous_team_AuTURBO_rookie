@@ -2,7 +2,6 @@
 # -*- coding:utf-8 -*-
 
 import numpy as np
-
 class ObstacleDetector(object):
     '''
     Detects obstacle using lidar data
