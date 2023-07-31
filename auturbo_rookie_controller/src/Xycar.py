@@ -16,6 +16,7 @@ from Detector.ObstacleDetector import ObstacleDetector
 from Controller.PursuitController import PurePursuitController 
 from Controller.ModeController import ModeController
 from Controller.ARController import ARController
+from Controller.ARCurveController import ARCurveController
 
 class Xycar(object):
     '''
@@ -33,7 +34,7 @@ class Xycar(object):
         yaw0 = self.sensor.init(self.rate)
 
         # 장애물 감지기 생성
-        self.obstacle_detector = ObstacleDetector(self.timer)
+        self.objectparking = ObjectParking(self.timer)
         # stop line 감지기 생성
         # self.stopline_detector = StopLineDetector()
 
@@ -47,8 +48,7 @@ class Xycar(object):
         self.pursuit_controller = PurePursuitController()
         # AR 컨트롤러 생성
         self.ar_controller = ARController()
-        # AR 컨트롤러 생성
-        self.ar_curve = ARCurve()
+        self.ar_curve_controller = ARCurveController()
     
     
         self.target_lane = 'middle'
@@ -76,7 +76,7 @@ class Xycar(object):
  
             ## ---- 추가 해주시면 됩니다!---------------------------------------------- ##
             # == 미션 2 ar curve 주행 == # -- 08.08 테스트
-            'ar_curve': self.ar_curve, 
+            'ar_curve_controller': self.ar_curve_controller, 
             # == 미션 3 객체 인식 후 주차 == # -- 07.31 테스트
             'objectparking': self.objectparking,
             # == 미션 4 장애물 회피 == # -- 07.31 테스트
@@ -149,12 +149,11 @@ class Xycar(object):
     # ================================ 미션 2 AR 커브 주행 =============================================#
     # 이 부분을 채워주세요~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     # !!!!!!!
-    def ar_curve(self):
-        self.msg.angle, self.msg.speed = self.ar_curve(self.sensor.ar_x, self.sensor.ar_y, self.sensor.ar_yaw)
+    def ar_curve_controller(self):
+        self.msg.angle = self.ar_curve_controller(self.sensor.sub_ar)
         self.pub.publish(self.msg)
         if self.msg.speed == 0:
             self.mode_controller.set_mode('curve')
-            print('King wang zzang AuTURBO OK?')
         self.rate.sleep()
         # 다음모드 커브모드 
     # ================================================================================================#
@@ -163,6 +162,7 @@ class Xycar(object):
     # 이 부분을 채워주세요~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     # !!!!!!!
     def objectparking(self):
+        self.objectparking(self.sensor.cam)
         return "help me"
     # ================================================================================================#
 
@@ -215,5 +215,5 @@ class Xycar(object):
     def control(self):
         # 어떤 모드인지 확인 후 해당 모드에 맞는 제어 수행
         mode = self.mode_controller(self.sensor.yaw)
-        self.control_dict['parallelparking']()
+        self.control_dict['ar_curve']()
         # cv2.waitKey(1)
