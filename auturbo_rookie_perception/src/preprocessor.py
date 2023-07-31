@@ -541,5 +541,6 @@ class PreProcessor:
                 left_fit[0] * ploty**3
                 + left_fit[1] * ploty**2
                 + left_fit[2] * ploty
+            )
 
         return warped_img
