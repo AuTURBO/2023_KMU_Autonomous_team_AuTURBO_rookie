@@ -10,7 +10,7 @@ class PurePursuitController:
         self.WB = 0.24
         self.Lf = 0.20
         self.diff_angle = 0
-        self.speed = 4
+        self.speed = 20
 
 
     def __call__(self, target):
@@ -30,6 +30,6 @@ class PurePursuitController:
 
         # 계산된 조향각을 디그리 투 라디안
         delta = -1 * delta * 180 / math.pi
-        return delta, self.speed
+        return int(delta), int(self.speed)
 
          

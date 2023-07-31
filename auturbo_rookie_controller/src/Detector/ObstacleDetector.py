@@ -38,7 +38,7 @@ class ObstacleDetector(object):
 
         elif self.obstacle_counter != 0:
             if self.timer() > self.obs_dict[self.obstacle_counter]:
-                if self.obstacle_counter == 3:
+                if self.obstacle_counter == 5:
                     self.avoid_direction = 'middle'                    
                 else:
                     self.avoid_direction = 'left' if self.avoid_direction == 'right' else 'right'
