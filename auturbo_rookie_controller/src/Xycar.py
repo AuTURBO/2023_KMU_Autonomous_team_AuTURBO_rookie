@@ -47,6 +47,8 @@ class Xycar(object):
         self.pursuit_controller = PurePursuitController()
         # AR 컨트롤러 생성
         self.ar_controller = ARController()
+        # AR 컨트롤러 생성
+        self.ar_curve = ARCurve()
     
     
         self.target_lane = 'middle'
@@ -148,7 +150,12 @@ class Xycar(object):
     # 이 부분을 채워주세요~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     # !!!!!!!
     def ar_curve(self):
-        return "help me"
+        self.msg.angle, self.msg.speed = self.ar_curve(self.sensor.ar_x, self.sensor.ar_y, self.sensor.ar_yaw)
+        self.pub.publish(self.msg)
+        if self.msg.speed == 0:
+            self.mode_controller.set_mode('curve')
+            print('King wang zzang AuTURBO OK?')
+        self.rate.sleep()
         # 다음모드 커브모드 
     # ================================================================================================#
 
