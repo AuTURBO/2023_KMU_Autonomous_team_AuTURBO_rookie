@@ -11,6 +11,7 @@ from XycarSensor import XycarSensor
 
 # from Detector.StopLineDetector import StopLineDetector
 from Detector.ObstacleDetector import ObstacleDetector
+from Detector.ObjectDetector import ObjectDetector
 
 
 from Controller.PursuitController import PurePursuitController 
@@ -34,7 +35,8 @@ class Xycar(object):
         yaw0 = self.sensor.init(self.rate)
 
         # 장애물 감지기 생성
-        self.objectparking = ObjectParking(self.timer)
+        self.obstacledetector = ObstacleDetector(self.timer)
+        self.verticalparking = VerticalParking(self.timer)
         # stop line 감지기 생성
         # self.stopline_detector = StopLineDetector()
 
@@ -78,7 +80,8 @@ class Xycar(object):
             # == 미션 2 ar curve 주행 == # -- 08.08 테스트
             'ar_curve_controller': self.ar_curve_controller, 
             # == 미션 3 객체 인식 후 주차 == # -- 07.31 테스트
-            'objectparking': self.objectparking,
+            'obstacledetector': self.obstacledetector,
+            'verticalparking': self.verticalparking,
             # == 미션 4 장애물 회피 == # -- 07.31 테스트
             'obstacle': self.obstacle,
             # == 미션 5 정지선 정지 == # -- 08.08 테스트
@@ -161,8 +164,17 @@ class Xycar(object):
     # ================================ 미션 3 객체 인식 후 주차 ==========================================#
     # 이 부분을 채워주세요~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     # !!!!!!!
-    def objectparking(self):
-        self.objectparking(self.sensor.cam)
+    def obstacledetector(self):
+        self.direction = self.obstacledetector(self.sensor.count, self.sensor.sum_x)
+        self.pub.publish(self.msg)
+        if self.direction == "right" or self.direction == "left":
+            self.mode_controller.set_mode('verticalparking')
+        self.rate.sleep()
+
+    def verticalparking(self, direction):
+        self.pub.publish(self.msg)
+        if self.msg.speed == 0 and self.msg.angle == 0:
+            self.mode_controller.set_mode('short straight')
         return "help me"
     # ================================================================================================#
 
@@ -215,5 +227,5 @@ class Xycar(object):
     def control(self):
         # 어떤 모드인지 확인 후 해당 모드에 맞는 제어 수행
         mode = self.mode_controller(self.sensor.yaw)
-        self.control_dict['ar_curve']()
+        self.control_dict['obstacledetector']()
         # cv2.waitKey(1)

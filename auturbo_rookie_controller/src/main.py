@@ -9,4 +9,4 @@ rospy.init_node('AuTOBO_rookie')
 xycar = Xycar()
 
 while not rospy.is_shutdown():
-    xycar.control("ar_curve_controller")
+    xycar.control()
