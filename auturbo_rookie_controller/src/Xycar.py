@@ -34,7 +34,7 @@ class Xycar(object):
         yaw0 = self.sensor.init(self.rate)
 
         # 장애물 감지기 생성
-        # self.obstacle_detector = ObstacleDetector(self.timer)
+        self.obstacle_detector = ObstacleDetector(self.timer)
         # stop line 감지기 생성
         # self.stopline_detector = StopLineDetector()
 
@@ -47,14 +47,14 @@ class Xycar(object):
         # 모드 컨트롤러 생성
         self.mode_controller = ModeController(yaw0, self.timer)
         # 펄슛 컨트롤러 생성
-        self.pursuit_controller = PurePursuitController()
+        self.pursuit_controller = PurePursuitController(self.timer)
         # AR 컨트롤러 생성
         self.ar_controller = ARController()
         # AR 컨트롤러 생성
         self.ar_curve_controller = ARCurveController()
     
         # 루버콘 컨트롤러 생성 
-        self.rubbercon_controller = RubberconController()
+        self.rubbercon_controller = RubberconController(self.timer)
 
 
     
@@ -180,8 +180,8 @@ class Xycar(object):
         msg = String()
         msg.data = self.target_lane
         self.pub_target_lane.publish(str(msg))
-        # print(self.target_lane + ' 를 향해 가야함')
-        if self.obstacle_detector.obstacle_counter == 5:
+        print(self.target_lane + ' 를 향해 가야함')
+        if self.obstacle_detector.obstacle_counter == 3:
             print('detecting stopline...')
             self.obstacle_detector.obstacle_counter = 0
             self.mode_controller.set_mode("stopline")
@@ -222,5 +222,5 @@ class Xycar(object):
     def control(self):
         # 어떤 모드인지 확인 후 해당 모드에 맞는 제어 수행
         mode = self.mode_controller(self.sensor.yaw)
-        self.control_dict[mode]()
+        self.control_dict['obstacle']()
         # cv2.waitKey(1)

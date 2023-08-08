@@ -1,10 +1,12 @@
+#! /usr/bin/env python
+# -*- coding:utf-8 -*-
 import math
-
+# from Timer import Timer
 class PurePursuitController(object):
-    def __init__(self):
+    def __init__(self, timer):
         self.WB = 0.24
         self.diff_angle = 0
-        self.speed = 4
+        self.speed = 10
         self.timer = timer
 
         self.Lf = {
@@ -13,7 +15,7 @@ class PurePursuitController(object):
             'curve': 0.15,
             'findparking': 0.15,
             'stopline': 0.15,
-            'obstacle': 0.15
+            'obstacle': 0.20
         }
         self.target_speed = {
             'long straight': 4,
@@ -43,23 +45,22 @@ class PurePursuitController(object):
 
     def __call__(self, target, mode):
 
-        if self.timer < self.delay[mode]:
-            if self.acc[mode] is None:
-                self.speed = self.target_speed[mode]
-            # 가속도가 0보다 크면
-            elif self.acc[mode] > 0:
-                self.speed = min(self.speed + self.acc[mode] * self.timer, self.target_speed[mode])
-            # 가속도가 0보다 작으면 
-            else:
-                self.speed = max(self.speed + self.acc[mode] * self.timer, self.target_speed[mode])
+        # if float(self.timer) < float(self.delay[mode]):
+        # if self.acc[mode] is None:
+        #     self.speed = self.target_speed[mode]
+        # # 가속도가 0보다 크면
+        # elif float(self.acc[mode]) > 0.0:
+        #     self.speed = min(self.speed + self.acc[mode] * self.timer, self.target_speed[mode])
+        # # 가속도가 0보다 작으면 
+        # else:
+        #     self.speed = max(self.speed + self.acc[mode] * self.timer, self.target_speed[mode])
 
             
-
         current_angle = target
         # 여기에 Pure Pursuit 알고리즘을 구현합니다.
         # 현재 조향각인 current_angle과 목표값(0으로 가정)을 이용하여 알고리즘을 적용합니다.
         # 다음 줄을 알고리즘에 맞게 수정해주세요.
-        target_angle = 0  # -5  # 여기에 Pure Pursuit 알고리즘을 적용하여 목표 조향각을 계산합니다.
+        target_angle = 10  # -5  # 여기에 Pure Pursuit 알고리즘을 적용하여 목표 조향각을 계산합니다.
 
         # 현재 조향각과 목표 조향각과의 차이를 계산합니다.
         self.diff_angle = target_angle - current_angle

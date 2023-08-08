@@ -421,7 +421,7 @@ class PreProcessor:
             filtered_lx.append(cx)
 
         if len(lx) < threshold_side_lane_num_error:
-            print("Left Lane Error")
+            # print("Left Lane Error")
             filtered_lx = None
             filtered_ly = None
 
@@ -431,7 +431,7 @@ class PreProcessor:
             filtered_rx.append(cx)
 
         if len(rx) < threshold_side_lane_num_error:
-            print("Right Lane Error")
+            # print("Right Lane Error")
             filtered_rx = None
             filtered_ry = None
 
@@ -441,15 +441,15 @@ class PreProcessor:
             filtered_mx.append(cx)
 
         if len(mx) > threshold_mid_lane_num_error:
-            print("Mid Lane Error")
+            # print("Mid Lane Error")
             filtered_mx = None
             filtered_my = None
 
         if len(mx) > 0 and len(lx) > 0:
             overlap_dist = abs(mx[0] - lx[0])
-            print(f"abs: {overlap_dist}")
+            # print(f"abs: {overlap_dist}")
             if overlap_dist < overlap_dist_threshold:
-                print("Mid Lane Overlap Error")
+                # print("Mid Lane Overlap Error")
                 filtered_mx = None
                 #cv2.waitKey(0)
                 

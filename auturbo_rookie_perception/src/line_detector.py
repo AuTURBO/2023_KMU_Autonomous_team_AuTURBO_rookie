@@ -56,23 +56,23 @@ def simple_controller(lx, ly, mx, my, rx, ry):
     obstacle_margin = 70
 
     if lx != None and rx != None and len(lx) > 5 and len(rx) > 5:
-        print("ALL!!!")
+        # print("ALL!!!")
         target = (lx[0] + rx[0]) // 2
     elif mx != None and len(mx) > 3:
-        print("Mid!!!")
+        # print("Mid!!!")
         target = mx[0]
     elif lx != None and len(lx) > 3:
-        print("Right!!!")
+        # print("Right!!!")
         #print(f"val: {lx[0]}")
         target = lx[0] + side_margin
     elif rx != None and len(rx) > 3:
-        print("Left!!!")
+        # print("Left!!!")
         target = rx[0] - side_margin
 
     # obstacle이 감지되었을떄
     if obstacle_info != None: 
         if obstacle_info == "middle": # obstacle이 우측에 존재
-            print("No Obstacle!!!")
+            # print("No Obstacle!!!")
             pass
         elif obstacle_info == "right": # obstacle이 우측에 존재
             if rx != None and len(rx) > 3 and mx != None and len(mx) > 3: #  우측차선과 중간차선이 모두 존재할떄
@@ -81,7 +81,7 @@ def simple_controller(lx, ly, mx, my, rx, ry):
                 target = rx[0] - obstacle_margin 
             if mx != None and len(mx) > 3:  # 중간 차선만 존재할떄
                 target = mx[0] + obstacle_margin + 150
-            print("Obstacle Right!!!")
+            # print("Obstacle Right!!!")
         elif obstacle_info == "left": # obstacle이 좌측에 존재
             if lx != None and len(lx) > 3 and mx != None and len(mx) > 3: #  좌측차선과 중간차선이 모두 존재할떄
                 target = (lx[0] + mx[0]) // 2 #  좌측차선과 중간차선의 평균
@@ -89,9 +89,9 @@ def simple_controller(lx, ly, mx, my, rx, ry):
                 target = lx[0] + obstacle_margin
             if mx != None and len(mx) > 3:  # 중간 차선만 존재할떄
                 target = mx[0] - obstacle_margin - 150
-            print("Obstacle Left!!!")
+            # print("Obstacle Left!!!")
 
-    print(f"target: {target}")
+    # print(f"target: {target}")
     return int(target)
 
 

@@ -7,7 +7,7 @@ from cv_bridge import CvBridge
 from sensor_msgs.msg import Image
 from sensor_msgs.msg import LaserScan
 from sensor_msgs.msg import Imu
-from sensor_msgs.msg import Ultrasonic
+# from sensor_msgs.msg import Ultrasonic
 from ar_track_alvar_msgs.msg import AlvarMarkers
 from tf.transformations import euler_from_quaternion
 
@@ -38,7 +38,7 @@ class XycarSensor(object):
 
         # ultrasonic sensor
         self.ultra = None
-        self.sub_ultra = rospy.Subscriber('ultrasonic', Ultrasonic, self.callback_ultra, queue_size = 1)
+        # self.sub_ultra = rospy.Subscriber('ultrasonic', Ultrasonic, self.callback_ultra, queue_size = 1)
 
     # def callback_ultra(self, msg):
         # code update 필요 ... 
