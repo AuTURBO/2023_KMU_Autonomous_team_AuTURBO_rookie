@@ -14,7 +14,7 @@ class ModeController(object):
         self.mode = 'long straight'
         self.timer = timer
         self.yaw0 = yaw0
-        self.lap = 4
+        self.lap = 0
         self.lap_target = 3
 
     def set_mode(self, mode):
@@ -45,13 +45,14 @@ class ModeController(object):
         # 각도 오차값 계산
         diff_yaw = abs(yaw - self.yaw0)
         # 만약 각도 오차값이 180도를 넘어가면 360도에서 빼주어 양수로 만들어준다.
+        # ex) 360 - 190 = 170
         if diff_yaw > np.pi: 
             diff_yaw = 2*np.pi - diff_yaw
-        # 직진 모드고, 90도 +- 0.1 radian 범위에 들어오면 짧은 직진 모드로 변경
+        # 직진 모드고, 90도 +- 0.1 radian 범위에 들어오면 짧은 직진 모드로 변경 85 ~ 95 deg
         if self.mode == 'long straight' and  np.pi/2.0 - 0.1 < diff_yaw < np.pi/2.0 + 0.1:
             self.mode = 'short straight'
             self.timer.update()
-        # 짧은 직진 모드고, 180도 +- 0.15 radian 범위에 들어오면 장애물 모드로 변경
+        # 짧은 직진 모드고, 180도 +- 0.15 radian 170 ~ 190 deg 범위에 들어오면 장애물 모드로 변경
         elif self.mode == 'short straight' and  np.pi - 0.15 < diff_yaw < np.pi + 0.15:
             print('detecting obstacle...')
             self.timer.update()
@@ -61,10 +62,10 @@ class ModeController(object):
         # lap이 lap_target보다 작으면 직진 모드로 변경
         # lap이 lap_target보다 크면 주차장 찾기 모드로 변경
         # 왜냐 1바퀴를 돌고나면 주차장을 다시 찾아야 하기 때문
-
+        # 3deg +- 0.05 radian 범위에 들어오면 커브 모드로 변경
         elif self.mode == 'curve' and  diff_yaw < 0.05:
             self.lap += 1
-            print('finish lap {}'.format(self.lap))
+            print('커브 모드가 정상적으로 작동중임 ... {}'.format(self.lap))
             
             self.timer.update()
             # ar 커브 모드

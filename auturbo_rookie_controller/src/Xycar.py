@@ -94,8 +94,7 @@ class Xycar(object):
             # == 미션 6 라바콘 주행 == # -- 07.31 테스트
             # 라바콘 주행 
             'rubbercon': self.rubbercon
-            #################################################################################
-            
+            ################################################################################# 
         }
     # cv로 차선 인식 후 목표 각도값 받아오기 
     def target_angle_callback(self, msg):
@@ -112,7 +111,7 @@ class Xycar(object):
 
     # 차선 컨트롤러
     def pursuit(self):
-        self.msg.angle, self.msg.speed = self.pursuit_controller(self.target_angle)
+        self.msg.angle, self.msg.speed = self.pursuit_controller(self.target_angle, self.mode_controller.get_mode())
         self.pub.publish(self.msg)
         self.rate.sleep()
 
@@ -157,8 +156,8 @@ class Xycar(object):
     # 이 부분을 채워주세요~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     # !!!!!!!
     def ar_curve(self):
-        self.msg.angle = self.ar_curve_controller(self.sensor.ar_msg)
-        self.pub.publish(self.msg)
+        self.target_angle = self.ar_curve_controller(self.sensor.ar_msg)
+        self.pursuit()
         if self.msg.angle == 0:
             print('finish ar_curve')
             # self.mode_controller.set_mode('curve')
@@ -222,5 +221,5 @@ class Xycar(object):
     def control(self):
         # 어떤 모드인지 확인 후 해당 모드에 맞는 제어 수행
         mode = self.mode_controller(self.sensor.yaw)
-        self.control_dict['long straight']()
+        self.control_dict[mode]()
         # cv2.waitKey(1)
