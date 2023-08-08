@@ -54,7 +54,7 @@ class Xycar(object):
         self.ar_curve_controller = ARCurveController()
     
         # 루버콘 컨트롤러 생성 
-        self.rubbercon_controller = RubberconController(self.timer)
+        self.rubbercon_controller = RubberconController()
 
 
     
@@ -119,7 +119,7 @@ class Xycar(object):
     # 주차공간 찾기 
     def findparking(self):
         if self.timer() > 1.0:
-            ranges = np.array(self.ranges)
+            ranges = np.array(self.sensor.lidar)
             ranges = ranges[505//4:505//2]
             if np.count_nonzero((ranges > 0.0 ) & (ranges < 0.7)) > 20 :
                 print('start parking...')
@@ -128,18 +128,19 @@ class Xycar(object):
 
     # 가로주차 주차공간 들어가기 
     def parallelpark(self):
-        for _ in range(34):
-            self.msg.angle, self.msg.speed = 0, 20
+        for _ in range(50):
+            self.msg.angle, self.msg.speed = 0, 3
             self.pub.publish(self.msg)
             self.rate.sleep()
-        for _ in range(43):
-            self.msg.angle, self.msg.speed = 50, -20
+        for _ in range(30):
+            self.msg.angle, self.msg.speed = 50, -3
             self.pub.publish(self.msg)
             self.rate.sleep()
-        for _ in range(43):
-            self.msg.angle, self.msg.speed = -50, -20
+        for _ in range(20):
+            self.msg.angle, self.msg.speed = -50, -3
             self.pub.publish(self.msg)
             self.rate.sleep()
+        print("주차시작")
         self.mode_controller.set_mode('arparking')
 
     # 가로주차 aruco marker 인식 후 미세조정 모드 시작
@@ -213,8 +214,8 @@ class Xycar(object):
     def rubbercon(self):
         self.msg.angle, self.msg.speed = self.rubbercon_controller(self.sensor.lidar)
         self.pub.publish(self.msg)
-        if self.timer() > self.rubbercon_controller.rubbercon_timer:
-            self.mode_controller.set_mode('short straight')
+        # if self.timer() > self.rubbercon_controller.rubbercon_timer:
+            # self.mode_controller.set_mode('short straight')
         self.rate.sleep()
 
 
@@ -222,5 +223,5 @@ class Xycar(object):
     def control(self):
         # 어떤 모드인지 확인 후 해당 모드에 맞는 제어 수행
         mode = self.mode_controller(self.sensor.yaw)
-        self.control_dict['obstacle']()
+        self.control_dict[mode]()
         # cv2.waitKey(1)

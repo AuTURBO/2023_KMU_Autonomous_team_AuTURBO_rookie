@@ -3,10 +3,11 @@
 <launch>
   <include file="$(find usb_cam)/launch/xycar_cam.launch" />
   <include file="$(find xycar_motor)/launch/xycar_motor.launch" />
-  <include file="$(find xycar_lidar)/launch/xycar_lidar.launch" />
+  <!--<include file="$(find xycar_lidar)/launch/xycar_lidar.launch" /> -->
 
-  <!--<include file="$(find ydlidar_ros_driver)/launch/G2.launch" /> -->
-
+  <include file="$(find ydlidar_ros_driver)/launch/G2.launch" />
+  
+  
   <!-- ar tag -->
   <node name="ar_track_alvar" pkg="ar_track_alvar" type="individualMarkersNoKinect" respawn="false" output="screen">
     <param name="marker_size" type="double" value="9.0" />
@@ -27,5 +28,5 @@
 
 
   <!-- rviz -->
-  <node type="rviz" name="rviz" pkg="rviz" args="-d $(find auturbo_rookie_bringup)/rviz/config_file.rviz" />
+  <node type="rviz" name="rviz" pkg="rviz" args="-d $(find auturbo_rookie_controller)/rviz/config_file.rviz" />
 </launch>

@@ -5,8 +5,8 @@
 # 시간을 쟤서 5초 이상 시간이 지나면 다음 모드로 넘어가게 하기 
 
 class RubberconController(object):
-    def __init__(self, timer):
-        self.timer = timer
+    def __init__(self):
+        # self.timer = timer
         self.angle = 0
         self.speed = 0
         self.error = 0 
@@ -18,8 +18,9 @@ class RubberconController(object):
         self.prev_rotation = 0
 
     def __call__(self, ranges):
+        
         num_ranges = len(ranges)  
-        quarter = num_ranges // 2
+        quarter = num_ranges // 4
         # 오른쪽의 장애물의 최소 거리 계산
         right_quarter_ranges = [range_val for range_val in ranges[:quarter] if range_val > 0]
         if len(right_quarter_ranges) > 0:
@@ -30,7 +31,7 @@ class RubberconController(object):
             right_quarter_min_distance = 0
 
         # 왼쪽의 최소 거리 계산
-        left_quarter_ranges = [range_val for range_val in ranges[quarter:] if range_val > 0]
+        left_quarter_ranges = [range_val for range_val in ranges[2*quarter//4:] if range_val > 0]
         if len(left_quarter_ranges) > 0:
             left_quarter_min_distance = min(left_quarter_ranges)
             print("left min distance: {} cm".format(left_quarter_min_distance * 100))
@@ -65,6 +66,6 @@ class RubberconController(object):
         elif steer < -30:   
             steer = -30
 
-        return -1 * steer, self.speed 
+        return -1 * int(steer), int(self.speed) 
             
     

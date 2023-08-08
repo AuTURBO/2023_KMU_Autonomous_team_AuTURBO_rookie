@@ -14,6 +14,11 @@ class ARController(object):
         return angle and speed from x, y, yaw of a AR tag
         '''
         # direction
+        print("x :{}".format(x))
+
+        print("y :{}".format(y))
+
+        print("x :{}".format(x))
         if self.reverse:
             if y > 0.4:
                 self.reverse = False
@@ -31,5 +36,5 @@ class ARController(object):
             angle = -300 * (yaw - 0.05) 
         else:
             angle = -self.offset +20 if y < 0.35 else self.offset + 20     
-        speed = -16 if self.reverse else 16
+        speed = 0 if self.reverse else  0
         return angle, speed
