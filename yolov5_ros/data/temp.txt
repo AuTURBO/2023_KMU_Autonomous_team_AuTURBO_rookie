@@ -1,0 +1,29 @@
+---
+header: 
+  seq: 97
+  stamp: 
+    secs: 1691401594
+    nsecs:  78547000
+  frame_id: "usb_cam"
+image_header: 
+  seq: 97
+  stamp: 
+    secs: 1691401594
+    nsecs:  78547000
+  frame_id: "usb_cam"
+bounding_boxes: 
+  - 
+    Class: "sonata"
+    probability: 0.9071847796440125
+    xmin: 189
+    ymin: 360
+    xmax: 318
+    ymax: 473
+  - 
+    Class: "grandeur"
+    probability: 0.927424967288971
+    xmin: 332
+    ymin: 361
+    xmax: 461
+    ymax: 470
+---

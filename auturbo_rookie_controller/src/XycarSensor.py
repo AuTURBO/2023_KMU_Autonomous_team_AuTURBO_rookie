@@ -23,6 +23,11 @@ class XycarSensor(object):
         self.bridge = CvBridge()
         self.sub_cam = rospy.Subscriber("/usb_cam/image_raw", Image, self.callback_cam)
 
+        # yolo node
+        self.count = {"grandeur":0, "avante":0, "sonata":0}
+        self.sum_x = {"grandeur":0, "avante":0, "sonata":0}
+        self.sub_yolo = rospy.Subscriber("/yolov5/detections", Image, self.callback_yolo)
+
         # lidar sensor
         self.lidar = None
         self.angle_increments = None
@@ -39,6 +44,10 @@ class XycarSensor(object):
     # 카메라 콜백 함수 일단 넣었는데 정지선 인식 부분만 따로 만드시면 사용 안해도 됩니다~ 
     def callback_cam(self, msg):
         self.cam = self.bridge.imgmsg_to_cv2(msg, "bgr8")
+    def callback_yolo(self, msg):
+        for bbox in msg.bounding_boxes:
+            self.count[bbox.Class] += 1
+            self.sum_x[bbox.Class] += (bbox.xmin + bbox.xmax) / 2
 
     # 라이다 콜백 함수
     def callback_lidar(self, msg):
