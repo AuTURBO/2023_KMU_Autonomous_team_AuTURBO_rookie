@@ -9,7 +9,7 @@ from std_msgs.msg import Int32
 
 from XycarSensor import XycarSensor
 
-# from Detector.StopLineDetector import StopLineDetector
+from Detector.StopLineDetector import StopLineDetector
 from Detector.ObstacleDetector import ObstacleDetector
 from Detector.ObjectDetector import ObjectDetector
 
@@ -43,7 +43,7 @@ class Xycar(object):
         self.objectdetector = ObjectDetector(self.timer, self.specfic_car)
         # self.verticalparking = VerticalParking(self.timer)
         # stop line 감지기 생성
-        # self.stopline_detector = StopLineDetector()
+        self.stopline_detector = StopLineDetector()
 
         # 목표 차선 정보 받아오기 & 목표 각도 받아오기 
         rospy.Subscriber("xycar_angle", Int32, self.target_angle_callback, queue_size=10)
@@ -167,8 +167,6 @@ class Xycar(object):
     # ================================================================================================#
 
     # ================================ 미션 3 객체 인식 후 주차 ==========================================#
-    # 이 부분을 채워주세요~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    # !!!!!!!
     def objectdetector(self):
         self.direction = self.objectdetector(self.sensor.count, self.sensor.sum_x)
         self.pub.publish(self.msg)
@@ -232,8 +230,8 @@ class Xycar(object):
     def control(self):
         # 어떤 모드인지 확인 후 해당 모드에 맞는 제어 수행
         # mode = self.mode_controller(self.sensor.yaw)
-        # rospy.loginfo("current mode is %s", mode)
-        # self.control_dict[mode]()
-
-        self.control_dict['objectdetector'](self.sensor.count, self.sensor.sum_x)
+        
+        mode = 'stopline'
+        rospy.loginfo("current mode is %s", mode)
+        self.control_dict[mode]()
         # cv2.waitKey(1)
