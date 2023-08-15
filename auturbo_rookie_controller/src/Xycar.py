@@ -36,7 +36,12 @@ class Xycar(object):
 
         # 장애물 감지기 생성
         self.obstacledetector = ObstacleDetector(self.timer)
-        self.verticalparking = VerticalParking(self.timer)
+        # 객체인식 주차
+        # self.specfic_car = "grandeur"
+        # self.specfic_car = "avante"
+        self.specfic_car = "sonata"
+        self.objectdetector = ObjectDetector(self.timer, self.specfic_car)
+        # self.verticalparking = VerticalParking(self.timer)
         # stop line 감지기 생성
         # self.stopline_detector = StopLineDetector()
 
@@ -80,7 +85,7 @@ class Xycar(object):
             # == 미션 2 ar curve 주행 == # -- 08.08 테스트
             'ar_curve_controller': self.ar_curve_controller, 
             # == 미션 3 객체 인식 후 주차 == # -- 07.31 테스트
-            'obstacledetector': self.obstacledetector,
+            'objectdetector': self.objectdetector,
             'verticalparking': self.verticalparking,
             # == 미션 4 장애물 회피 == # -- 07.31 테스트
             'obstacle': self.obstacle,
@@ -164,8 +169,8 @@ class Xycar(object):
     # ================================ 미션 3 객체 인식 후 주차 ==========================================#
     # 이 부분을 채워주세요~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     # !!!!!!!
-    def obstacledetector(self):
-        self.direction = self.obstacledetector(self.sensor.count, self.sensor.sum_x)
+    def objectdetector(self):
+        self.direction = self.objectdetector(self.sensor.count, self.sensor.sum_x)
         self.pub.publish(self.msg)
         if self.direction == "right" or self.direction == "left":
             self.mode_controller.set_mode('verticalparking')
@@ -226,6 +231,9 @@ class Xycar(object):
     # 메인 루프 
     def control(self):
         # 어떤 모드인지 확인 후 해당 모드에 맞는 제어 수행
-        mode = self.mode_controller(self.sensor.yaw)
-        self.control_dict['obstacledetector']()
+        # mode = self.mode_controller(self.sensor.yaw)
+        # rospy.loginfo("current mode is %s", mode)
+        # self.control_dict[mode]()
+
+        self.control_dict['objectdetector'](self.sensor.count, self.sensor.sum_x)
         # cv2.waitKey(1)

@@ -7,6 +7,7 @@ from cv_bridge import CvBridge
 from sensor_msgs.msg import Image
 from sensor_msgs.msg import LaserScan
 from sensor_msgs.msg import Imu
+from detection_msgs.msg import BoundingBox, BoundingBoxes
 from ar_track_alvar_msgs.msg import AlvarMarkers
 from tf.transformations import euler_from_quaternion
 
@@ -14,10 +15,7 @@ class XycarSensor(object):
     '''
     Class for receiving and recording datas from Xycar's Sensors
     '''
-    def __init__(self):
-
-
-        
+    def __init__(self):   
         # camera sensor
         self.cam = None
         self.bridge = CvBridge()
@@ -25,8 +23,8 @@ class XycarSensor(object):
 
         # yolo node
         self.count = {"grandeur":0, "avante":0, "sonata":0}
-        self.sum_x = {"grandeur":0, "avante":0, "sonata":0}
-        self.sub_yolo = rospy.Subscriber("/yolov5/detections", Image, self.callback_yolo)
+        self.sum_x = {"grandeur":0.0, "avante":0.0, "sonata":0.0}
+        self.sub_yolo = rospy.Subscriber("/yolov5/detections", BoundingBoxes, self.callback_yolo)
 
         # lidar sensor
         self.lidar = None
@@ -46,8 +44,9 @@ class XycarSensor(object):
         self.cam = self.bridge.imgmsg_to_cv2(msg, "bgr8")
     def callback_yolo(self, msg):
         for bbox in msg.bounding_boxes:
-            self.count[bbox.Class] += 1
-            self.sum_x[bbox.Class] += (bbox.xmin + bbox.xmax) / 2
+            self.count[bbox.Class] = self.count[bbox.Class] + 1
+            self.sum_x[bbox.Class] = self.sum_x[bbox.Class] + (bbox.xmin + bbox.xmax) / 2
+
 
     # 라이다 콜백 함수
     def callback_lidar(self, msg):
