@@ -54,13 +54,13 @@ class Xycar(object):
         self.ar_curve_controller = ARCurveController()
     
         # 루버콘 컨트롤러 생성 
-        self.rubbercon_controller = RubberconController()
+        self.rubbercon_controller = RubberconController(self.timer)
 
 
     
         self.target_lane = 'middle'
         self.control_dict = {
-            # 직선 주행 
+            # 직선 주행 findparking
             # 긴 구간 직진 -- 07.31 테스트 
             'long straight' : self.pursuit,
             # 짧은 구간 직진 -- 07.31 테스트
@@ -209,10 +209,13 @@ class Xycar(object):
 
     # ================================ 미션 6 라바콘 주행 ====================================================#
     def rubbercon(self):
-        self.msg.angle, self.msg.speed = self.rubbercon_controller(self.sensor.lidar)
+        self.msg.angle, self.msg.speed = self.rubbercon_controller(self.sensor.lidar, self.sensor.angle_increment)
         self.pub.publish(self.msg)
-        # if self.timer() > self.rubbercon_controller.rubbercon_timer:
-            # self.mode_controller.set_mode('short straight')
+        if self.msg.speed == 0:
+            print('obstacle 모드 종료')
+            self.mode_controller.set_mode('long straight')
+            self.msg.angle, self.msg.speed = -1*self.target_angle, 0
+            self.pub.publish(self.msg)
         self.rate.sleep()
 
 
@@ -220,5 +223,5 @@ class Xycar(object):
     def control(self):
         # 어떤 모드인지 확인 후 해당 모드에 맞는 제어 수행
         mode = self.mode_controller(self.sensor.yaw)
-        self.control_dict['obstacle']()
+        self.control_dict[mode]()
         # cv2.waitKey(1)

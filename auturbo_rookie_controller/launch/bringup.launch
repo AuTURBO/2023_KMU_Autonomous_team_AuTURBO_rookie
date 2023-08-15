@@ -26,6 +26,9 @@
   <!-- 초음파 -->
   <node pkg="xycar_ultrasonic" type="xycar_ultrasonic.py" name="xycar_ultrasonic" output="screen" />
 
+  <!-- 초음파 -->
+  <node pkg="auturbo_rookie_perception" type="line_detector.py" name="line_detector" output="screen" />
+
 
   <!-- rviz -->
   <node type="rviz" name="rviz" pkg="rviz" args="-d $(find auturbo_rookie_controller)/rviz/config_file.rviz" />

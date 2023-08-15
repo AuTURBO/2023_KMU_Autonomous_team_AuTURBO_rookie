@@ -5,69 +5,76 @@
 # 초기값 : 0
 
 # 시간을 쟤서 5초 이상 시간이 지나면 다음 모드로 넘어가게 하기 
+import numpy as np
+
 
 class RubberconController(object):
-    def __init__(self):
-        # self.timer = timer
+    def __init__(self, timer):
+        self.timer = timer
         self.angle = 0
         self.speed = 0
         self.error = 0 
         # 비례 제어 게인
-        self.k = 30.0  
+        self.k = 1 
         #라이다 /scan 토픽 값을 이용하여 오차 계산
 
         self.rotation = 0
         self.prev_rotation = 0
-
-    def __call__(self, ranges):
+        self.right_quarter_min_distance = 0
+        self.left_quarter_min_distance = 0
+ 
+    def __call__(self, ranges, angle_increment):
         
-        num_ranges = len(ranges)  
-        quarter = num_ranges // 4
-        # 오른쪽의 장애물의 최소 거리 계산
-        right_quarter_ranges = [range_val for range_val in ranges[:quarter] if range_val > 0]
-        if len(right_quarter_ranges) > 0:
-            right_quarter_min_distance = min(right_quarter_ranges)
-            print("right min distnace: {} cm".format(right_quarter_min_distance * 100))
-        else:
-            print("right, no obstacle.")
-            right_quarter_min_distance = 0
+        if self.timer() < 6 or self.error != 0: 
+            ranges = np.array(ranges)
+            
+            # 라이다 데이터의 1/4 구간과 3/4 구간은 0으로 설정하여 로봇의 전방 및 후방을 제외합니다.
+            ranges[:len(ranges)//4] = 0.0
+            ranges[3*len(ranges)//4:] = 0.0
 
-        # 왼쪽의 최소 거리 계산
-        left_quarter_ranges = [range_val for range_val in ranges[2*quarter//4:] if range_val > 0]
-        if len(left_quarter_ranges) > 0:
-            left_quarter_min_distance = min(left_quarter_ranges)
-            print("left min distance: {} cm".format(left_quarter_min_distance * 100))
-        else:
-            print("left, no obstacle.")
-            left_quarter_min_distance = 0
+            # 각도 값들을 계산합니다.
+            # print("angle_increment: ", angle_increment)
+            deg = np.arange(len(ranges)) * angle_increment - 252 * angle_increment
 
+            # 장애물로 판단할 조건을 마스킹하여 필터링합니다.
+            # 거리값에 따른 필터링 조건을 설정합니다.
+            mask = (np.abs(ranges * np.sin(deg)) < 0.6) & (0.1 < ranges * np.cos(deg)) & (ranges * np.cos(deg) < 0.6)
+
+            filtered = np.where(mask, ranges, 0.0)
+
+            # 필터링된 데이터 중 0이 아닌 값의 인덱스를 찾습니다.
+            nz = np.nonzero(filtered)[0]
+
+            if len(nz) > 10:
+                for i in range(len(nz)):
+                    if nz[i] < len(ranges) // 2 and nz[i] > 0:
+                        self.error -= abs(filtered[nz[i]]-0.6)
+                    elif nz[i] > len(ranges) // 2 and nz[i] < len(ranges) - 1:
+                        self.error += abs(filtered[nz[i]]-0.6)
+            else:
+                self.error = 0
         
-        if left_quarter_min_distance > right_quarter_min_distance:
-            self.rotation = -1
-        else:
-            self.rotation = 1
+            if self.error > 30:
+                self.error = 30
+            elif self.error < -30:
+                self.error = -30
 
-        # 오차 계산
-        self.error -= 0.5 - right_quarter_min_distance
-        self.error += 0.5 - left_quarter_min_distance
-
-        # 태그 설정
-        if self.rotation != self.prev_rotation:
-            self.error = 0
-        self.prev_rotation = self.rotation
-
-        # 장애물이 없을 때 0 조향각으로 초기화
-        if len(right_quarter_ranges) == 0 and len(left_quarter_ranges) == 0:
-            steer = 0
-            self.error = 0
-        else: # 장애물이 있을 경우 게인 값 비례 제어
             steer = self.error * self.k
 
-        if steer > 30:
-            steer = 30
-        elif steer < -30:   
-            steer = -30
+        
+            if self.rotation != self.prev_rotation:
+                self.error = 0
+            self.prev_rotation = self.rotation
 
-        return -1 * int(steer), int(self.speed) 
-            
-    
+            if steer > 30:
+                steer = 30
+            elif steer < -30:   
+                steer = -30
+
+            print("steer: ", steer)
+
+
+            return  int(steer), 4
+        else:
+            print("라바콘 모드 종료")
+            return 0, 0
