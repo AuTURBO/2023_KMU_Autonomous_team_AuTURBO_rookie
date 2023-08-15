@@ -23,6 +23,8 @@ $ roscore
 $ cd <bag file location>
 $ rosbag play <bag file>.bag -l
 
+$ rosrun image_transport republish compressed in:=/usb_cam/image_raw  raw out:=/usb_cam/image_raw
+
 $ roslaunch yolov5_ros yolov5.launch
 
 $ rosrun auturbo_rookie_perception line_detector.py

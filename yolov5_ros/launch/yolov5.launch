@@ -21,7 +21,7 @@
 
     <!-- ROS topics -->
     <!-- <arg name="input_image_topic" default="/usb_cam/image_raw"/> -->
-    <arg name="input_image_topic" default="/usb_cam/image_raw/compressed"/>
+    <arg name="input_image_topic" default="/usb_cam/image_raw"/>
     <arg name="output_topic" default="/yolov5/detections"/>
 
     <!-- Optional topic (publishing annotated image) -->
