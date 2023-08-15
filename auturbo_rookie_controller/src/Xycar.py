@@ -9,8 +9,9 @@ from std_msgs.msg import Int32, String
 
 from XycarSensor import XycarSensor
 
-# from Detector.StopLineDetector import StopLineDetector
+from Detector.StopLineDetector import StopLineDetector
 from Detector.ObstacleDetector import ObstacleDetector
+from Detector.ObjectDetector import ObjectDetector
 
 from Controller.RubberconController import RubberconController
 from Controller.PursuitController import PurePursuitController 
@@ -34,9 +35,15 @@ class Xycar(object):
         yaw0 = self.sensor.init(self.rate)
 
         # 장애물 감지기 생성
-        self.obstacle_detector = ObstacleDetector(self.timer)
+        self.obstacledetector = ObstacleDetector(self.timer)
+        # 객체인식 주차
+        # self.specfic_car = "grandeur"
+        # self.specfic_car = "avante"
+        self.specfic_car = "sonata"
+        self.objectdetector = ObjectDetector(self.timer, self.specfic_car)
+        # self.verticalparking = VerticalParking(self.timer)
         # stop line 감지기 생성
-        # self.stopline_detector = StopLineDetector()
+        self.stopline_detector = StopLineDetector()
 
         # 목표 차선 정보 받아오기 & 목표 각도 받아오기 
         rospy.Subscriber("xycar_angle", Int32, self.target_angle_callback, queue_size=10)
@@ -85,7 +92,8 @@ class Xycar(object):
             # == 미션 2 ar curve 주행 == # -- 08.08 테스트
             'ar_curve': self.ar_curve, 
             # == 미션 3 객체 인식 후 주차 == # -- 07.31 테스트
-            'objectparking': self.objectparking,
+            'objectdetector': self.objectdetector,
+            'verticalparking': self.verticalparking,
             # == 미션 4 장애물 회피 == # -- 07.31 테스트
             'obstacle': self.obstacle,
             # == 미션 5 정지선 정지 == # -- 08.08 테스트
@@ -179,9 +187,17 @@ class Xycar(object):
     # ================================================================================================#
 
     # ================================ 미션 3 객체 인식 후 주차 ==========================================#
-    # 이 부분을 채워주세요~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    # !!!!!!!
-    def objectparking(self):
+    def objectdetector(self):
+        self.direction = self.objectdetector(self.sensor.count, self.sensor.sum_x)
+        self.pub.publish(self.msg)
+        if self.direction == "right" or self.direction == "left":
+            self.mode_controller.set_mode('verticalparking')
+        self.rate.sleep()
+
+    def verticalparking(self, direction):
+        self.pub.publish(self.msg)
+        if self.msg.speed == 0 and self.msg.angle == 0:
+            self.mode_controller.set_mode('short straight')
         return "help me"
     # ================================================================================================#
 
@@ -233,6 +249,10 @@ class Xycar(object):
     # 메인 루프 
     def control(self):
         # 어떤 모드인지 확인 후 해당 모드에 맞는 제어 수행
-        mode = self.mode_controller(self.sensor.yaw)
+        # mode = self.mode_controller(self.sensor.yaw)
+        
+        mode = 'stopline'
+        rospy.loginfo("current mode is %s", mode)
+        
         self.control_dict[mode]()
         # cv2.waitKey(1)
