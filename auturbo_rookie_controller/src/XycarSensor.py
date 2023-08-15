@@ -33,9 +33,9 @@ class XycarSensor(object):
         self.sub_imu = rospy.Subscriber('imu', Imu, self.callback_imu, queue_size=1)
 
         # ar alvar track
-        self.ar_msg, self.ar_x, self.ar_y, self.ar_yaw = None, None, None, None
+        self.ar_id, self.ar_msg, self.ar_x, self.ar_y, self.ar_yaw = None, None, None, None, None
         self.sub_ar = rospy.Subscriber('ar_pose_marker', AlvarMarkers, self.callback_ar, queue_size = 1)
-
+        
         # ultrasonic sensor
         self.ultra = None
         # self.sub_ultra = rospy.Subscriber('ultrasonic', Ultrasonic, self.callback_ultra, queue_size = 1)
@@ -64,6 +64,7 @@ class XycarSensor(object):
             self.ar_y = pose.position.z
             self.ar_yaw = euler_from_quaternion((pose.orientation.x, pose.orientation.y,
                                               pose.orientation.z, pose.orientation.w))[1]
+            self.ar_id = i.id
 
     def init(self, rate):
         '''

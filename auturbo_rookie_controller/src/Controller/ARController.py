@@ -13,28 +13,33 @@ class ARController(object):
         '''
         return angle and speed from x, y, yaw of a AR tag
         '''
-        # direction
-        print("x :{}".format(x))
+        if x != None and y != None and yaw != None:
+            # direction
+            print("x :{}".format(x))
 
-        print("y :{}".format(y))
+            print("y :{}".format(y))
 
-        print("x :{}".format(x))
-        if self.reverse:
-            if y > 0.4:
-                self.reverse = False
-                self.offset = (x + 0.01) * 150
+            print("yaw :{}".format(yaw))
+
+            if self.reverse:
+                if y > 0.4:
+                    self.reverse = False
+                    self.offset = (x + 0.01) * 150
+            else:
+                if y < 0.24:
+                    self.reverse = True
+
+            # termination
+            if 0.05 < x + 0.25 < 0.02 and 0.44 < y < 0.60 and abs(yaw) < 0.1:
+                print('ar 주차 성공')
+                return 0, 0
+
+            if self.reverse:
+                angle = -300 * (yaw - 0.05) 
+            else:
+                angle = -self.offset +20 if y < 0.35 else self.offset + 20     
+            speed = 4 if self.reverse else  0
+            return int(angle), int(speed)
         else:
-            if y < 0.24:
-                self.reverse = True
-
-        # termination
-        if -0.02 < x + 0.01 < 0.02 and 0.24 < y < 0.27 and abs(yaw) < 0.035:
-            print('we are no.1 jayool-joohaeng developers, you know?')
-            return 0, 0
-
-        if self.reverse:
-            angle = -300 * (yaw - 0.05) 
-        else:
-            angle = -self.offset +20 if y < 0.35 else self.offset + 20     
-        speed = 0 if self.reverse else  0
-        return angle, speed
+            print('no tag')
+            return 0, 4
