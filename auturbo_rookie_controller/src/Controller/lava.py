@@ -1,4 +1,6 @@
-#TEST_3
+#!/usr/bin/env python
+
+# TEST_3
 import rospy
 from sensor_msgs.msg import LaserScan
 from xycar_msgs.msg import xycar_motor

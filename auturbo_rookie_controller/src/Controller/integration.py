@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 
 #TEST_3
 import rospy

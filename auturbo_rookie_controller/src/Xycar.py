@@ -160,7 +160,7 @@ class Xycar(object):
         self.target_angle = self.ar_curve_controller(self.sensor.ar_msg)
         self.pursuit()
         if self.msg.angle == 0:
-            print('finish ar_curve')
+            print('obstacle')
             # self.mode_controller.set_mode('curve')
         self.rate.sleep()
         # 다음모드 커브모드 
@@ -179,13 +179,10 @@ class Xycar(object):
     def obstacle(self):
         self.target_lane = self.obstacle_detector(self.sensor.lidar, self.sensor.angle_increment)
         msg = String()
-        msg.data = self.target_lane
-        self.pub_target_lane.publish(str(msg))
-        print(self.target_lane + ' 를 향해 가야함')
-        if self.obstacle_detector.obstacle_counter == 3:
-            print('detecting stopline...')
-            self.obstacle_detector.obstacle_counter = 0
-            self.mode_controller.set_mode("stopline")
+        msg.data = str(self.target_lane)
+        self.pub_target_lane.publish(msg)
+        # print(self.target_lane + ' 를 향해 가야함')
+
         self.pursuit()
     # =====================================================================================================#
 
@@ -223,5 +220,5 @@ class Xycar(object):
     def control(self):
         # 어떤 모드인지 확인 후 해당 모드에 맞는 제어 수행
         mode = self.mode_controller(self.sensor.yaw)
-        self.control_dict[mode]()
+        self.control_dict['obstacle']()
         # cv2.waitKey(1)
