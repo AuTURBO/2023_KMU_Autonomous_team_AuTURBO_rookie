@@ -13,7 +13,7 @@ class PurePursuitController(object):
             'long straight': 0.2,
             'short straight': 0.15,
             'curve': 0.15,
-            'findparking': 0.15,
+            'findparking': 0.20,
             'stopline': 0.15,
             'obstacle': 0.15,
             'parallelparking': 0.15,

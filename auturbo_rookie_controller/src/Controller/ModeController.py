@@ -11,7 +11,7 @@ class ModeController(object):
 
     def __init__(self, yaw0, timer):
         # 첫 시작은 긴 직진 모드
-        self.mode = 'rubbercon'
+        self.mode = 'findparking'
         self.timer = timer
         self.yaw0 = yaw0
         self.lap = 0
@@ -21,6 +21,9 @@ class ModeController(object):
         self.mode = mode
 
     def set_yaw0(self, yaw0):
+
+
+        
         self.yaw0 = yaw0
 
     def get_mode(self):

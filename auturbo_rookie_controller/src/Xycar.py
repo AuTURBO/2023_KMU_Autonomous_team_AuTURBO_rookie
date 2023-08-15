@@ -117,15 +117,25 @@ class Xycar(object):
 
     # ================================ 미션 1 수평주차 =======================================================#
     # 주차공간 찾기 
+# x :1.574026937403328
+# y :2.197917242725258
+# yaw :0.35974991878453877
     def findparking(self):
         # self.sensor.ar_x, self.sensor.ar_y, self.sensor.ar_yaw, self.sensor.ar_id
-        if self.timer() > 1.0:
-            ranges = np.array(self.sensor.lidar)
-            ranges = ranges[505//4:505//2]
-            if np.count_nonzero((ranges > 0.0 ) & (ranges < 0.7)) > 20 :
-                print('start parking...')
-                self.mode_controller.set_mode('parallelparking')
-        self.pursuit()
+        if self.sensor.ar_id != None:
+            x = self.sensor.ar_x
+            y = self.sensor.ar_y
+            yaw = self.sensor.ar_yaw
+            #id = self.sensor.ar_id
+
+            # if 1.2 < x < 1.8 and 1.8 < y < 2.8 and yaw < 0.4 :      #id == 0  미포함
+            print('start parking...')
+            # self.msg.angle, self.msg.speed = 0, 0
+            # self.pub.publish(self.msg)
+            self.mode_controller.set_mode('parallelparking')
+            self.pursuit()
+        else:
+            self.pursuit()
 
     # 가로주차 주차공간 들어가기 
     def parallelpark(self):
@@ -224,5 +234,5 @@ class Xycar(object):
     def control(self):
         # 어떤 모드인지 확인 후 해당 모드에 맞는 제어 수행
         mode = self.mode_controller(self.sensor.yaw)
-        self.control_dict['arparking']()
+        self.control_dict[mode]()
         # cv2.waitKey(1)
