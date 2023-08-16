@@ -11,13 +11,13 @@ class PurePursuitController(object):
 
         self.Lf = {
             'long straight': 0.2,
-            'short straight': 0.15,
-            'curve': 0.15,
+            'short straight': 0.2,
+            'curve': 0.2,
             'findparking': 0.20,
-            'stopline': 0.15,
-            'obstacle': 0.15,
-            'parallelparking': 0.15,
-            'ar_curve': 0.15
+            'stopline': 0.2,
+            'obstacle': 0.2,
+            'parallelparking': 0.2,
+            'ar_curve': 0.2
         }
         self.target_speed = {
             'long straight': 4,

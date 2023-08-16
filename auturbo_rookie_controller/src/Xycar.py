@@ -117,42 +117,50 @@ class Xycar(object):
 
     # ================================ 미션 1 수평주차 =======================================================#
     # 주차공간 찾기 
-# x :1.574026937403328
-# y :2.197917242725258
-# yaw :0.35974991878453877
+# x  0.7517626732542556   y  1.1183388094957174  w  -0.26245737259726215  id  0
+# 0.5074189710992407   y  0.9376329910134537  w  -0.1507904648456464
     def findparking(self):
         # self.sensor.ar_x, self.sensor.ar_y, self.sensor.ar_yaw, self.sensor.ar_id
-        if self.sensor.ar_id != None:
+        if self.sensor.ar_id == 0:
+            msg = String()
+            msg.data = str("right")
+            self.pub_target_lane.publish(msg)
             x = self.sensor.ar_x
             y = self.sensor.ar_y
             yaw = self.sensor.ar_yaw
-            #id = self.sensor.ar_id
-
-            # if 1.2 < x < 1.8 and 1.8 < y < 2.8 and yaw < 0.4 :      #id == 0  미포함
-            print('start parking...')
-            # self.msg.angle, self.msg.speed = 0, 0
-            # self.pub.publish(self.msg)
-            self.mode_controller.set_mode('parallelparking')
+            
+            id = self.sensor.ar_id
+            print("x ", x, "  y ", y, " w ", yaw, " id ", id)
+            if 0.3 < x < .7 and 0.8 < y < 1.4 and yaw < -0.1 and id == 0 :      #id == 0  미포함
+                print('start parking...')
+                self.msg.angle, self.msg.speed = 0, 0
+                self.pub.publish(self.msg)
+                self.mode_controller.set_mode('parallelparking')
             self.pursuit()
         else:
+            print("hi")
             self.pursuit()
 
     # 가로주차 주차공간 들어가기 
     def parallelpark(self):
-        for _ in range(50):
-            self.msg.angle, self.msg.speed = 0, 3
+        for _ in range(80):
+            self.msg.angle, self.msg.speed = 0, 4
             self.pub.publish(self.msg)
             self.rate.sleep()
-        for _ in range(30):
-            self.msg.angle, self.msg.speed = 50, -3
+        for _ in range(33):
+            self.msg.angle, self.msg.speed = 50, -4
             self.pub.publish(self.msg)
             self.rate.sleep()
         for _ in range(20):
-            self.msg.angle, self.msg.speed = -50, -3
+            self.msg.angle, self.msg.speed = -50, -4
             self.pub.publish(self.msg)
             self.rate.sleep()
         print("주차시작")
         self.mode_controller.set_mode('arparking')
+    #x  0.22868945620672587   y  0.9174609773533844  w  0.20812997531422267  id  1
+    #x  0.1765239034700272   y  0.716902588854083  w  0.24787252483351582  id  1
+
+    #x  0.11365149612910468   y  0.39251462070955173  w  0.11461349366373742  id  1
 
     # 가로주차 aruco marker 인식 후 미세조정 모드 시작
     def arparking(self):

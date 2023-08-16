@@ -26,20 +26,24 @@ class ARController(object):
                     self.reverse = False
                     self.offset = (x + 0.01) * 150
             else:
-                if y < 0.44:
+                if y < 0.28:
                     self.reverse = True
+   #x  0.22868945620672587   y  0.9174609773533844  w  0.20812997531422267  id  1
+    #x  0.1765239034700272   y  0.716902588854083  w  0.24787252483351582  id  1
+
+    #x  0.11365149612910468   y  0.39251462070955173  w  0.11461349366373742  id  1
 
             # termination
-            if 0.05 < x < 0.25 and 0.5 < y < 0.67 and abs(yaw) < 0.1:
+            if 0.15 < x < 0.20 and 0.50 < y < 0.81 and abs(yaw) < 0.28:
                 print('ar 주차 성공')
                 return 0, 0
 
             if self.reverse:
                 angle = -300 * (yaw - 0.05) 
             else:
-                angle = -self.offset +20 if y < 0.35 else self.offset + 20     
+                angle = -self.offset +20 if y < 0.28 else self.offset + 20     
             speed = -4 if self.reverse else  4
-            return 0, int(speed)
+            return angle, int(speed)
         else:
             print('no tag')
             return 0, 0
