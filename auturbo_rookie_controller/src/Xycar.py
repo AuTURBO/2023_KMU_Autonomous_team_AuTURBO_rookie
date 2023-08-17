@@ -231,6 +231,8 @@ class Xycar(object):
             self.mode_controller.set_mode('verticalparking')
         self.rate.sleep()
 
+#x  0.5155718232876816   y  1.4638857327161652  w  -0.09014562949153192  id  2
+
     def findverticalparking(self):
         object_id = 2
         if object_id == 2:
@@ -327,6 +329,10 @@ class Xycar(object):
         msg.data = str(self.target_lane)
         self.pub_target_lane.publish(msg)
         # print(self.target_lane + ' 를 향해 가야함')
+        if self.obstacle_detector.obstacle_counter == 4:
+            print('detecting stopline...')
+            self.obstacle_detector.obstacle_counter = 0
+            self.mode_controller.set_mode("long straight")
 
         self.pursuit()
     # =====================================================================================================#
@@ -369,9 +375,9 @@ class Xycar(object):
         # 어떤 모드인지 확인 후 해당 모드에 맞는 제어 수행
         mode = self.mode_controller(self.sensor.yaw)
         
-        mode = 'stopline'
+        # mode = 'stopline'
         # mode = self.mode_controller(self.sensor.yaw)
-        # rospy.loginfo("current mode is %s", mode)
+        rospy.loginfo("current mode is %s", mode)
         
-        self.control_dict['findparking']()
+        self.control_dict[mode]()
         # cv2.waitKey(1)
