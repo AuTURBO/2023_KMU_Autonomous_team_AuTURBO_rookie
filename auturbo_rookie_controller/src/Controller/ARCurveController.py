@@ -12,10 +12,11 @@ class ARCurveController(object):
         self.target = 0.43
         self.flag = 0
         self.global_marker_id = [0]*10
+        self.angle = 0
 
     def __call__(self, ar_msg):
         '''
-        return angle and speed from x, y, yaw of a AR tag
+        return self.angle and speed from x, y, yaw of a AR tag
         '''
         local_marker_id = [0]*10
         markers_x_point_list = []
@@ -36,7 +37,7 @@ class ARCurveController(object):
 
         # start
         if len(markers_x_point_list) == 0 and self.flag == 0:
-            angle = 0
+            self.angle = 0
         
         # detection
         elif len(markers_x_point_list) > 0 and self.flag == 0:
@@ -44,18 +45,18 @@ class ARCurveController(object):
                 if self.global_marker_id[i] == 1 and local_marker_id == 0:
                     print('AR Curve start: ', len(markers_x_point_list))
                     self.flag = 1
-                    angle = 45
+                    self.angle = -45
 
         # curve controll 
         elif len(markers_x_point_list) > 0 and self.flag == 1:
             error = markers_x_point_list[0] - self.target
-            angle = int(error * 170) 
+            self.angle = int(error * 170) 
             self.flag = 2
-            print(f"error: {error}, angle: {angle}")
+            print(f"error: {error}, self.angle: {self.angle}")
 
         # termination
         if len(markers_x_point_list) == 0 and self.flag == 2:
             self.flag = 3
-            angle = 0
+            self.angle = 0
 
-        return self.flag, angle
+        return self.flag, int(self.angle)
