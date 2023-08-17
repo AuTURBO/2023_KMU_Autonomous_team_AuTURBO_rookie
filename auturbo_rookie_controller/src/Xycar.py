@@ -332,7 +332,7 @@ class Xycar(object):
         if self.obstacle_detector.obstacle_counter == 4:
             print('detecting stopline...')
             self.obstacle_detector.obstacle_counter = 0
-            self.mode_controller.set_mode("long straight")
+            self.mode_controller.set_mode("stopline")
 
         self.pursuit()
     # =====================================================================================================#
@@ -377,7 +377,7 @@ class Xycar(object):
         
         # mode = 'stopline'
         # mode = self.mode_controller(self.sensor.yaw)
-        rospy.loginfo("current mode is %s", mode)
+        # rospy.loginfo("current mode is %s", mode)
         
         self.control_dict[mode]()
         # cv2.waitKey(1)
