@@ -54,6 +54,7 @@ class StopLineDetector(object):
             _, width = bev.shape
             # detected boundingRect:  133 375 245 105
             # detected boundingRect center:  (255, 427)
+            cv2.rectangle(bev, (x, y), (x + w, y + h), green, 2)
             print("detected boundingRect: ", x, y, w, h)
             print("detected boundingRect center: ", center)
             detected = True
