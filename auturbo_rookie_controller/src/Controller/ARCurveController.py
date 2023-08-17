@@ -17,14 +17,14 @@ class ARCurveController(object):
         '''
         return angle and speed from x, y, yaw of a AR tag
         '''
-        marker_id = [0]*10
+        local_marker_id = [0]*10
         markers_x_point_list = []
         markers_y_point_list = []
         markers_yaw_point_list = []
 
         for i in ar_msg.markers:
             self.global_marker_id[i.id] = 1
-            marker_id[i.id] = 1
+            local_marker_id[i.id] = 1
 
             pose = i.pose.pose
             markers_x_point_list.append(pose.position.x)
@@ -41,7 +41,7 @@ class ARCurveController(object):
         # detection
         elif len(markers_x_point_list) > 0 and self.flag == 0:
             for i in range(10):
-                if self.global_marker_id[i] == 1 and marker_id == 0:
+                if self.global_marker_id[i] == 1 and local_marker_id == 0:
                     print('AR Curve start: ', len(markers_x_point_list))
                     self.flag = 1
                     angle = 45
