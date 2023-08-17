@@ -207,14 +207,20 @@ class Xycar(object):
     # 이 부분을 채워주세요~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     # !!!!!!!
     def ar_curve(self):
-        self.target_angle, flag = self.ar_curve_controller(self.sensor.ar_msg)
-        self.pursuit()
+        flag, self.msg.angle = self.ar_curve_controller(self.sensor.ar_msg)
         if flag == 0:
-            print('ar tag')
             self.pursuit()
-            # 수직 주차모드 시작 
-            # self.mode_controller.set_mode('findverticalparking')
-            # self.mode_controller.set_mode('curve')
+        elif flag == 1:
+            print('AR Curve init - flag: ', self.flag)
+            self.msg.speed = 2
+            self.pub.publish(self.msg)
+        elif flag == 2:
+            print('AR Curve start - flag: ', self.flag)
+            self.msg.speed = 2
+            self.pub.publish(self.msg)
+        elif flag == 3:
+            print('AR Curve termination - flag: ', self.flag)
+            self.mode_controller.set_mode('curve')
         self.rate.sleep()
         # 다음모드 커브모드 
         # 객체인식 주차모드일 수 있음 
