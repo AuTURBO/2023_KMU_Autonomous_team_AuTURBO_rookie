@@ -15,7 +15,7 @@ class ObstacleDetector(object):
         self.obstacle_counter = 0
         self.timer = timer
         # 장애물을 감지하기 위한 타이머입니다.
-        self.obs_dict = {1: 0.5, 2: 1, 3: 1.5}
+        self.obs_dict = {1: 1, 2: 2.6, 3: 4}
 
     # 콜
     def __call__(self, ranges, angle_increment):
@@ -40,7 +40,7 @@ class ObstacleDetector(object):
 
             # 장애물로 판단할 조건을 마스킹하여 필터링합니다.
             # 거리값에 따른 필터링 조건을 설정합니다.
-            mask = (np.abs(ranges * np.sin(deg)) < 0.5) & (0.2 < ranges * np.cos(deg)) & (ranges * np.cos(deg) < 0.5)
+            mask = (np.abs(ranges * np.sin(deg)) < 0.4) & (0.2 < ranges * np.cos(deg)) & (ranges * np.cos(deg) < 0.4)
             # 필터링 조건에 따라 데이터를 필터링합니다.
             filtered = np.where(mask, ranges, 0.0)
 
@@ -48,15 +48,15 @@ class ObstacleDetector(object):
             nz = np.nonzero(filtered)[0]
             # print(nz)
             
-            if len(nz) > 5:
+            if len(nz) > 10:
                 # print("nz: ", nz)
                 # 만약 필터링된 데이터의 개수가 5개 이상이면, 어느 방향으로 피해야 할지 결정합니다.
 
                 if np.median(nz) > len(ranges) // 2 and np.median(nz) < len(ranges):
-                    # print("right")
+                    print("right")
                     self.avoid_direction = 'right'
                 else:
-                    # print("left")
+                    print("left")
                     self.avoid_direction = 'left'
 
 

@@ -1,15 +1,13 @@
 <?xml version="1.0"?>
 
 <launch>
+  <!-- Launch camera, motor, lidar, and YOLOv5 nodes -->
   <include file="$(find usb_cam)/launch/xycar_cam.launch" />
   <include file="$(find xycar_motor)/launch/xycar_motor.launch" />
   <include file="$(find ydlidar_ros_driver)/launch/G2.launch" />
-  <include file="$(find yolov5_ros)/launch/yolov5.launch" />
+  <!-- <include file="$(find yolov5_ros)/launch/yolov5.launch" /> -->
 
-  <include file="$(find ydlidar_ros_driver)/launch/G2.launch" />
-  
-  
-  <!-- ar tag -->
+  <!-- AR tag detection -->
   <node name="ar_track_alvar" pkg="ar_track_alvar" type="individualMarkersNoKinect" respawn="false" output="screen">
     <param name="marker_size" type="double" value="9.0" />
     <param name="max_new_marker_error" type="double" value="0.05" />
@@ -19,18 +17,17 @@
     <remap from="camera_info" to="/usb_cam/camera_info" />
   </node>
 
-  <!-- imu -->
+  <!-- IMU -->
   <node pkg="xycar_imu" type="9dof_imu_node.py" name="xycar_imu" output="screen">
     <param name="rviz_mode" type="string" value="false" />
   </node>
 
-  <!-- 초음파 -->
+  <!-- Ultrasonic -->
   <node pkg="xycar_ultrasonic" type="xycar_ultrasonic.py" name="xycar_ultrasonic" output="screen" />
 
-  <!-- 초음파 -->
+  <!-- Line Detector -->
   <node pkg="auturbo_rookie_perception" type="line_detector.py" name="line_detector" output="screen" />
 
-
-  <!-- rviz -->
+  <!-- RViz -->
   <node type="rviz" name="rviz" pkg="rviz" args="-d $(find auturbo_rookie_controller)/rviz/config_file.rviz" />
 </launch>

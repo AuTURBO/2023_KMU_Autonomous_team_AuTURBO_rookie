@@ -58,6 +58,7 @@ class StopLineDetector(object):
             if (200 <= center[0] <= (width - 200)) and (w > 400) & (h < 80):
                 cv2.rectangle(bev, (x, y), (x + w, y + h), green, 2)
                 detected = True
+                rospy.loginfo("StopLine detected")  
 
         cv2.imshow('stopline', bev)
         key = cv2.waitKey(self.frameRate)

@@ -35,7 +35,7 @@ class Xycar(object):
         yaw0 = self.sensor.init(self.rate)
 
         # 장애물 감지기 생성
-        self.obstacledetector = ObstacleDetector(self.timer)
+        self.obstacle_detector = ObstacleDetector(self.timer)
         # 객체인식 주차
         # self.specfic_car = "grandeur"
         # self.specfic_car = "avante"
@@ -130,7 +130,7 @@ class Xycar(object):
 # 0.5074189710992407   y  0.9376329910134537  w  -0.1507904648456464
     def findparking(self):
         # self.sensor.ar_x, self.sensor.ar_y, self.sensor.ar_yaw, self.sensor.ar_id
-        if self.sensor.ar_id == 0:
+        if self.sensor.ar_id != None:
             msg = String()
             msg.data = str("right")
             self.pub_target_lane.publish(msg)
@@ -139,16 +139,16 @@ class Xycar(object):
             yaw = self.sensor.ar_yaw
             
             id = self.sensor.ar_id
-            # print("x ", x, "  y ", y, " w ", yaw, " id ", id)
-            if 0.2 < x < 0.8 and 0.7 < y < 1.5 and yaw < 0.1 and id == 0 :      #id == 0  미포함
-                print('start parking...')
-                self.msg.angle, self.msg.speed = 0, 0
-                self.pub.publish(self.msg)
-                self.mode_controller.set_mode('parallelparking')
-            self.pursuit()
-        else:
-            # print("hi")
-            self.pursuit()
+            print("x ", x, "  y ", y, " w ", yaw, " id ", id)
+        #     if 0.2 < x < 0.8 and 0.7 < y < 1.5 and yaw < 0.1 and id == 0 :      #id == 0  미포함
+        #         print('start parking...')
+        #         self.msg.angle, self.msg.speed = 0, 0
+        #         self.pub.publish(self.msg)
+        #         self.mode_controller.set_mode('parallelparking')
+        #     self.pursuit()
+        # else:
+        #     # print("hi")
+        #     self.pursuit()
 
     # 가로주차 주차공간 들어가기 
     def parallelpark(self):
@@ -367,10 +367,11 @@ class Xycar(object):
     # 메인 루프 
     def control(self):
         # 어떤 모드인지 확인 후 해당 모드에 맞는 제어 수행
-        # mode = self.mode_controller(self.sensor.yaw)
+        mode = self.mode_controller(self.sensor.yaw)
         
         mode = 'stopline'
-        rospy.loginfo("current mode is %s", mode)
+        # mode = self.mode_controller(self.sensor.yaw)
+        # rospy.loginfo("current mode is %s", mode)
         
-        self.control_dict[mode]()
+        self.control_dict['findparking']()
         # cv2.waitKey(1)
