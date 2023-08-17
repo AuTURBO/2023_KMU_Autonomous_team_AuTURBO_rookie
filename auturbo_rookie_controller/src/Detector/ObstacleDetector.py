@@ -15,7 +15,7 @@ class ObstacleDetector(object):
         self.obstacle_counter = 0
         self.timer = timer
         # 장애물을 감지하기 위한 타이머입니다.
-        self.obs_dict = {1: 1., 2: 2.6, 3: 4}
+        self.obs_dict = {1: 2, 2: 2.6, 3: 4}
 
     # 콜
     def __call__(self, ranges, angle_increment):
@@ -53,33 +53,35 @@ class ObstacleDetector(object):
                 # 만약 필터링된 데이터의 개수가 5개 이상이면, 어느 방향으로 피해야 할지 결정합니다.
 
                 if np.median(nz) > len(ranges) // 2 and np.median(nz) < len(ranges):
-                    print("right")
+                    # print("right")
                     self.avoid_direction = 'right'
                 else:
-                    print("left")
+                    # print("left")
                     self.avoid_direction = 'left'
 
 
-                print('avoid to ' + self.avoid_direction)
+        #         print('avoid to ' + self.avoid_direction)
 
-                # 타이머를 업데이트하고, 장애물 카운터를 1 증가시킵니다.
-                self.timer.update()
-                self.obstacle_counter += 1
-                return self.avoid_direction
+        #         # 타이머를 업데이트하고, 장애물 카운터를 1 증가시킵니다.
+        #         self.timer.update()
+        #         self.obstacle_counter += 1
+        #         return self.avoid_direction
             
-            # nz 리스트 초기화
-            nz = []
-        elif self.obstacle_counter != 0:
-            # 이미 장애물을 감지한 경우
-            if self.timer() > self.obs_dict[self.obstacle_counter]:
-                # 장애물에 대한 카운터 값에 해당하는 시간이 지나면 다음 단계로 넘어갑니다.
-                if self.obstacle_counter == 3:
-                    self.avoid_direction = 'middle'   
+        #     # nz 리스트 초기화
+        #     nz = []
+        # elif self.obstacle_counter != 0:
+        #     # 이미 장애물을 감지한 경우
+        #     if self.timer() > self.obs_dict[self.obstacle_counter]:
+        #         # 장애물에 대한 카운터 값에 해당하는 시간이 지나면 다음 단계로 넘어갑니다.
+        #         if self.obstacle_counter == 3:
+        #             self.avoid_direction = 'middle'   
                                      
-                else:
-                    self.avoid_direction = 'left' if self.avoid_direction == 'right' else 'right'
-                self.timer.update()
-                self.obstacle_counter += 1
-            print('avoid to ' + self.avoid_direction)
-            return self.avoid_direction
+        #         else:
+        #             self.avoid_direction = 'left' if self.avoid_direction == 'right' else 'right'
+        #         self.timer.update()
+        #         self.obstacle_counter += 1
+        #     print('avoid to ' + self.avoid_direction)
+        #     return self.avoid_direction
     
+        else:
+            return "done play"

@@ -325,14 +325,33 @@ class Xycar(object):
 
     def obstacle(self):
         self.target_lane = self.obstacle_detector(self.sensor.lidar, self.sensor.angle_increment)
-        msg = String()
-        msg.data = str(self.target_lane)
-        self.pub_target_lane.publish(msg)
-        # print(self.target_lane + ' 를 향해 가야함')
-        if self.obstacle_detector.obstacle_counter == 4:
-            print('detecting stopline...')
-            self.obstacle_detector.obstacle_counter = 0
-            self.mode_controller.set_mode("stopline")
+        print ("target_lane : ", self.target_lane)
+        if self.pub_target_lane != None:
+            print("start right")
+            for _ in range(10):
+                self.msg.angle, self.msg.speed = -50, 3
+                self.pub.publish(self.msg)
+                self.rate.sleep()
+            for _ in range(15):
+                self.msg.angle, self.msg.speed = 0, 3
+                self.pub.publish(self.msg)
+                self.rate.sleep()
+            for _ in range(10):
+                self.msg.angle, self.msg.speed = 50, 3
+                self.pub.publish(self.msg)
+                self.rate.sleep()
+            for _ in range(15):
+                self.msg.angle, self.msg.speed = 0, 3
+                self.pub.publish(self.msg)
+                self.rate.sleep()
+            for _ in range(10):
+                self.msg.angle, self.msg.speed = -50, 3
+                self.pub.publish(self.msg)
+                self.rate.sleep()                        
+            for _ in range(10):
+                self.msg.angle, self.msg.speed = 0, 3
+                self.pub.publish(self.msg)
+                self.rate.sleep()
 
         self.pursuit()
     # =====================================================================================================#

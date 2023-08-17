@@ -7,5 +7,5 @@
         "/opt/ros/noetic/lib/python3/dist-packages",
         "/home/ggh/catkin_ws/devel/lib/python3/dist-packages"
     ],
-    "cmake.sourceDirectory": "/home/ggh/catkin_ws/src/2023_KMU_Autonomous_team_AuTURBO_rookie/auturbo_rookie_perception"
+    "cmake.sourceDirectory": "/home/xytron/xycar_ws/src/2023_KMU_Autonomous_team_AuTURBO_rookie/auturbo_rookie_perception"
 }
