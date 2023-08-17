@@ -10,31 +10,52 @@ class ARCurveController(object):
     '''
     def __init__(self):
         self.target = 0.43
-        self.markers_x_point_list = []
-        self.markers_y_point_list = []
-        self.markers_yaw_point_list = []
+        self.flag = 0
+        self.global_marker_id = [0]*10
 
     def __call__(self, ar_msg):
         '''
         return angle and speed from x, y, yaw of a AR tag
         '''
-        for i in ar_msg.markers:     
+        marker_id = [0]*10
+        markers_x_point_list = []
+        markers_y_point_list = []
+        markers_yaw_point_list = []
+
+        for i in ar_msg.markers:
+            self.global_marker_id[i.id] = 1
+            marker_id[i.id] = 1
+
             pose = i.pose.pose
-            self.markers_x_point_list.append(pose.position.x)
-            self.markers_y_point_list.append(pose.position.z)
-            self.markers_yaw_point_list.append(euler_from_quaternion((pose.orientation.x, pose.orientation.y,
+            markers_x_point_list.append(pose.position.x)
+            markers_y_point_list.append(pose.position.z)
+            markers_yaw_point_list.append(euler_from_quaternion((pose.orientation.x, pose.orientation.y,
                                               pose.orientation.z, pose.orientation.w))[1])
+        markers_x_point_list.sort(reverse=True)
+        print('detecting AR tag: ', len(markers_x_point_list))
+
+        # start
+        if len(markers_x_point_list) == 0 and self.flag == 0:
+            angle = 0
+        
+        # detection
+        elif len(markers_x_point_list) > 0 and self.flag == 0:
+            for i in range(10):
+                if self.global_marker_id[i] == 1 and marker_id == 0:
+                    print('AR Curve start: ', len(markers_x_point_list))
+                    self.flag = 1
+                    angle = 45
+
+        # curve controll 
+        elif len(markers_x_point_list) > 0 and self.flag == 1:
+            error = markers_x_point_list[0] - self.target
+            angle = int(error * 170) 
+            self.flag = 2
+            print(f"error: {error}, angle: {angle}")
 
         # termination
-        if len(self.markers_x_point_list) == 0:
-            print('there is no detecting AR tag')
-            return 0, 0
+        if len(markers_x_point_list) == 0 and self.flag == 2:
+            self.flag = 3
+            angle = 0
 
-        # direction
-        elif len(self.markers_x_point_list) > 0:
-            error = self.markers_x_point_list[0] - self.target
-            print(f"error: {error}")
-            angle = int(error * 170) 
-            print(angle)
-
-        return angle, 1
+        return self.flag, angle
