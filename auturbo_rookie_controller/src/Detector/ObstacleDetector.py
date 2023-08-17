@@ -15,7 +15,7 @@ class ObstacleDetector(object):
         self.obstacle_counter = 0
         self.timer = timer
         # 장애물을 감지하기 위한 타이머입니다.
-        self.obs_dict = {1: 1.0, 2: 2.0, 3: 3.0}
+        self.obs_dict = {1: 0.5, 2: 1, 3: 1.5}
 
     # 콜
     def __call__(self, ranges, angle_increment):
@@ -24,7 +24,7 @@ class ObstacleDetector(object):
         
         '''
 
-        if(self.timer() < 100):
+        if self.obstacle_counter == 0:
         
             # print(ranges)
             # 장애물 카운터가 0이고, 타이머가 0.35초 이상인 경우에만 장애물을 감지합니다.
@@ -40,7 +40,7 @@ class ObstacleDetector(object):
 
             # 장애물로 판단할 조건을 마스킹하여 필터링합니다.
             # 거리값에 따른 필터링 조건을 설정합니다.
-            mask = (np.abs(ranges * np.sin(deg)) < 0.4) & (0.2 < ranges * np.cos(deg)) & (ranges * np.cos(deg) < 0.4)
+            mask = (np.abs(ranges * np.sin(deg)) < 0.5) & (0.2 < ranges * np.cos(deg)) & (ranges * np.cos(deg) < 0.5)
             # 필터링 조건에 따라 데이터를 필터링합니다.
             filtered = np.where(mask, ranges, 0.0)
 
@@ -48,29 +48,24 @@ class ObstacleDetector(object):
             nz = np.nonzero(filtered)[0]
             # print(nz)
             
-            if len(nz) > 10:
+            if len(nz) > 5:
                 # print("nz: ", nz)
                 # 만약 필터링된 데이터의 개수가 5개 이상이면, 어느 방향으로 피해야 할지 결정합니다.
 
                 if np.median(nz) > len(ranges) // 2 and np.median(nz) < len(ranges):
-                    print("right")
+                    # print("right")
                     self.avoid_direction = 'right'
-                elif np.median(nz) > len(ranges) // 2 - 5 and np.median(nz) < len(ranges) // 2 + 5:
-                    print("middle")
-                    self.avoid_direction = 'middle'
                 else:
-                    print("left")
+                    # print("left")
                     self.avoid_direction = 'left'
-            else:
-                self.avoid_direction = 'middle'
-                print("middle")
 
 
-                # print('avoid to ' + self.avoid_direction)
+                print('avoid to ' + self.avoid_direction)
 
                 # 타이머를 업데이트하고, 장애물 카운터를 1 증가시킵니다.
                 self.timer.update()
                 self.obstacle_counter += 1
+                return self.avoid_direction
             
             # nz 리스트 초기화
             nz = []
@@ -82,13 +77,8 @@ class ObstacleDetector(object):
                     self.avoid_direction = 'middle'                    
                 else:
                     self.avoid_direction = 'left' if self.avoid_direction == 'right' else 'right'
-                # print('avoid to ' + self.avoid_direction)
-
-                # 타이머를 업데이트하고, 장애물 카운터를 1 증가시킵니다.
                 self.timer.update()
                 self.obstacle_counter += 1
-
+            print('avoid to ' + self.avoid_direction)
             return self.avoid_direction
-        else:
-            print("stopline start")
-            return "stopline"
+    

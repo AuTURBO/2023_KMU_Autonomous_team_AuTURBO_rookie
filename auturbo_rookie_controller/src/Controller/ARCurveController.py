@@ -28,7 +28,7 @@ class ARCurveController(object):
         # termination
         if len(self.markers_x_point_list) == 0:
             print('there is no detecting AR tag')
-            return 0
+            return 0, 0
 
         # direction
         elif len(self.markers_x_point_list) > 0:
@@ -37,4 +37,4 @@ class ARCurveController(object):
             angle = int(error * 170) 
             print(angle)
 
-        return angle
+        return angle, 1

@@ -15,11 +15,11 @@ class ARController(object):
         '''
         if x != None and y != None and yaw != None:
             # direction
-            print("x :{}".format(x))
+            # print("x :{}".format(x))
 
-            print("y :{}".format(y))
+            # print("y :{}".format(y))
 
-            print("yaw :{}".format(yaw))
+            # print("yaw :{}".format(yaw))
 
             if self.reverse:
                 if y > 0.6:
@@ -34,16 +34,17 @@ class ARController(object):
     #x  0.11365149612910468   y  0.39251462070955173  w  0.11461349366373742  id  1
 
             # termination
-            if 0.15 < x < 0.20 and 0.50 < y < 0.81 and abs(yaw) < 0.28:
+            if 0.15 < x < 0.20 and 0.65 < y < 0.91 and abs(yaw) < 0.28:
                 print('ar 주차 성공')
                 return 0, 0
 
             if self.reverse:
                 angle = -300 * (yaw - 0.05) 
             else:
-                angle = -self.offset +20 if y < 0.28 else self.offset + 20     
-            speed = -4 if self.reverse else  4
-            return angle, int(speed)
+                angle = -self.offset +20 if y < 0.28 else self.offset + 20   
+  
+            speed = -3 if self.reverse else  3
+            return int(angle), int(speed)
         else:
             print('no tag')
             return 0, 0

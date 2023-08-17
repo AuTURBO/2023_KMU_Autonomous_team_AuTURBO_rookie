@@ -79,7 +79,7 @@ def simple_controller(lx, ly, mx, my, rx, ry):
         if rx != None and len(rx) > 3:  # 우측 차선만 존재할떄
             target = rx[0] - obstacle_margin 
         if mx != None and len(mx) > 3:  # 중간 차선만 존재할떄
-            target = mx[0] + obstacle_margin + 150
+            target = mx[0] + obstacle_margin + 80
         print("Obstacle Right!!!")
     elif obstacle_info == "left": # obstacle이 좌측에 존재
         if lx != None and len(lx) > 3 and mx != None and len(mx) > 3: #  좌측차선과 중간차선이 모두 존재할떄
@@ -87,7 +87,7 @@ def simple_controller(lx, ly, mx, my, rx, ry):
         if lx != None and len(lx) > 3:  # 좌측 차선만 존재할떄
             target = lx[0] + obstacle_margin
         if mx != None and len(mx) > 3:  # 중간 차선만 존재할떄
-            target = mx[0] - obstacle_margin - 150
+            target = mx[0] - obstacle_margin - 80
         print("Obstacle Left!!!")
 
     # print(f"target: {target}")
