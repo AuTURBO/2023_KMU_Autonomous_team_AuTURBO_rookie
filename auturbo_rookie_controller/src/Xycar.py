@@ -323,37 +323,78 @@ class Xycar(object):
 
     # ================================ 미션 4 장애물 회피 ==============================================#
 
+
+    def right_obstacle(self):
+        print("start right")
+        for _ in range(10):
+            self.msg.angle, self.msg.speed = -50, 3
+            self.pub.publish(self.msg)
+            self.rate.sleep()
+        for _ in range(15):
+            self.msg.angle, self.msg.speed = 0, 3
+            self.pub.publish(self.msg)
+            self.rate.sleep()
+
+        
+        for _ in range(10):
+            self.msg.angle, self.msg.speed = 50, 3
+            self.pub.publish(self.msg)
+            self.rate.sleep()
+        for _ in range(15):
+            self.msg.angle, self.msg.speed = 0, 3
+            self.pub.publish(self.msg)
+            self.rate.sleep()
+        for _ in range(10):
+            self.msg.angle, self.msg.speed = -50, 3
+            self.pub.publish(self.msg)
+            self.rate.sleep()                        
+        for _ in range(10):
+            self.msg.angle, self.msg.speed = 0, 3
+            self.pub.publish(self.msg)
+            self.rate.sleep()
+
+    def left_obstacle(self):
+        print("start left")
+        for _ in range(10):
+            self.msg.angle, self.msg.speed = 50, 3
+            self.pub.publish(self.msg)
+            self.rate.sleep()
+        for _ in range(15):
+            self.msg.angle, self.msg.speed = 0, 3
+            self.pub.publish(self.msg)
+            self.rate.sleep()
+
+        
+        for _ in range(10):
+            self.msg.angle, self.msg.speed = -50, 3
+            self.pub.publish(self.msg)
+            self.rate.sleep()
+        for _ in range(15):
+            self.msg.angle, self.msg.speed = 0, 3
+            self.pub.publish(self.msg)
+            self.rate.sleep()
+        for _ in range(10):
+            self.msg.angle, self.msg.speed = 50, 3
+            self.pub.publish(self.msg)
+            self.rate.sleep()                        
+        for _ in range(10):
+            self.msg.angle, self.msg.speed = 0, 3
+            self.pub.publish(self.msg)
+            self.rate.sleep()
+
     def obstacle(self):
         self.target_lane = self.obstacle_detector(self.sensor.lidar, self.sensor.angle_increment)
         print ("target_lane : ", self.target_lane)
-        if self.pub_target_lane != None:
-            print("start right")
-            for _ in range(10):
-                self.msg.angle, self.msg.speed = -50, 3
-                self.pub.publish(self.msg)
-                self.rate.sleep()
-            for _ in range(15):
-                self.msg.angle, self.msg.speed = 0, 3
-                self.pub.publish(self.msg)
-                self.rate.sleep()
-            for _ in range(10):
-                self.msg.angle, self.msg.speed = 50, 3
-                self.pub.publish(self.msg)
-                self.rate.sleep()
-            for _ in range(15):
-                self.msg.angle, self.msg.speed = 0, 3
-                self.pub.publish(self.msg)
-                self.rate.sleep()
-            for _ in range(10):
-                self.msg.angle, self.msg.speed = -50, 3
-                self.pub.publish(self.msg)
-                self.rate.sleep()                        
-            for _ in range(10):
-                self.msg.angle, self.msg.speed = 0, 3
-                self.pub.publish(self.msg)
-                self.rate.sleep()
+        if self.pub_target_lane == 'right':
+            self.right_obstacle(self)
+        elif self.pub_target_lane == 'left':
+            self.left_obstacle(self)
 
         self.pursuit()
+        #다음 모드로 변경 필요 --시온--
+
+
+
     # =====================================================================================================#
 
     # ================================ 미션 5 스탑라인(횡단보도) 정지 ===========================================#
