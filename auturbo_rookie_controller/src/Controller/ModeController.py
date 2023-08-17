@@ -20,10 +20,7 @@ class ModeController(object):
     def set_mode(self, mode):
         self.mode = mode
 
-    def set_yaw0(self, yaw0):
-
-
-        
+    def set_yaw0(self, yaw0):        
         self.yaw0 = yaw0
 
     def get_mode(self):
