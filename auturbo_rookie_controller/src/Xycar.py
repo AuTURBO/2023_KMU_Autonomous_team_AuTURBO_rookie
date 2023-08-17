@@ -217,7 +217,7 @@ class Xycar(object):
         elif flag == 2:
             print('AR Curve start')
             self.pub.publish(self.msg)
-        elif flag == 2:
+        elif flag == 3:
             print('AR Curve termination')
             self.mode_controller.set_mode('curve')
 
