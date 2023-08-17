@@ -171,8 +171,8 @@ class Yolov5Detector:
 
         # Publish & visualize images
         if self.view_image:
-            cv2.imshow(str(0), im0)
-            cv2.waitKey(1)  # 1 millisecond
+            cv2.imshow("yolo inference frame", im0)
+            cv2.waitKey(10)  # 10 millisecond
         if self.publish_image:
             self.image_pub.publish(self.bridge.cv2_to_imgmsg(im0, "bgr8"))
         
