@@ -19,6 +19,9 @@ from Controller.ModeController import ModeController
 from Controller.ARController import ARController
 from Controller.ARCurveController import ARCurveController
 
+
+
+
 class Xycar(object):
     '''
     Main class for AutoDriving
@@ -38,8 +41,8 @@ class Xycar(object):
         self.obstacle_detector = ObstacleDetector(self.timer)
         # 객체인식 주차
         # self.specfic_car = "grandeur"
-        # self.specfic_car = "avante"
-        self.specfic_car = "sonata"
+        self.specfic_car = "avante"
+        # self.specfic_car = "sonata"
         self.objectdetector = ObjectDetector(self.timer, self.specfic_car)
         # self.verticalparking = VerticalParking(self.timer)
         # stop line 감지기 생성
@@ -62,6 +65,10 @@ class Xycar(object):
     
         # 루버콘 컨트롤러 생성 
         self.rubbercon_controller = RubberconController(self.timer)
+
+
+
+
 
 
     
@@ -324,73 +331,82 @@ class Xycar(object):
     # ================================ 미션 4 장애물 회피 ==============================================#
 
 
-    def right_obstacle(self):
-        print("start right")
-        for _ in range(10):
-            self.msg.angle, self.msg.speed = -50, 3
-            self.pub.publish(self.msg)
-            self.rate.sleep()
-        for _ in range(15):
-            self.msg.angle, self.msg.speed = 0, 3
-            self.pub.publish(self.msg)
-            self.rate.sleep()
 
-        
-        for _ in range(10):
-            self.msg.angle, self.msg.speed = 50, 3
-            self.pub.publish(self.msg)
-            self.rate.sleep()
-        for _ in range(15):
-            self.msg.angle, self.msg.speed = 0, 3
-            self.pub.publish(self.msg)
-            self.rate.sleep()
-        for _ in range(10):
-            self.msg.angle, self.msg.speed = -50, 3
-            self.pub.publish(self.msg)
-            self.rate.sleep()                        
-        for _ in range(10):
-            self.msg.angle, self.msg.speed = 0, 3
-            self.pub.publish(self.msg)
-            self.rate.sleep()
-
-    def left_obstacle(self):
-        print("start left")
-        for _ in range(10):
-            self.msg.angle, self.msg.speed = 50, 3
-            self.pub.publish(self.msg)
-            self.rate.sleep()
-        for _ in range(15):
-            self.msg.angle, self.msg.speed = 0, 3
-            self.pub.publish(self.msg)
-            self.rate.sleep()
-
-        
-        for _ in range(10):
-            self.msg.angle, self.msg.speed = -50, 3
-            self.pub.publish(self.msg)
-            self.rate.sleep()
-        for _ in range(15):
-            self.msg.angle, self.msg.speed = 0, 3
-            self.pub.publish(self.msg)
-            self.rate.sleep()
-        for _ in range(10):
-            self.msg.angle, self.msg.speed = 50, 3
-            self.pub.publish(self.msg)
-            self.rate.sleep()                        
-        for _ in range(10):
-            self.msg.angle, self.msg.speed = 0, 3
-            self.pub.publish(self.msg)
-            self.rate.sleep()
 
     def obstacle(self):
         self.target_lane = self.obstacle_detector(self.sensor.lidar, self.sensor.angle_increment)
+        self.target_lane = str(self.target_lane)
         print ("target_lane : ", self.target_lane)
-        if self.pub_target_lane == 'right':
-            self.right_obstacle(self)
-        elif self.pub_target_lane == 'left':
-            self.left_obstacle(self)
+        if self.target_lane == 'right':
+            print("start right")
+            for _ in range(10):
+                self.msg.angle, self.msg.speed = -50, 3
+                self.pub.publish(self.msg)
+                self.rate.sleep()
+            for _ in range(15):
+                self.msg.angle, self.msg.speed = 0, 3
+                self.pub.publish(self.msg)
+                self.rate.sleep()
 
-        self.pursuit()
+            
+            for _ in range(10):
+                self.msg.angle, self.msg.speed = 50, 3
+                self.pub.publish(self.msg)
+                self.rate.sleep()
+            for _ in range(15):
+                self.msg.angle, self.msg.speed = 0, 3
+                self.pub.publish(self.msg)
+                self.rate.sleep()
+            for _ in range(10):
+                self.msg.angle, self.msg.speed = -50, 3
+                self.pub.publish(self.msg)
+                self.rate.sleep()                        
+            for _ in range(10):
+                self.msg.angle, self.msg.speed = 0, 3
+                self.pub.publish(self.msg)
+                self.rate.sleep()
+            for _ in range(60):
+                self.msg.angle, self.msg.speed = 0, 0
+                self.pub.publish(self.msg)
+                self.rate.sleep()
+            print("right")
+        elif self.target_lane == 'left':
+            print("left")
+            print("start left")
+            for _ in range(10):
+                self.msg.angle, self.msg.speed = 50, 3
+                self.pub.publish(self.msg)
+                self.rate.sleep()
+            for _ in range(15):
+                self.msg.angle, self.msg.speed = 0, 3
+                self.pub.publish(self.msg)
+                self.rate.sleep()
+
+            
+            for _ in range(10):
+                self.msg.angle, self.msg.speed = -50, 3
+                self.pub.publish(self.msg)
+                self.rate.sleep()
+            for _ in range(15):
+                self.msg.angle, self.msg.speed = 0, 3
+                self.pub.publish(self.msg)
+                self.rate.sleep()
+            for _ in range(10):
+                self.msg.angle, self.msg.speed = 50, 3
+                self.pub.publish(self.msg)
+                self.rate.sleep()                        
+            for _ in range(10):
+                self.msg.angle, self.msg.speed = 0, 3
+                self.pub.publish(self.msg)
+                self.rate.sleep()
+            for _ in range(60):
+                self.msg.angle, self.msg.speed = 0, 0
+                self.pub.publish(self.msg)
+                self.rate.sleep()
+
+        else:
+            self.pursuit()
+
         #다음 모드로 변경 필요 --시온--
 
 
