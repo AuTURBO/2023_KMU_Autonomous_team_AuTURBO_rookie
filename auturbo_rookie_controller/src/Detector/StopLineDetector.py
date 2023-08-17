@@ -42,22 +42,23 @@ class StopLineDetector(object):
         for cont in contours:
             length = cv2.arcLength(cont, True)
             area = cv2.contourArea(cont)
-            if area > 1000:
-                print(area)
 
             if not ((area > self.area_threshold) and (length > self.lengh_threshold)):
                 continue
             if len(cv2.approxPolyDP(cont, length*0.02, True)) != 4:
                 continue
-
+            
             x, y, w, h = cv2.boundingRect(cont)
             center = (x + int(w/2), y + int(h/2))
             # _, width, _ = bev.shape
             _, width = bev.shape
+            print("detected boundingRect center: %d", center)
 
             if (200 <= center[0] <= (width - 200)) and (w > 400) & (h < 80):
                 cv2.rectangle(bev, (x, y), (x + w, y + h), green, 2)
                 detected = True
+                print("detected stopline")
+
 
         cv2.imshow('stopline', bev)
         key = cv2.waitKey(self.frameRate)
