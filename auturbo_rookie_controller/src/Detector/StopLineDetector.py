@@ -52,12 +52,16 @@ class StopLineDetector(object):
             center = (x + int(w/2), y + int(h/2))
             # _, width, _ = bev.shape
             _, width = bev.shape
-            print("detected boundingRect center: %d", center)
+            # detected boundingRect:  133 375 245 105
+            # detected boundingRect center:  (255, 427)
+            print("detected boundingRect: ", x, y, w, h)
+            print("detected boundingRect center: ", center)
+            detected = True
 
-            if (200 <= center[0] <= (width - 200)) and (w > 400) & (h < 80):
-                cv2.rectangle(bev, (x, y), (x + w, y + h), green, 2)
-                detected = True
-                print("detected stopline")
+            # if (200 <= center[0] <= (width - 200)) and (w > 400) & (h < 80):
+            #     cv2.rectangle(bev, (x, y), (x + w, y + h), green, 2)
+            #     detected = True
+            #     print("detected stopline")
 
 
         cv2.imshow('stopline', bev)
