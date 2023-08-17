@@ -9,11 +9,12 @@ class ModeController(object):
     Counts laps
     '''
 
-    def __init__(self, yaw0, timer):
+    # def __init__(self, yaw0, timer):
+    def __init__(self, timer):
         # 첫 시작은 긴 직진 모드
-        self.mode = 'obstacle'
+        self.mode = 'stopline'
         self.timer = timer
-        self.yaw0 = yaw0
+        # self.yaw0 = yaw0
         self.lap = 0
         self.lap_target = 3
 
@@ -38,12 +39,13 @@ class ModeController(object):
     # 8. 횡단보도 인식 모드가 끝나면 커브 모드로 변경 후 lap == 3일때 정지선 라바콘 주행 모드로 변경
     # 9. 정지선 라바콘 주행 모드가 끝나면 짧은 직진 모드로 변경 후 lap == 4일때 직진 모드로 변경
 
-    def __call__(self, yaw):
+    def __call__(self):
         '''
         updates and returns current mode
         '''
         # 각도 오차값 계산
-        diff_yaw = abs(yaw - self.yaw0)
+        # diff_yaw = abs(yaw - self.yaw0)
+        diff_yaw = 0
         # 만약 각도 오차값이 180도를 넘어가면 360도에서 빼주어 양수로 만들어준다.
         # ex) 360 - 190 = 170
         if diff_yaw > np.pi: 
@@ -71,7 +73,7 @@ class ModeController(object):
             # ar 커브 모드
             if self.lap == 1:
                 print('detecting ar curve...')
-                self.mode = 'ar curve'
+                self.mode = 'ar_curve'
             # 장애물 회피 모드
             elif self.lap == 2:
                 print('detecting obstacle...')

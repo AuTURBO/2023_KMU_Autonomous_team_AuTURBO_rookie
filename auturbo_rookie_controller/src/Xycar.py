@@ -52,7 +52,7 @@ class Xycar(object):
         self.pub_target_lane = rospy.Publisher("/obstacle/info", String,queue_size=10)
 
         # 모드 컨트롤러 생성
-        self.mode_controller = ModeController(yaw0, self.timer)
+        self.mode_controller = ModeController(self.timer)
         # 펄슛 컨트롤러 생성
         self.pursuit_controller = PurePursuitController(self.timer)
         # AR 컨트롤러 생성
@@ -357,8 +357,8 @@ class Xycar(object):
             self.rate.sleep()
         print('go!')
         yaw0 = (np.mean(yaws) - np.pi) % (2*np.pi)
-        self.mode_controller.set_yaw0(yaw0)
-        self.mode_controller.set_mode('curve')
+        # self.mode_controller.set_yaw0(yaw0)
+        self.mode_controller.set_mode('rubbercon')
     # =====================================================================================================#
 
     # ================================ 미션 6 라바콘 주행 ====================================================#
@@ -376,7 +376,9 @@ class Xycar(object):
     # 메인 루프 
     def control(self):
         # 어떤 모드인지 확인 후 해당 모드에 맞는 제어 수행
-        mode = self.mode_controller(self.sensor.yaw)
-        # rospy.loginfo("current mode is %s", mode)
+        # mode = self.mode_controller(self.sensor.yaw)
+        mode = self.mode_controller()
+        rospy.loginfo("current mode is %s", mode)
+        
         self.control_dict[mode]()
         # cv2.waitKey(1)
