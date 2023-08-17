@@ -3,7 +3,8 @@
 <launch>
   <include file="$(find usb_cam)/launch/xycar_cam.launch" />
   <include file="$(find xycar_motor)/launch/xycar_motor.launch" />
-  <!--<include file="$(find xycar_lidar)/launch/xycar_lidar.launch" /> -->
+  <include file="$(find ydlidar_ros_driver)/launch/G2.launch" />
+  <include file="$(find yolov5_ros)/launch/yolov5.launch" />
 
   <include file="$(find ydlidar_ros_driver)/launch/G2.launch" />
   

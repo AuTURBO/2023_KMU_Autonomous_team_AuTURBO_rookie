@@ -5,7 +5,8 @@
     <arg name="confidence_threshold" default="0.75"/>
     <arg name="iou_threshold" default="0.45"/>
     <arg name="maximum_detections" default="1000"/>
-    <arg name="device" default=""/>
+    <!-- <arg name="device" default="0"/> -->
+    <arg name="device" default="cpu"/>
     <arg name="agnostic_nms" default="true"/>
     <arg name="line_thickness" default="3"/>
     <arg name="dnn" default="true"/>
@@ -19,6 +20,7 @@
     <arg name="view_image" default="true"/>
 
     <!-- ROS topics -->
+    <!-- <arg name="input_image_topic" default="/usb_cam/image_raw"/> -->
     <arg name="input_image_topic" default="/usb_cam/image_raw"/>
     <arg name="output_topic" default="/yolov5/detections"/>
 
