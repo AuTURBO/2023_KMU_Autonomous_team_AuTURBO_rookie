@@ -212,11 +212,11 @@ class Xycar(object):
             self.pursuit()
         elif flag == 1:
             print('AR Curve init')
-            self.msg.speed = 0
+            self.msg.speed = 2
             self.pub.publish(self.msg)
         elif flag == 2:
             print('AR Curve start')
-            self.msg.speed = 0
+            self.msg.speed = 2
             self.pub.publish(self.msg)
         elif flag == 3:
             print('AR Curve termination')

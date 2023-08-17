@@ -48,10 +48,10 @@ class ARCurveController(object):
                     self.angle = -45
 
         # curve controll 
-        elif len(markers_x_point_list) > 0 and self.flag == 1:
+        elif len(markers_x_point_list) >= 0 and self.flag == 1:
+            self.flag = 2
             error = markers_x_point_list[0] - self.target
             self.angle = int(error * 170) 
-            self.flag = 2
             print(f"error: {error}, self.angle: {self.angle}")
 
         # termination
