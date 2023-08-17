@@ -211,15 +211,15 @@ class Xycar(object):
         if flag == 0:
             self.pursuit()
         elif flag == 1:
-            print('AR Curve init')
+            print('AR Curve init - flag: ', self.flag)
             self.msg.speed = 2
             self.pub.publish(self.msg)
         elif flag == 2:
-            print('AR Curve start')
+            print('AR Curve start - flag: ', self.flag)
             self.msg.speed = 2
             self.pub.publish(self.msg)
         elif flag == 3:
-            print('AR Curve termination')
+            print('AR Curve termination - flag: ', self.flag)
             self.mode_controller.set_mode('curve')
         self.rate.sleep()
         # 다음모드 커브모드 
