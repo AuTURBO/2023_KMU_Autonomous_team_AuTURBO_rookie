@@ -40,7 +40,7 @@ class Xycar(object):
         self.obstacle_detector = ObstacleDetector(self.timer)
         # 객체인식 주차
         # grandeur avante sonata
-        car_target = "sonata"
+        car_target = "avante"
         car_rest = "grandeur"
         self.objectdetector = ObjectDetector(self.timer, car_target, car_rest)
         # self.verticalparking = VerticalParking(self.timer)
@@ -92,6 +92,8 @@ class Xycar(object):
             ## ---- 추가 해주시면 됩니다!---------------------------------------------- ##
             # == 미션 2 ar curve 주행 == # -- 08.08 테스트
             'ar_curve': self.ar_curve, 
+            'object' : self.object,
+            'findverticalparking': self.findverticalparking,
             # == 미션 3 객체 인식 후 주차 == # -- 07.31 테스트
             'verticalparking': self.verticalparking,
             # == 미션 4 장애물 회피 == # -- 07.31 테스트
@@ -161,7 +163,7 @@ class Xycar(object):
 
     # 가로주차 주차공간 들어가기 
     def parallelpark(self):
-        for _ in range(70):
+        for _ in range(75):
             self.msg.angle, self.msg.speed = 0, 3
             self.pub.publish(self.msg)
             self.rate.sleep()
@@ -173,8 +175,12 @@ class Xycar(object):
             self.msg.angle, self.msg.speed = 50, -3
             self.pub.publish(self.msg)
             self.rate.sleep()
-        for _ in range(25):
+        for _ in range(30):
             self.msg.angle, self.msg.speed = -50, -3
+            self.pub.publish(self.msg)
+            self.rate.sleep()
+        for _ in range(10):
+            self.msg.angle, self.msg.speed = 0, 3
             self.pub.publish(self.msg)
             self.rate.sleep()
         print("평행 주차 시작")
@@ -208,10 +214,7 @@ class Xycar(object):
 
             print('King wang zzang AuTURBO OK?')
             # 모드 커브모드로 바꾸기
-            msg = String()
-            msg.data = str("middle")
-            self.pub_target_lane.publish(msg)
-            self.mode_controller.set_mode('ar_curve')
+            self.mode_controller.set_mode('findverticalparking')
 
         self.rate.sleep()
     # ================================================================================================#
@@ -247,7 +250,6 @@ class Xycar(object):
     # ================================ 미션 3 객체 인식 후 주차 ==========================================#
     # 이 부분을 채워주세요~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     # !!!!!!!
-
     def object(self):
         self.pursuit()
         self.direction = self.objectdetector(self.sensor.detect, self.sensor.x_mid, self.sensor.y)
@@ -259,70 +261,117 @@ class Xycar(object):
 #x  0.5155718232876816   y  1.4638857327161652  w  -0.09014562949153192  id  2
 
     def findverticalparking(self):
-        msg = String()
-        msg.data = str(self.direction)
-        self.pub_target_lane.publish(msg)
-        x = self.sensor.ar_x
-        y = self.sensor.ar_y
-        yaw = self.sensor.ar_yaw
-        id = self.sensor.ar_id
-        print("x ", x, "  y ", y, " w ", yaw, " id ", id)
-        if 0.1 < x < .5 and 0.3 < y < 0.8 and yaw < -0.1 and id == 1 :      #id == 0  미포함
-            print('start parking...')
-            self.msg.angle, self.msg.speed = 0, 0
-            self.pub.publish(self.msg)
-            self.mode_controller.set_mode('verticalparking')
-        self.pursuit()
+        if self.sensor.ar_id != None and self.sensor.ar_id != 7:
+            x = self.sensor.ar_x
+            y = self.sensor.ar_y
+            yaw = self.sensor.ar_yaw
+            id = self.sensor.ar_id
+            #print("x ", x, "  y ", y, " w ", yaw, " id ", id)
+            if 0.6 < y < 2.3:      #id == 0  미포함
+                print('start parking...')
+                self.msg.angle, self.msg.speed = 0, 0
+                self.pub.publish(self.msg)
+                self.mode_controller.set_mode('verticalparking')
+        else:    
+            self.pursuit()
 
     def verticalparking(self):
-        print("주차시작")
-        #AR 인식 후 앞으로 직진
-        for _ in range(65):
-            self.msg.angle, self.msg.speed = 0, 3
-            self.pub.publish(self.msg)
-            self.rate.sleep()
-        #핸들 왼쪽으로 꺽어서 앞으로 살짝 진진
-        for _ in range(10):
-            self.msg.angle, self.msg.speed = -50, 3
-            self.pub.publish(self.msg)
-            self.rate.sleep()
-        #핸들 오른쪽으로 꺽어서 후진
-        for _ in range(36):
-            self.msg.angle, self.msg.speed = 50, -3
-            self.pub.publish(self.msg)
-            self.rate.sleep()
-        #그대로 후진
-        for _ in range(20):
-            self.msg.angle, self.msg.speed = 0, -3 
-            self.pub.publish(self.msg)
-            self.rate.sleep()
-        # 3초 기다리기
-        for _ in range(30):
-            self.msg.angle, self.msg.speed = 0, 0 
-            self.pub.publish(self.msg)
-            self.rate.sleep()
+        self.direction = 'left'
+        if self.direction == 'right' :  #direction은 Yolo를 통해 받은 변수의 값
+            print("오른쪽 주차시작")
+            #AR 인식 후 앞으로 직진
+            for _ in range(110):
+                self.msg.angle, self.msg.speed = 0, 3
+                self.pub.publish(self.msg)
+                self.rate.sleep()
+            #핸들 왼쪽으로 꺽어서 앞으로 살짝 진진
+            for _ in range(15):
+                self.msg.angle, self.msg.speed = -50, 3
+                self.pub.publish(self.msg)
+                self.rate.sleep()
+            #핸들 오른쪽으로 꺽어서 후진
+            for _ in range(36):
+                self.msg.angle, self.msg.speed = 50, -3
+                self.pub.publish(self.msg)
+                self.rate.sleep()
+            #그대로 후진
+            for _ in range(15):
+                self.msg.angle, self.msg.speed = 0, -3 
+                self.pub.publish(self.msg)
+                self.rate.sleep()
+            # 3초 기다리기
+            for _ in range(30):
+                self.msg.angle, self.msg.speed = 0, 0 
+                self.pub.publish(self.msg)
+                self.rate.sleep()
 
-        #############주차 탈출하기 ##############
-        
-        #살짝 나오기
-        for _ in range(20):
-            self.msg.angle, self.msg.speed = 0, 3 
-            self.pub.publish(self.msg)
-            self.rate.sleep()
-        #오른쪽으로 나오기
-        for _ in range(35):
-            self.msg.angle, self.msg.speed = 50, 3
-            self.pub.publish(self.msg)
-            self.rate.sleep()
-        
-        # 그대로 직진( 이제 차선 인식 하면 됨)
-        for _ in range(20):
-            self.msg.angle, self.msg.speed = 0, 3 
-            self.pub.publish(self.msg)
-            self.rate.sleep()
 
-        self.mode_controller.set_mode('obstacle')
-    # ================================================================================================#
+            #############주차 탈출하기 ##############
+            #살짝 나오기
+            for _ in range(20):
+                self.msg.angle, self.msg.speed = 0, 3 
+                self.pub.publish(self.msg)
+                self.rate.sleep()
+            #오른쪽으로 나오기
+            for _ in range(45):
+                self.msg.angle, self.msg.speed = -50, 3
+                self.pub.publish(self.msg)
+                self.rate.sleep()
+            
+            # 그대로 직진( 이제 차선 인식 하면 됨)
+            for _ in range(20):
+                self.msg.angle, self.msg.speed = 0, 3 
+                self.pub.publish(self.msg)
+                self.rate.sleep()
+
+        elif self.direction == 'left':
+            print("왼쪽 주차시작") 
+            #AR 인식 후 앞으로 직진
+            for _ in range(110):
+                self.msg.angle, self.msg.speed = 0, 3
+                self.pub.publish(self.msg)
+                self.rate.sleep()
+            #핸들 오른쪽 꺽어서 앞으로 살짝 진진
+            for _ in range(15):
+                self.msg.angle, self.msg.speed = 50, 3
+                self.pub.publish(self.msg)
+                self.rate.sleep()
+            #핸들 왼쪽 꺽어서 후진
+            for _ in range(36):
+                self.msg.angle, self.msg.speed = -50, -3
+                self.pub.publish(self.msg)
+                self.rate.sleep()
+            #그대로 후진
+            for _ in range(15):
+                self.msg.angle, self.msg.speed = 0, -3 
+                self.pub.publish(self.msg)
+                self.rate.sleep()
+            # 3초 기다리기
+            for _ in range(30):
+                self.msg.angle, self.msg.speed = 0, 0 
+                self.pub.publish(self.msg)
+                self.rate.sleep()
+            
+            #############주차 탈출하기 ##############  
+            #살짝 나오기
+            for _ in range(20):
+                self.msg.angle, self.msg.speed = 0, 3 
+                self.pub.publish(self.msg)
+                self.rate.sleep()
+            #왼쪽으로 나오기
+            for _ in range(45):
+                self.msg.angle, self.msg.speed = -50, 3
+                self.pub.publish(self.msg)
+                self.rate.sleep()
+            
+            # 그대로 직진( 이제 차선 인식 하면 됨)
+            for _ in range(20):
+                self.msg.angle, self.msg.speed = 0, 3 
+                self.pub.publish(self.msg)
+                self.rate.sleep()
+
+            self.mode_controller.set_mode('obstacle')
+        # ================================================================================================#
 
 
 
@@ -332,16 +381,94 @@ class Xycar(object):
 
     def obstacle(self):
         self.target_lane = self.obstacle_detector(self.sensor.lidar, self.sensor.angle_increment)
-        msg = String()
-        msg.data = str(self.target_lane)
-        self.pub_target_lane.publish(msg)
-        # print(self.target_lane + ' 를 향해 가야함')
-        if self.obstacle_detector.obstacle_counter == 4:
-            print('detecting stopline...')
-            self.obstacle_detector.obstacle_counter = 0
-            self.mode_controller.set_mode("stopline")
+        flag = 0
+        if self.target_lane == "left":
+            for _ in range(7):
+                self.msg.angle, self.msg.speed = -50, 3
+                self.pub.publish(self.msg)
+                self.rate.sleep()
+            for _ in range(8):
+                self.msg.angle, self.msg.speed = 50, 3
+                self.pub.publish(self.msg)
+                self.rate.sleep()
+            for _ in range(15):
+                self.msg.angle, self.msg.speed = 0, 3
+                self.pub.publish(self.msg)
+                self.rate.sleep()
+            for _ in range(8):
+                self.msg.angle, self.msg.speed = 50, 3
+                self.pub.publish(self.msg)
+                self.rate.sleep()
+            for _ in range(9):
+                self.msg.angle, self.msg.speed = -50, 3
+                self.pub.publish(self.msg)
+                self.rate.sleep()                      
+            for _ in range(10):
+                self.msg.angle, self.msg.speed = 0, 3
+                self.pub.publish(self.msg)
+                self.rate.sleep()
 
-        self.pursuit()
+            for _ in range(7):
+                self.msg.angle, self.msg.speed = -50, 3
+                self.pub.publish(self.msg)
+                self.rate.sleep()
+            for _ in range(8):
+                self.msg.angle, self.msg.speed = 50, 3
+                self.pub.publish(self.msg)
+                self.rate.sleep()
+            for _ in range(10):
+                self.msg.angle, self.msg.speed = 0, 3
+                self.pub.publish(self.msg)
+                self.rate.sleep()
+                flag = 1
+
+####################right####################################
+
+        elif self.target_lane == "right":
+
+            for _ in range(9):
+                self.msg.angle, self.msg.speed = 50, 3
+                self.pub.publish(self.msg)
+                self.rate.sleep()
+            for _ in range(9):
+                self.msg.angle, self.msg.speed = -50, 3
+                self.pub.publish(self.msg)
+                self.rate.sleep()
+            for _ in range(10):
+                self.msg.angle, self.msg.speed = 0, 3
+                self.pub.publish(self.msg)
+                self.rate.sleep()
+            for _ in range(16):
+                self.msg.angle, self.msg.speed = -50, 3
+                self.pub.publish(self.msg)
+                self.rate.sleep()              
+            for _ in range(17):
+                self.msg.angle, self.msg.speed = 50, 3
+                self.pub.publish(self.msg)
+                self.rate.sleep()
+            for _ in range(12):
+                self.msg.angle, self.msg.speed = 0, 3
+                self.pub.publish(self.msg)
+                self.rate.sleep()
+            for _ in range(17):
+                self.msg.angle, self.msg.speed = 50, 3
+                self.pub.publish(self.msg)
+                self.rate.sleep()
+            for _ in range(19):
+                self.msg.angle, self.msg.speed = -50, 3
+                self.pub.publish(self.msg)
+                self.rate.sleep()
+            for _ in range(10):
+                self.msg.angle, self.msg.speed = 0, 3
+                self.pub.publish(self.msg)
+                self.rate.sleep()
+                flag = 1
+
+        if flag == 1:
+            self.mode_controller.set_mode('stopline')
+            self.pursuit()
+        else:
+            self.pursuit()
     # =====================================================================================================#
 
     # ================================ 미션 5 스탑라인(횡단보도) 정지 ===========================================#
