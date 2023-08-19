@@ -69,6 +69,7 @@ class Xycar(object):
         self.control_dict = {
             # 직선 주행 findparking
             # 긴 구간 직진 -- 07.31 테스트 
+            'ar_marker_pose' : self.ar_marker_pose,
             'long straight' : self.pursuit,
             # 짧은 구간 직진 -- 07.31 테스트
             'short straight' : self.pursuit,
@@ -76,7 +77,7 @@ class Xycar(object):
             'curve': self.pursuit,
             # == 미션 1 평행주차 ===== #
             # 주차 공간 찾기 -- 07.31 테스트
-            'findparking': self.findparking,
+            'findparallelparking': self.findparallelparking,
             # 가로주차  -- 07.31 테스트
             'parallelparking': self.parallelpark,
             # AR 정밀주차 -- 07.31 테스트
@@ -102,6 +103,15 @@ class Xycar(object):
             'rubbercon': self.rubbercon
             ################################################################################# 
         }
+    def ar_marker_pose(self):
+        x = self.sensor.ar_x
+        y = self.sensor.ar_y
+        yaw = self.sensor.ar_yaw
+        
+        id = self.sensor.ar_id
+        print("ar_marker_pose")
+        print("x : ", x, "y : ", y, "yaw : ", yaw, "id : ", id)
+    
     # cv로 차선 인식 후 목표 각도값 받아오기 
     def target_angle_callback(self, msg):
         self.target_angle = msg.data
@@ -125,19 +135,19 @@ class Xycar(object):
     # 주차공간 찾기 
 # x  0.7517626732542556   y  1.1183388094957174  w  -0.26245737259726215  id  0
 # 0.5074189710992407   y  0.9376329910134537  w  -0.1507904648456464
-    def findparking(self):
+    def findparallelparking(self):
         # self.sensor.ar_x, self.sensor.ar_y, self.sensor.ar_yaw, self.sensor.ar_id
-        if self.sensor.ar_id != None:
-            msg = String()
-            msg.data = str("right")
-            self.pub_target_lane.publish(msg)
+        if self.sensor.ar_id == 0:
+            # msg = String()
+            # msg.data = str("right")
+            # self.pub_target_lane.publish(msg)
             x = self.sensor.ar_x
             y = self.sensor.ar_y
             yaw = self.sensor.ar_yaw
             
             id = self.sensor.ar_id
             print("x ", x, "  y ", y, " w ", yaw, " id ", id)
-            if 0.2 < x < 0.8 and 0.7 < y < 1.5 and yaw < 0.1 and id == 0 :      #id == 0  미포함
+            if 0.7 < y < 2 and yaw < 0.1 :      #id == 0  미포함
                 print('start parking...')
                 self.msg.angle, self.msg.speed = 0, 0
                 self.pub.publish(self.msg)
@@ -149,15 +159,19 @@ class Xycar(object):
 
     # 가로주차 주차공간 들어가기 
     def parallelpark(self):
-        for _ in range(90):
+        for _ in range(70):
             self.msg.angle, self.msg.speed = 0, 3
             self.pub.publish(self.msg)
             self.rate.sleep()
-        for _ in range(33):
+        for _ in range(10):
+            self.msg.angle, self.msg.speed = -50, 3
+            self.pub.publish(self.msg)
+            self.rate.sleep()
+        for _ in range(27):
             self.msg.angle, self.msg.speed = 50, -3
             self.pub.publish(self.msg)
             self.rate.sleep()
-        for _ in range(21):
+        for _ in range(25):
             self.msg.angle, self.msg.speed = -50, -3
             self.pub.publish(self.msg)
             self.rate.sleep()
@@ -276,18 +290,17 @@ class Xycar(object):
     def verticalparking(self):
         print("주차시작")
         #AR 인식 후 앞으로 직진
-        for _ in range(50):
+        for _ in range(65):
             self.msg.angle, self.msg.speed = 0, 3
             self.pub.publish(self.msg)
             self.rate.sleep()
-        
         #핸들 왼쪽으로 꺽어서 앞으로 살짝 진진
         for _ in range(10):
-            self.msg.angle, self.msg,speed = -50, 3
+            self.msg.angle, self.msg.speed = -50, 3
             self.pub.publish(self.msg)
             self.rate.sleep()
         #핸들 오른쪽으로 꺽어서 후진
-        for _ in range(33):
+        for _ in range(36):
             self.msg.angle, self.msg.speed = 50, -3
             self.pub.publish(self.msg)
             self.rate.sleep()
@@ -310,8 +323,8 @@ class Xycar(object):
             self.pub.publish(self.msg)
             self.rate.sleep()
         #오른쪽으로 나오기
-        for _ in range(33):
-            self.msg.angle, self.msg.speed = 50, -3
+        for _ in range(35):
+            self.msg.angle, self.msg.speed = 50, 3
             self.pub.publish(self.msg)
             self.rate.sleep()
         
@@ -322,6 +335,10 @@ class Xycar(object):
             self.rate.sleep()
 
         self.mode_controller.set_mode('obstacle')
+    # ================================================================================================#
+
+
+
     # ================================================================================================#
 
     # ================================ 미션 4 장애물 회피 ==============================================#
@@ -378,7 +395,7 @@ class Xycar(object):
         # 어떤 모드인지 확인 후 해당 모드에 맞는 제어 수행
         # mode = self.mode_controller(self.sensor.yaw)
         mode = self.mode_controller()
-        rospy.loginfo("current mode is %s", mode)
+        # rospy.loginfo("current mode is %s", mode)
         
         self.control_dict[mode]()
         # cv2.waitKey(1)
