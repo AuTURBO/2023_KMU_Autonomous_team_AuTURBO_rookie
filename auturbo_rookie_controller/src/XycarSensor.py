@@ -7,7 +7,7 @@ from cv_bridge import CvBridge
 from sensor_msgs.msg import Image
 from sensor_msgs.msg import LaserScan
 from sensor_msgs.msg import Imu
-# from sensor_msgs.msg import Ultrasonic
+#from sensor_msgs.msg import Ultrasonic
 from detection_msgs.msg import BoundingBox, BoundingBoxes
 from ar_track_alvar_msgs.msg import AlvarMarkers
 from tf.transformations import euler_from_quaternion
@@ -41,11 +41,15 @@ class XycarSensor(object):
         self.sub_ar = rospy.Subscriber('ar_pose_marker', AlvarMarkers, self.callback_ar, queue_size = 1)
         
         # ultrasonic sensor
-        self.ultra = None
+        # self.ultra = None
         # self.sub_ultra = rospy.Subscriber('ultrasonic', Ultrasonic, self.callback_ultra, queue_size = 1)
 
-    # def callback_ultra(self, msg):
-        # code update 필요 ... 
+    def callback_ultra(self, msg):
+        self.ultra = msg.data
+        
+
+
+
 
     # 카메라 콜백 함수 일단 넣었는데 정지선 인식 부분만 따로 만드시면 사용 안해도 됩니다~ 
     def callback_cam(self, msg):

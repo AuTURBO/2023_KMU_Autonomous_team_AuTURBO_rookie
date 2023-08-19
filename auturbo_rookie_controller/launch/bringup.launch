@@ -21,9 +21,8 @@
   <node pkg="xycar_imu" type="9dof_imu_node.py" name="xycar_imu" output="screen">
     <param name="rviz_mode" type="string" value="false" />
   </node>
+ <node pkg="xycar_ultrasonic" type="xycar_ultrasonic.py" name="xycar_ultrasonic" output="screen" />
 
-  <!-- Ultrasonic -->
-  <node pkg="xycar_ultrasonic" type="xycar_ultrasonic.py" name="xycar_ultrasonic" output="screen" />
 
   <!-- Line Detector -->
   <node pkg="auturbo_rookie_perception" type="line_detector.py" name="line_detector" output="screen" />
