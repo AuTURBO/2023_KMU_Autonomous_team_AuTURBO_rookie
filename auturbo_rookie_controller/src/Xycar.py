@@ -223,7 +223,8 @@ class Xycar(object):
         if self.sensor.ar_msg != None:
             self.msg.angle = 0
             self.msg.speed = 0
-            flag, self.msg.angle = self.ar_curve_controller(self.sensor.ar_msg)
+            self.msg.angle, self.msg.speed = self.ar_curve_controller(self.sensor.lidar, self.sensor.angle_increment)
+            # flag, self.msg.angle = self.ar_curve_controller(self.sensor.ar_msg)
             self.pub.publish(self.msg)
         
 
