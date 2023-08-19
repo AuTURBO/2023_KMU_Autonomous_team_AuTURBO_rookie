@@ -34,7 +34,7 @@ class Xycar(object):
         self.timer = Timer()
         self.sensor = XycarSensor()
         yaw0 = self.sensor.init(self.rate)
-
+        self.first = True
         # 장애물 감지기 생성
         self.obstacle_detector = ObstacleDetector(self.timer)
         # 객체인식 주차
@@ -220,27 +220,20 @@ class Xycar(object):
     # !!!!!!!
     def ar_curve(self):
         self.first = False
-        flag, self.msg.angle = self.ar_curve_controller(self.sensor.ar_msg)
-        self.msg.speed = 3
-        if flag == 0:
-            self.pursuit()
-        elif flag == 1:
-            print('AR Curve init - flag: ', flag)
+        if self.sensor.ar_msg != None:
+            self.msg.angle = 0
+            self.msg.speed = 0
+            flag, self.msg.angle = self.ar_curve_controller(self.sensor.ar_msg)
             self.pub.publish(self.msg)
-        elif flag == 2:
-            if (self.first == False):
-                time.sleep(0.5)
-                self.first = True
-            print('AR Curve start - flag: ', flag)
-            self.pub.publish(self.msg)
-        elif flag == 3:
-            self.pub.publish(self.msg)
-            time.sleep(0.5)
-            print('AR Curve termination - flag: ', flag)
-            self.mode_controller.set_mode('object')
-        self.rate.sleep()
-        # 다음모드 커브모드 
-        # 객체인식 주차모드일 수 있음 
+        
+
+        #     else:
+        #         self.pursuit() 
+  
+
+        # else:
+        #     self.pursuit()
+
     # ================================================================================================#
 
     # ================================ 미션 3 객체 인식 후 주차 ==========================================#
