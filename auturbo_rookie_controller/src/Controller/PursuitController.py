@@ -13,7 +13,7 @@ class PurePursuitController(object):
             'long straight': 0.2,
             'short straight': 0.2,
             'curve': 0.2,
-            'findparking': 0.20,
+            'findparallelparking': 0.20,
             'stopline': 0.2,
             'obstacle': 0.2,
             'parallelparking': 0.2,
@@ -23,7 +23,7 @@ class PurePursuitController(object):
             'long straight': 3,
             'short straight': 3,
             'curve': 3,
-            'findparking': 3,
+            'findparallelparking': 4,
             'stopline': 3,
             'obstacle': 3,
             'parallelparking': 3,
@@ -33,7 +33,7 @@ class PurePursuitController(object):
             'long straight': 0.5,
             'short straight': 0.5,
             'curve': 0.5,
-            'findparking': 0.5,
+            'findparallelparking': 0.5,
             'stopline': 0.5,
             'obstacle': 0.5,
             'parallelparking': 0.5,
@@ -43,7 +43,7 @@ class PurePursuitController(object):
             'long straight': 0.5,
             'short straight': 0.5,
             'curve': 0.5,
-            'findparking': 0.5,
+            'findparallelparking': 0.5,
             'stopline': 0.5,
             'obstacle': 0.5,
             'parallelparking': 0.5,
@@ -78,6 +78,6 @@ class PurePursuitController(object):
 
         # 계산된 조향각을 디그리 투 라디안
         delta = -1 * delta * 180 / math.pi
-        return int(delta), 3
+        return int(delta), 4
 
          
