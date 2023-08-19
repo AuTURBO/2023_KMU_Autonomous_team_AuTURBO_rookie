@@ -8,11 +8,37 @@ class ModeController(object):
     Detects mode based on imu sensor data
     Counts laps
     '''
+    # == 기본 주행 ===== #
+    # 긴 구간 직진 'long straight' : self.pursuit,
+    # 짧은 구간 직진 'short straight' : self.pursuit,
+    # 각 모서리의 커브 구간'curve': self.pursuit,
+    
+    # == 미션 1 평행주차 ===== #
+    # 주차 공간 찾기 'findparking': self.findparking,
+    # 가로주차  'parallelparking': self.parallelpark,
+    # AR 정밀주차 'arparking': self.arparking,
+    # 차량 정지 'poweroff' : self.poweroff,
+    
+    # == 미션 2 ar curve 주행 == # -- 08.08 테스트
+    # AR Curve 'ar_curve': self.ar_curve, 
+    
+    # == 미션 3 객체 인식 후 주차 == # -- 07.31 테스트
+    # Object detection 'object': self.object,
+    # vertical parking 'verticalparking': self.verticalparking,
+    
+    # == 미션 4 장애물 회피 == # -- 07.31 테스트
+    # 장애물 회피 'obstacle': self.obstacle,
+    
+    # == 미션 5 정지선 정지 == # -- 08.08 테스트
+    # stopline 'stopline': self.stopline,
+    
+    # == 미션 6 라바콘 주행 == # -- 07.31 테스트
+    # 라바콘 주행 'rubbercon': self.rubbercon
 
     # def __init__(self, yaw0, timer):
     def __init__(self, timer):
         # 첫 시작은 긴 직진 모드
-        self.mode = 'stopline'
+        self.mode = 'object'
         self.timer = timer
         # self.yaw0 = yaw0
         self.lap = 0
