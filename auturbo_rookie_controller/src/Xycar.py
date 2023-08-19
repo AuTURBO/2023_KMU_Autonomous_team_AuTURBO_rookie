@@ -90,6 +90,7 @@ class Xycar(object):
             'ar_curve': self.ar_curve, 
             # == 미션 3 객체 인식 후 주차 == # -- 07.31 테스트
             'object': self.object,
+            'findverticalparking': self.findverticalparking,
             'verticalparking': self.verticalparking,
             # == 미션 4 장애물 회피 == # -- 07.31 테스트
             'obstacle': self.obstacle,
@@ -227,17 +228,17 @@ class Xycar(object):
     # !!!!!!!
 
     def object(self):
-        direction = self.objectdetector(self.sensor.detect, self.sensor.x_mid, self.sensor.y)
+        self.direction = self.objectdetector(self.sensor.detect, self.sensor.x_mid, self.sensor.y)
         self.pub.publish(self.msg)
-        if direction == "right" or direction == "left":
-            findverticalparking(self, direction)
+        if self.direction == "right" or self.direction == "left":
+            self.mode_controller.set_mode('findverticalparking')
         self.rate.sleep()
 
 #x  0.5155718232876816   y  1.4638857327161652  w  -0.09014562949153192  id  2
 
-    def findverticalparking(self, direction):
+    def findverticalparking(self):
         msg = String()
-        msg.data = str(direction)
+        msg.data = str(self.direction)
         self.pub_target_lane.publish(msg)
         x = self.sensor.ar_x
         y = self.sensor.ar_y

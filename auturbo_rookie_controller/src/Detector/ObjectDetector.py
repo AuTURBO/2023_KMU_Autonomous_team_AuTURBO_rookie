@@ -19,7 +19,7 @@ class ObjectDetector(object):
         '''
         returns direction to avoid obstacles from lidar inputs
         '''
-        if (detect[self.car_target] and detect[self.car_rest] and y[self.car_target] > 50):
+        if (detect[self.car_target] and detect[self.car_rest] and y[self.car_target] > 30):
             if (x_mid[self.car_target] < x_mid[self.car_rest]):
                 self.direction = "left"
             elif (x_mid[self.car_target] > x_mid[self.car_rest]):

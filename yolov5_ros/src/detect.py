@@ -9,6 +9,7 @@ from cv_bridge import CvBridge
 from pathlib import Path
 import os
 import sys
+import time
 from rostopic import get_topic_type
 
 from sensor_msgs.msg import Image, CompressedImage
@@ -172,7 +173,7 @@ class Yolov5Detector:
         # Publish & visualize images
         if self.view_image:
             cv2.imshow("yolo inference frame", im0)
-            cv2.waitKey(10)  # 10 millisecond
+            cv2.waitKey(15)  # 15 millisecond
         if self.publish_image:
             self.image_pub.publish(self.bridge.cv2_to_imgmsg(im0, "bgr8"))
         
