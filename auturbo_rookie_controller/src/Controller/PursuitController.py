@@ -14,40 +14,48 @@ class PurePursuitController(object):
             'short straight': 0.2,
             'curve': 0.2,
             'findparallelparking': 0.20,
+            'findverticalparking': 0.20,
             'stopline': 0.2,
             'obstacle': 0.2,
             'parallelparking': 0.2,
-            'ar_curve': 0.2
+            'ar_curve': 0.2,
+            'object': 0.2
         }
         self.target_speed = {
             'long straight': 3,
             'short straight': 3,
             'curve': 3,
             'findparallelparking': 4,
+            'findverticalparking': 4,
             'stopline': 3,
             'obstacle': 3,
             'parallelparking': 3,
-            'ar_curve': 3
+            'ar_curve': 3,
+            'object': 3
         }
         self.acc = {
             'long straight': 0.5,
             'short straight': 0.5,
             'curve': 0.5,
             'findparallelparking': 0.5,
+            'findverticalparking': 0.5,
             'stopline': 0.5,
             'obstacle': 0.5,
             'parallelparking': 0.5,
-            'ar_curve': 0.5
+            'ar_curve': 0.5,
+            'object': 0.5
         }
         self.delay = {
             'long straight': 0.5,
             'short straight': 0.5,
             'curve': 0.5,
             'findparallelparking': 0.5,
+            'findverticalparking': 0.5,
             'stopline': 0.5,
             'obstacle': 0.5,
             'parallelparking': 0.5,
-            'ar_curve': 0.5
+            'ar_curve': 0.5,
+            'object': 0.5
         }
 
 
