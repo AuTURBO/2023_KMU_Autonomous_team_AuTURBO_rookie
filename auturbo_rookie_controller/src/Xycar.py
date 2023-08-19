@@ -6,6 +6,7 @@ import numpy as np
 from Timer import Timer
 from xycar_msgs.msg import xycar_motor
 from std_msgs.msg import Int32, String
+import time
 
 from XycarSensor import XycarSensor
 
@@ -218,20 +219,25 @@ class Xycar(object):
     # 이 부분을 채워주세요~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     # !!!!!!!
     def ar_curve(self):
+        self.first = False
         flag, self.msg.angle = self.ar_curve_controller(self.sensor.ar_msg)
+        self.msg.speed = 3
         if flag == 0:
             self.pursuit()
         elif flag == 1:
-            print('AR Curve init - flag: ', self.flag)
-            self.msg.speed = 2
+            print('AR Curve init - flag: ', flag)
             self.pub.publish(self.msg)
         elif flag == 2:
-            print('AR Curve start - flag: ', self.flag)
-            self.msg.speed = 2
+            if (self.first == False):
+                time.sleep(0.5)
+                self.first = True
+            print('AR Curve start - flag: ', flag)
             self.pub.publish(self.msg)
         elif flag == 3:
-            print('AR Curve termination - flag: ', self.flag)
-            self.mode_controller.set_mode('curve')
+            self.pub.publish(self.msg)
+            time.sleep(0.5)
+            print('AR Curve termination - flag: ', flag)
+            self.mode_controller.set_mode('object')
         self.rate.sleep()
         # 다음모드 커브모드 
         # 객체인식 주차모드일 수 있음 
@@ -242,6 +248,7 @@ class Xycar(object):
     # !!!!!!!
 
     def object(self):
+        self.pursuit()
         self.direction = self.objectdetector(self.sensor.detect, self.sensor.x_mid, self.sensor.y)
         self.pub.publish(self.msg)
         if self.direction == "right" or self.direction == "left":
