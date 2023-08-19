@@ -17,8 +17,6 @@ class PurePursuitController(object):
             'findverticalparking': 0.20,
             'stopline': 0.2,
             'obstacle': 0.2,
-            'parallelparking': 0.2,
-            'ar_curve': 0.2,
             'object': 0.2
         }
         self.target_speed = {

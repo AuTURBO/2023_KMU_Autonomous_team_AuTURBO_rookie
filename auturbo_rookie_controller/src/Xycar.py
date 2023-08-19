@@ -91,8 +91,6 @@ class Xycar(object):
             # == 미션 2 ar curve 주행 == # -- 08.08 테스트
             'ar_curve': self.ar_curve, 
             # == 미션 3 객체 인식 후 주차 == # -- 07.31 테스트
-            'object': self.object,
-            'findverticalparking': self.findverticalparking,
             'verticalparking': self.verticalparking,
             # == 미션 4 장애물 회피 == # -- 07.31 테스트
             'obstacle': self.obstacle,

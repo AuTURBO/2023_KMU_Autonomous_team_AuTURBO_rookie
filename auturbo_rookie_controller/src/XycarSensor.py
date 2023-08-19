@@ -51,6 +51,10 @@ class XycarSensor(object):
     # 카메라 콜백 함수 일단 넣었는데 정지선 인식 부분만 따로 만드시면 사용 안해도 됩니다~ 
     def callback_cam(self, msg):
         self.cam = self.bridge.imgmsg_to_cv2(msg, "bgr8")
+        # self.lidar = 0
+        # self.angle_increments = 0
+        # self.yaw = 0
+
     def callback_yolo(self, msg):
         self.detect = {"grandeur":0, "avante":0, "sonata":0}
         self.x_mid = {"grandeur":0.0, "avante":0.0, "sonata":0.0}
