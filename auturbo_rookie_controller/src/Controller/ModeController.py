@@ -38,7 +38,12 @@ class ModeController(object):
     # def __init__(self, yaw0, timer):
     def __init__(self, timer):
         # 첫 시작은 긴 직진 모드
+<<<<<<< HEAD
         self.mode = 'object'
+=======
+        # self.mode = 'findparallelparking'
+        self.mode = 'findparallelparking'
+>>>>>>> 0819_parallelparking
         self.timer = timer
         # self.yaw0 = yaw0
         self.lap = 0
