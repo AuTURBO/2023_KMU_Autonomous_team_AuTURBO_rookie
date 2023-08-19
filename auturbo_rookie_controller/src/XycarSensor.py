@@ -23,8 +23,9 @@ class XycarSensor(object):
         self.sub_cam = rospy.Subscriber("/usb_cam/image_raw", Image, self.callback_cam)
 
         # yolo node
-        self.count = {"grandeur":0, "avante":0, "sonata":0}
-        self.sum_x = {"grandeur":0.0, "avante":0.0, "sonata":0.0}
+        self.detect = {"grandeur":0, "avante":0, "sonata":0}
+        self.x_mid = {"grandeur":0.0, "avante":0.0, "sonata":0.0}
+        self.y = {"grandeur":0.0, "avante":0.0, "sonata":0.0}
         self.sub_yolo = rospy.Subscriber("/yolov5/detections", BoundingBoxes, self.callback_yolo)
 
         # lidar sensor
@@ -51,9 +52,13 @@ class XycarSensor(object):
     def callback_cam(self, msg):
         self.cam = self.bridge.imgmsg_to_cv2(msg, "bgr8")
     def callback_yolo(self, msg):
+        self.detect = {"grandeur":0, "avante":0, "sonata":0}
+        self.x_mid = {"grandeur":0.0, "avante":0.0, "sonata":0.0}
+        self.y = {"grandeur":0.0, "avante":0.0, "sonata":0.0}
         for bbox in msg.bounding_boxes:
-            self.count[bbox.Class] = self.count[bbox.Class] + 1
-            self.sum_x[bbox.Class] = self.sum_x[bbox.Class] + (bbox.xmin + bbox.xmax) / 2
+            self.detect[bbox.Class] = 1
+            self.x_mid[bbox.Class] = (bbox.xmin + bbox.xmax) / 2
+            self.y[bbox.Class] = abs(bbox.ymax - bbox.ymin)
 
 
     # 라이다 콜백 함수

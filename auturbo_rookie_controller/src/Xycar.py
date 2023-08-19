@@ -37,10 +37,10 @@ class Xycar(object):
         # 장애물 감지기 생성
         self.obstacle_detector = ObstacleDetector(self.timer)
         # 객체인식 주차
-        # self.specfic_car = "grandeur"
-        # self.specfic_car = "avante"
-        self.specfic_car = "sonata"
-        self.objectdetector = ObjectDetector(self.timer, self.specfic_car)
+        # grandeur avante sonata
+        car_target = "sonata"
+        car_rest = "grandeur"
+        self.objectdetector = ObjectDetector(self.timer, car_target, car_rest)
         # self.verticalparking = VerticalParking(self.timer)
         # stop line 감지기 생성
         self.stopline_detector = StopLineDetector()
@@ -227,7 +227,7 @@ class Xycar(object):
     # !!!!!!!
 
     def object(self):
-        direction = self.objectdetector(self.sensor.count, self.sensor.sum_x)
+        direction = self.objectdetector(self.sensor.detect, self.sensor.x_mid, self.sensor.y)
         self.pub.publish(self.msg)
         if direction == "right" or direction == "left":
             findverticalparking(self, direction)
