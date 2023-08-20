@@ -133,9 +133,9 @@ class Xycar(object):
 
     # 차선 컨트롤러
     def pursuit(self):
-        angle, target = self.lane_detector_hough(self.sensor.cam, self.target_lane)
-        # self.target_angle = self.lane_detector(self.sensor.cam)
-        self.msg.angle, self.msg.speed = self.pursuit_controller(target, self.mode_controller.get_mode())
+        # angle, self.target_angle = self.lane_detector_hough(self.sensor.cam, self.target_lane)
+        self.target_angle = self.lane_detector(self.sensor.cam)
+        self.msg.angle, self.msg.speed = self.pursuit_controller(self.target_angle, self.mode_controller.get_mode())
         self.pub.publish(self.msg)
         self.rate.sleep()
 

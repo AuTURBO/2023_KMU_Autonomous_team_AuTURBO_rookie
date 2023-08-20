@@ -5,6 +5,7 @@ import cv2
 import numpy as np
 from collections import deque
 from Detector.BEV_hough import BEV
+from Detector.MovingAverage import MovingAverage
 
 # colors
 red, green, blue, yellow = (0, 0, 255), (0, 255, 0), (255, 0, 0), (0, 255, 255)
@@ -36,6 +37,10 @@ class LaneDetectorHough():
         self.cluster_threshold = 25
 
         self.frameRate = 11
+
+        self.filter_lane0 = MovingAverage(10)
+        self.filter_lane1 = MovingAverage(10)
+        self.filter_lane2 = MovingAverage(10)
 
     def to_canny(self, img, show=False):
         img = cv2.GaussianBlur(img, (7,7), 0)
@@ -196,10 +201,12 @@ class LaneDetectorHough():
         angle : radians
         cte : pixels
         '''
-        canny = self.to_canny(img, show=False)
-        bev = self.bev(canny, show=True)
-        lines = self.hough(bev, show=False)
-        positions = self.filter(lines, show=False)
+
+        show = True
+        canny = self.to_canny(img, show)
+        bev = self.bev(canny, show)
+        lines = self.hough(bev, show)
+        positions = self.filter(lines, show)
         lane_candidates = self.get_cluster(positions)
         predicted_lane = self.predict_lane()
         self.update_lane(lane_candidates, predicted_lane)
@@ -207,9 +214,14 @@ class LaneDetectorHough():
 
         key = cv2.waitKey(self.frameRate)
 
+        self.filter_lane0.add_sample(self.lane[0])
+        self.filter_lane1.add_sample(self.lane[1])
+        self.filter_lane2.add_sample(self.lane[2])
+        # print("Moving Average Filter: ", self.lane[1], self.filter_lane1.get_mm())
+
         if target_lane == 'middle':
-            return self.angle, self.lane[1]
+            return self.angle, self.filter_lane1.get_mm()
         elif target_lane == 'left':
-            return self.angle, self.lane[0]*0.75+self.lane[1]*0.25
+            return self.angle, self.filter_lane0.get_mm()*0.75+self.filter_lane1.get_mm()*0.25
         else:
-            return self.angle, self.lane[2]*0.75+self.lane[1]*0.25
+            return self.angle, self.filter_lane2.get_mm()*0.75+self.filter_lane1.get_mm()*0.25
