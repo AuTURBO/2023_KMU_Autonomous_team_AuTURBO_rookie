@@ -81,7 +81,7 @@ class ModeController(object):
 
         # 장애물로 판단할 조건을 마스킹하여 필터링합니다.
         # 거리값에 따른 필터링 조건을 설정합니다.
-        mask = (np.abs(ranges * np.sin(deg)) < 15) & (5 < ranges * np.cos(deg)) & (ranges * np.cos(deg) < 15)
+        mask = (np.abs(ranges * np.sin(deg)) < 15) & (8 < ranges * np.cos(deg)) & (ranges * np.cos(deg) < 15)
         # 필터링 조건에 따라 데이터를 필터링합니다.
         filtered = np.where(mask, ranges, 0.0)
 
@@ -104,7 +104,9 @@ class ModeController(object):
                 if abs(error_mean) > 5:
                     self.mode = 'curve'
                     self.timer.update()
-                    print('long straight -> curve')
+                if abs(error_mean) < 5 and self.long_state == 0:
+                    self.mode = 'short straight'
+                    # print('long straight -> curve')
         # 커브
         elif self.mode == 'curve':
             self.error_list.append(angle_error)
@@ -116,11 +118,11 @@ class ModeController(object):
                 if abs(error_mean) < 5 and self.long_state == 0:
                     self.mode = 'short straight'
                     self.timer.update()
-                    print('curve -> short straight')
+                    # print('curve -> short straight')
                 elif abs(error_mean) > 5 and self.long_state == 1:
                     self.mode = 'long straight'
                     self.timer.update()
-                    print('curve -> long straight')
+                    # print('curve -> long straight')
         # 짧은 직진
         elif self.mode == 'short straight':
             self.error_list.append(angle_error)
@@ -129,48 +131,12 @@ class ModeController(object):
                 self.error_sum = sum(self.error_list)
                 error_mean = self.error_sum / len(self.error_list)
                 self.error_list.pop(0)
-                if abs(error_mean) > 5:
+                if abs(error_mean) > 5 and self.long_state == 0:
                     self.mode = 'curve'
                     self.timer.update()
-                print('short straight -> curve')
+                if abs(error_mean) < 5 and self.long_state == 1:
+                    self.mode = 'long straight'
+                    # print('short straight -> curve')
 
-        # # 각도 오차값 계산
-        # # diff_yaw = abs(yaw - self.yaw0)
-        # diff_yaw = 0
-        # # 만약 각도 오차값이 180도를 넘어가면 360도에서 빼주어 양수로 만들어준다.
-        # # ex) 360 - 190 = 170
-        # if diff_yaw > np.pi: 
-        #     diff_yaw = 2*np.pi - diff_yaw
-        # # 직진 모드고, 90도 +- 0.1 radian 범위에 들어오면 짧은 직진 모드로 변경 85 ~ 95 deg
-        # if self.mode == 'long straight' and  np.pi/2.0 - 0.1 < diff_yaw < np.pi/2.0 + 0.1:
-        #     self.mode = 'short straight'
-        #     self.timer.update()
-        # # 짧은 직진 모드고, 180도 +- 0.15 radian 170 ~ 190 deg 범위에 들어오면 장애물 모드로 변경
-        # elif self.mode == 'short straight' and  np.pi - 0.15 < diff_yaw < np.pi + 0.15:
-        #     print('detecting obstacle...')
-        #     self.timer.update()
-        #     self.mode = 'obstacle'
-       
-        # # 각 모서리의 커브를 지날 때마다 lap을 1씩 증가시킴
-        # # lap이 lap_target보다 작으면 직진 모드로 변경
-        # # lap이 lap_target보다 크면 주차장 찾기 모드로 변경
-        # # 왜냐 1바퀴를 돌고나면 주차장을 다시 찾아야 하기 때문
-        # # 3deg +- 0.05 radian 범위에 들어오면 커브 모드로 변경
-        # elif self.mode == 'curve' and  diff_yaw < 0.05:
-        #     self.lap += 1
-        #     print('커브 모드가 정상적으로 작동중임 ... {}'.format(self.lap))
-            
-        #     self.timer.update()
-        #     # ar 커브 모드
-        #     if self.lap == 1:
-        #         print('detecting ar curve...')
-        #         self.mode = 'ar_curve'
-        #     # 장애물 회피 모드
-        #     elif self.lap == 2:
-        #         print('detecting obstacle...')
-        #         self.mode = 'obstacle'
-        #     # 라바콘 주행 모드
-        #     elif self.lap == 3:
-        #         print('lavacon mode...')
-        #         self.mode = 'lavacon'
+        print(self.mode)
         return self.mode

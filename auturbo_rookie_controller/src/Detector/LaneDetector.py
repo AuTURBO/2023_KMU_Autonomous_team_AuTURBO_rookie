@@ -146,7 +146,7 @@ def simple_controller(lx, ly, mx, my, rx, ry):
         # print("Obstacle Left!!!")
 
     # print(f"target: {target}")
-    print(target)
+    # print(target)
     return int(target)
 
 def obstacle_callback(msg):

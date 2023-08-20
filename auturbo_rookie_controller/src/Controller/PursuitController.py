@@ -39,8 +39,8 @@ class PurePursuitController(object):
         }
         self.acc = {
             'long straight': 1.,
-            'short straight': -0.4,
-            'curve': 0,
+            'short straight': -1,
+            'curve': None,
 
             'findparallelparking': 0.5,
             'findverticalparking': 0.5,
@@ -63,9 +63,9 @@ class PurePursuitController(object):
 
 
         self.delay = {
-            'long straight': 1.0,
-            'short straight': 2.5,
-            'curve': -1,
+            'long straight': .1,
+            'short straight': .1,
+            'curve': 0.1,
 
             'findparallelparking': 0.5,
             'findverticalparking': 0.5,
@@ -80,7 +80,7 @@ class PurePursuitController(object):
 
     def __call__(self, target, mode):
 
-        # 고속주행모드
+        # 고속주행모드self
         if mode == 'curve' or mode == 'long straight' or mode == 'short straight':   
             if self.timer() > self.delay[mode]:
                     if self.acc[mode] is None:
