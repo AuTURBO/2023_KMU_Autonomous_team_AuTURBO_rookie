@@ -64,12 +64,15 @@ class Xycar(object):
         # AR 컨트롤러 생성
         self.ar_controller = ARController()
         # AR 컨트롤러 생성
-        self.ar_curve_controller = ARCurveController()
+        self.ar_curve_controller = ARCurveController(self.timer)
+        self.ar_start = 0
+        self.ar_cnt = 0
     
         # 루버콘 컨트롤러 생성 
         self.rubbercon_controller = RubberconController(self.timer)
 
-
+        self.rubber_action_flag= 0
+        self.rubber_state_flag = 0
     
         self.target_lane = 'middle'
         self.control_dict = {
@@ -207,7 +210,7 @@ class Xycar(object):
                 self.msg.angle, self.msg.speed = 50, -3
                 self.pub.publish(self.msg)
                 self.rate.sleep()
-            for _ in range(20):
+            for _ in range(35):
                 self.msg.angle, self.msg.speed = -50, 3
                 self.pub.publish(self.msg)
                 self.rate.sleep()
@@ -227,27 +230,12 @@ class Xycar(object):
     # 이 부분을 채워주세요~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     # !!!!!!!
     def ar_curve(self):
-        self.ar_cnt = 0
-        ar_flag = 0
-        self.msg.angle, ar_flag = self.ar_curve_controller(self.sensor.ar_msg)
-        self.ar_start = ar_flag
-        if self.ar_start == 1:
-            if ar_flag == 0: # 인식될 경우
-                self.ar_start = 1 
-                self.msg.speed = 3
-                self.pub.publish(self.msg)
-            else:
-                if self.ar_cnt > 20:
-                    # ar 모드 종료
-                    print('AR 모드 종료')
-                    self.mode_controller.set_mode('findverticalparking')
-                else:
-                    self.ar_cnt += 1
-                    self.msg.speed = 3
-                    self.pub.publish(self.msg)
-            self.rate.sleep()
-        else:
-            self.pursuit()
+        self.msg.angle, self.msg.speed = self.ar_curve_controller(self.sensor.lidar, self.sensor.angle_increment)
+        self.pub.publish(self.msg)
+        if self.msg.speed == 0:
+            print('ar_curve 모드 종료')
+            self.mode_controller.set_mode('object')
+        self.rate.sleep()
         # 다음모드 커브모드 
         # 객체인식 주차모드일 수 있음 
     # ================================================================================================#
@@ -400,19 +388,8 @@ class Xycar(object):
                 self.msg.angle, self.msg.speed = 0, 3
                 self.pub.publish(self.msg)
                 self.rate.sleep()
-            for _ in range(8):
-                self.msg.angle, self.msg.speed = 50, 3
-                self.pub.publish(self.msg)
-                self.rate.sleep()
-            for _ in range(9):
-                self.msg.angle, self.msg.speed = -50, 3
-                self.pub.publish(self.msg)
-                self.rate.sleep()                      
-            for _ in range(10):
-                self.msg.angle, self.msg.speed = 0, 3
-                self.pub.publish(self.msg)
-                self.rate.sleep()
 
+        # 계산된 조향각을 디그리 투 라디안
             for _ in range(7):
                 self.msg.angle, self.msg.speed = -50, 3
                 self.pub.publish(self.msg)
@@ -479,12 +456,13 @@ class Xycar(object):
     # ================================ 미션 5 스탑라인(횡단보도) 정지 ===========================================#
     def stopline(self):
         if self.stopline_detector(self.sensor.cam):
+            print("정지선을 인식했습니다.")
             self.stop6s()
         else:
             self.pursuit()
     # 5초 정지 후 3초 이내에 출발 해야합니다. 
     def stop6s(self):
-        print("stop for 5s...")
+        print("5초간 정지합니다.")
         yaws = []
         for _ in range(52):
             yaws.append(self.sensor.yaw)
@@ -499,16 +477,19 @@ class Xycar(object):
 
     # ================================ 미션 6 라바콘 주행 ====================================================#
     def rubbercon(self):
-        self.msg.angle, self.msg.speed = self.rubbercon_controller(self.sensor.lidar, self.sensor.angle_increment)
-        self.pub.publish(self.msg)
-        if self.msg.speed == 0:
-            print('rubber 모드 종료')
-            self.mode_controller.set_mode('long straight')
-            self.msg.angle, self.msg.speed = -1*self.target_angle, 0
+            self.msg.angle, self.msg.speed, self.rubber_state_flag, self.rubber_action_flag = self.rubbercon_controller(self.sensor.lidar, self.sensor.angle_increment)
             self.pub.publish(self.msg)
-        self.rate.sleep()
+            if self.rubber_state_flag == 0 and self.rubber_action_flag == 0:
+                self.pursuit()
+                print("장애물 인식 전, 차선을 따라갑니다.")
+            elif self.rubber_state_flag ==0 and self.rubber_action_flag == 1:
+                print("라바 콘을 회피하여 주행합니다.")
+            elif self.rubber_state_flag == 1 and self.rubber_action_flag == 0:
+                    print('obstacle 모드 종료')
+                    self.mode_controller.set_mode('short straight')        #우성님...헬프
+            self.rate.sleep()
 
-
+ 
     # 메인 루프 
     def control(self):
         # 어떤 모드인지 확인 후 해당 모드에 맞는 제어 수행
@@ -517,4 +498,4 @@ class Xycar(object):
         # rospy.loginfo("current mode is %s", mode)
         
         self.control_dict[mode]()
-        # cv2.waitKey(1)
+        # cv2.waitKey(1)    

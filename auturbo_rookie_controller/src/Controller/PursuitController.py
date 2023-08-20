@@ -21,7 +21,8 @@ class PurePursuitController(object):
             'obstacle': 0.2,
             'parallelparking': 0.2,
             'object': 0.2,
-            'ar_curve': 0.2
+            'ar_curve': 0.2,
+            'rubbercon': 0.2
         }
         self.target_speed = {
             'long straight': 7,
@@ -35,7 +36,8 @@ class PurePursuitController(object):
             'obstacle': 3,
             'parallelparking': 3,
             'ar_curve': 3,
-            'object': 3
+            'object': 3,
+            'rubbercon' : 3
         }
         self.acc = {
             'long straight': 1.,
@@ -49,7 +51,8 @@ class PurePursuitController(object):
             'obstacle': 0.5,
             'parallelparking': 0.5,
             'ar_curve': 0.5,
-            'object': 0.5
+            'object': 0.5,
+            'rubbercon' : 0.5
         }
 
         # self.delay = {
@@ -74,7 +77,8 @@ class PurePursuitController(object):
             'obstacle': 0.5,
             'parallelparking': 0.5,
             'ar_curve': 0.5,
-            'object': 0.5
+            'object': 0.5,
+            'rubbercon' : 0.5
         }
 
 

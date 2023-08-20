@@ -1,69 +1,137 @@
-#! /usr/bin/env python
-# -*- coding:utf-8 -*-
+#!/usr/bin/env python
 
-from ar_track_alvar_msgs.msg import AlvarMarkers
-from tf.transformations import euler_from_quaternion
+#rotation 1일 때 : 왼쪽 장애물이 오른쪽 장애물 보다 가까이 있음
+#rotation -1일 때 : 오른쪽 장애물이 왼쪽 장애물 보다 가까이 있음
+# 초기값 : 0
+
+# 시간을 쟤서 5초 이상 시간이 지나면 다음 모드로 넘어가게 하기 
+import numpy as np
+
 
 class ARCurveController(object):
-    '''
-    Speed and Steer controller for precise parking using AR tag
-    '''
-    def __init__(self):
-        self.target = 0.43
-        self.flag = 0
-        self.global_marker_id = [0]*10
+    def __init__(self, timer):
+        self.obstacle_count = 0
+
+        self.timer = timer
         self.angle = 0
+        self.speed = 0
+        self.error = 0 
+        # 비례 제어 게인
+        self.k = 50.0  
+        #라이다 /scan 토픽 값을 이용하여 오차 계산
 
-    def __call__(self, ar_msg):
-        '''
-        return self.angle and speed from x, y, yaw of a AR tag
-        '''
-        local_marker_id = [0]*10
-        markers_x_point_list = []
-        markers_y_point_list = []
-        markers_yaw_point_list = []
+        self.rotation = 0
+        self.prev_rotation = 0
 
-        for i in ar_msg.markers:
-            self.global_marker_id[i.id] = 1
-            local_marker_id[i.id] = 1
-            print("id: ", i.id)
-
-            pose = i.pose.pose
-            markers_x_point_list.append(pose.position.x)
-            markers_y_point_list.append(pose.position.z)
-            markers_yaw_point_list.append(euler_from_quaternion((pose.orientation.x, pose.orientation.y,
-                                              pose.orientation.z, pose.orientation.w))[1])
-        markers_y_point_list.sort(reverse=True)
-        print('detecting AR tag: ', len(markers_y_point_list))
-
-        # start
-        if len(markers_y_point_list) == 0 and self.flag == 0:
-            self.angle = 0
+    def __call__(self, ranges, angle_increment):
+        state_flag = 0
+        action_flag = 0
+        min_filtered = 0
+        right_filtered = 0
+        left_filtered = 0
+        ranges = np.array(ranges)
         
-        # detection
-        elif len(markers_y_point_list) > 0 and self.flag == 0:
-            self.flag = 1
-            self.angle = 5
+        # 라이다 데이터의 1/4 구간과 3/4 구간은 0으로 설정하여 로봇의 전방 및 후방을 제외합니다.
+        ranges[:len(ranges)//4] = 0.0
+        ranges[3*len(ranges)//4:] = 0.0
 
-        elif len(markers_y_point_list) > 0 and self.flag == 1:
-            for i in range(10):
-                if self.global_marker_id[i] == 1 and local_marker_id[i] == 0:
-                    print('AR Curve start: ', len(markers_y_point_list))
-                    self.flag = 2
-                    self.angle = 20
-                print("global: ", self.global_marker_id)
-                print(" local: ", local_marker_id)
+        # 각도 값들을 계산합니다.
+        # print("angle_increment: ", angle_increment)
+        deg = np.arange(len(ranges)) * angle_increment - 220 * angle_increment
+        # deg = np.arange(len(ranges)) * angle_increment - 252 * angle_increment
 
-        # curve controll 
-        elif len(markers_y_point_list) > 0 and self.flag == 2:
-            print('markers_y_point_list[0]: ', markers_y_point_list[0])
-            error = markers_y_point_list[0] - self.target
-            self.angle = -abs(error * 170) 
-            print(f"error: {error}, self.angle: {self.angle}")
+        # 장애물로 판단할 조건을 마스킹하여 필터링합니다.
+        # 거리값에 따른 필터링 조건을 설정합니다.
+        mask = (np.abs(ranges * np.sin(deg)) < 0.75) & (0.1 < ranges * np.cos(deg)) & (ranges * np.cos(deg) < 0.75)
 
-        # termination
-        elif len(markers_y_point_list) == 0 and self.flag == 2 and self.global_marker_id.count(1) >= 5:
-            self.flag = 3
-            self.angle = 30
+        filtered = np.where(mask, ranges, 0.0)
 
-        return self.flag, int(self.angle)
+        # 필터링된 데이터 중 0이 아닌 값의 인덱스를 찾습니다.
+        nz = np.nonzero(filtered)[0]
+
+        #필터리된 데이터중 최대값을 찾습니다.
+            
+        if len(nz) > 5:
+            state_flag = 1
+            action_flag = 1
+            # # print("nz: ", nz)
+            # # 만약 필터링된 데이터의 개수가 5개 이상이면, 어느 방향으로 피해야 할지 결정합니다.
+            # #  1. 1/4 구간에 장애물이 있으면, 오차값을 더해주고, 3/4 구간에 장애물이 있으면, 오차값을 빼줍니다.
+            # if np.median(nz) > len(ranges) // 2 and np.median(nz) < len(ranges):
+            #     #self.rotation = -1
+                
+            #     left_filtered = filtered[int(np.median(nz))]
+            #     #print("왼쪽", filtered[int(np.median(nz))])
+            #     #self.error += 0.5 - filtered[int(np.median(nz))]
+            # elif np.median(nz) > len(ranges) // 2 - 5 and np.median(nz) < len(ranges) // 2 + 5:
+            #     self.error = 0
+            #     steer = 0
+            # elif np.median(nz) < len(ranges) // 2 and np.median(nz) > 0:
+            #     #self.rotation = 1
+                
+            #     right_filtered = filtered[int(np.median(nz))]
+            #     #self.error -= 0.5 - filtered[int(np.median(nz))]
+            #     #print("오른쪽", filtered[int(np.median(nz))])
+
+
+            min_filtered = filtered[int(np.median(nz))]
+            if self.obstacle_count < 2 :
+                th = 0.45 
+            else :
+                th = 0.55
+            if min_filtered > th :
+                self.rotation = 1
+            elif min_filtered < th:
+                self.rotation = -1
+
+            if self.rotation == -1:
+                self.error -= th - right_filtered
+            elif self.rotation == 1:
+                self.error += th - left_filtered
+            
+            # print("min_filtered: ", min_filtered)
+        else:
+            self.error = 0
+            action_flag = 0
+
+
+
+
+
+        
+
+        # 태그 설정
+        if self.rotation != self.prev_rotation and self.rotation == 1:
+            self.error = 15
+            self.obstacle_count +=1
+
+        elif self.rotation != self.prev_rotation and self.rotation == -1:
+            self.error = -15
+            self.obstacle_count +=1
+        self.prev_rotation = self.rotation
+
+        if self.error == 0:
+            steer = 0
+            self.error = 0
+        else:
+            steer = self.error * self.k
+
+    
+
+
+        if steer > 30:
+            steer = 30
+        elif steer < -30:   
+            steer = -30
+
+        #조향각 출력하기
+        
+        # print("rotation : {}".format(self.rotation))
+        # print("angle_steer: {} ".format(int(steer)))
+        # print("obstacle_count: ", self.obstacle_count)
+
+
+        if self.obstacle_count >= 6 and action_flag == 0:
+            print("수직주차 모드 변경")
+            return  0, 0
+        return  int(steer), 3   
