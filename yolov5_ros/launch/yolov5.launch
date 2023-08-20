@@ -1,6 +1,6 @@
 <launch>
     <!-- Detection configuration -->
-    <arg name="weights" default="$(find yolov5_ros)/data/best.pt"/>
+    <arg name="weights" default="$(find yolov5_ros)/data/best_sch.pt"/>
     <arg name="data" default="$(find yolov5_ros)/data/data_augment.yaml"/>
     <arg name="confidence_threshold" default="0.75"/>
     <arg name="iou_threshold" default="0.45"/>
@@ -17,8 +17,8 @@
     <arg name="inference_size_w" default="640"/>
 
     <!-- Visualize using OpenCV window -->
-    <!-- <arg name="view_image" default="true"/> -->
-    <arg name="view_image" default="false"/>
+    <arg name="view_image" default="true"/>
+    <!-- <arg name="view_image" default="false"/> -->
 
     <!-- ROS topics -->
     <!-- <arg name="input_image_topic" default="/usb_cam/image_raw"/> -->
