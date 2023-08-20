@@ -42,6 +42,7 @@ class Xycar(object):
         # grandeur avante sonata
         car_target = "avante"
         car_rest = "grandeur"
+        self.direction = "none"
         self.objectdetector = ObjectDetector(self.timer, car_target, car_rest)
         # self.verticalparking = VerticalParking(self.timer)
         # stop line 감지기 생성
