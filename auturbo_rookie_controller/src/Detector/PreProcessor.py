@@ -7,7 +7,6 @@ import cv2
 import os
 #import matplotlib.pyplot as plt
 import queue
-from Detector.MovingAverage import MovingAverage
 
 def LowPassFilter(alpha, prev, x):
     """
@@ -44,10 +43,6 @@ class PreProcessor:
         self.left_window_n = 0
         self.right_window_n = 0
         self.mid_window_n = 0
-
-        self.filter_left = MovingAverage(100)
-        self.filter_right = MovingAverage(100)
-        self.filter_mid = MovingAverage(100)
 
     # =============================================
     # Bird Eye View 변환 함수
