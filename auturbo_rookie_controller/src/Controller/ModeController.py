@@ -94,6 +94,7 @@ class ModeController(object):
         else:
             self.long_state = 0
         # 긴 직진 
+        self.timer.update()
         if self.mode == 'long straight': 
             self.error_list.append(angle_error)
             if len(self.error_list) > 10:
@@ -103,7 +104,7 @@ class ModeController(object):
                 self.error_list.pop(0)
                 if abs(error_mean) > 5:
                     self.mode = 'curve'
-                    self.timer.update()
+                    # self.timer.update()
                 if abs(error_mean) < 5 and self.long_state == 0:
                     self.mode = 'short straight'
                     # print('long straight -> curve')
@@ -117,11 +118,11 @@ class ModeController(object):
                 self.error_list.pop(0)
                 if abs(error_mean) < 5 and self.long_state == 0:
                     self.mode = 'short straight'
-                    self.timer.update()
+                    # self.timer.update()
                     # print('curve -> short straight')
                 elif abs(error_mean) > 5 and self.long_state == 1:
                     self.mode = 'long straight'
-                    self.timer.update()
+                    # self.timer.update()
                     # print('curve -> long straight')
         # 짧은 직진
         elif self.mode == 'short straight':
@@ -133,7 +134,7 @@ class ModeController(object):
                 self.error_list.pop(0)
                 if abs(error_mean) > 5 and self.long_state == 0:
                     self.mode = 'curve'
-                    self.timer.update()
+                    # self.timer.update()
                 if abs(error_mean) < 5 and self.long_state == 1:
                     self.mode = 'long straight'
                     # print('short straight -> curve')
