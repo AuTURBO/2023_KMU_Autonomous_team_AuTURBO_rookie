@@ -227,26 +227,27 @@ class Xycar(object):
     # 이 부분을 채워주세요~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     # !!!!!!!
     def ar_curve(self):
-        self.first = False
-        flag, self.msg.angle = self.ar_curve_controller(self.sensor.ar_msg)
-        self.msg.speed = 3
-        if flag == 0:
+        self.ar_cnt = 0
+        ar_flag = 0
+        self.msg.angle, ar_flag = self.ar_curve_controller(self.sensor.ar_msg)
+        self.ar_start = ar_flag
+        if self.ar_start == 1:
+            if ar_flag == 0: # 인식될 경우
+                self.ar_start = 1 
+                self.msg.speed = 3
+                self.pub.publish(self.msg)
+            else:
+                if self.ar_cnt > 20:
+                    # ar 모드 종료
+                    print('AR 모드 종료')
+                    self.mode_controller.set_mode('findverticalparking')
+                else:
+                    self.ar_cnt += 1
+                    self.msg.speed = 3
+                    self.pub.publish(self.msg)
+            self.rate.sleep()
+        else:
             self.pursuit()
-        elif flag == 1:
-            print('AR Curve init - flag: ', flag)
-            self.pub.publish(self.msg)
-        elif flag == 2:
-            if (self.first == False):
-                time.sleep(0.5)
-                self.first = True
-            print('AR Curve start - flag: ', flag)
-            self.pub.publish(self.msg)
-        elif flag == 3:
-            self.pub.publish(self.msg)
-            time.sleep(0.5)
-            print('AR Curve termination - flag: ', flag)
-            self.mode_controller.set_mode('object')
-        self.rate.sleep()
         # 다음모드 커브모드 
         # 객체인식 주차모드일 수 있음 
     # ================================================================================================#
