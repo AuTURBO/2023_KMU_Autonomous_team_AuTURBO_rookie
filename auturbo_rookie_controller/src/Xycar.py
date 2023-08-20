@@ -62,12 +62,14 @@ class Xycar(object):
         self.ar_controller = ARController()
         # AR 컨트롤러 생성
         self.ar_curve_controller = ARCurveController()
+        self.ar_start = 0
+        self.ar_cnt = 0
     
         # 루버콘 컨트롤러 생성 
         self.rubbercon_controller = RubberconController(self.timer)
-        self.obstacle_status = 0
-        self.obstacle_flag = 0
-        self.obstacle_cnt = 0
+
+        self.rubber_action_flag= 0
+        self.rubber_state_flag = 0
     
         self.target_lane = 'middle'
         self.control_dict = {
@@ -224,26 +226,28 @@ class Xycar(object):
     # 이 부분을 채워주세요~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     # !!!!!!!
     def ar_curve(self):
-        self.first = False
-        flag, self.msg.angle = self.ar_curve_controller(self.sensor.ar_msg)
-        self.msg.speed = 3
-        if flag == 0:
+        self.ar_cnt = 0
+        ar_flag = 0
+        self.msg.angle, ar_flag = self.ar_curve_controller(self.sensor.ar_msg)
+        self.ar_start = ar_flag
+        if self.ar_start == 1:
+            print('AR 모드 시작')
+            if ar_flag == 0: # 인식될 경우
+                self.ar_start = 1 
+                self.msg.speed = 0
+                self.pub.publish(self.msg)
+            else:
+                if self.ar_cnt > 20:
+                    # ar 모드 종료
+                    print('AR 모드 종료')
+                    self.mode_controller.set_mode('findverticalparking')
+                else:
+                    self.ar_cnt += 1
+                    self.msg.speed = 0
+                    self.pub.publish(self.msg)
+            self.rate.sleep()
+        else:
             self.pursuit()
-        elif flag == 1:
-            print('AR Curve init - flag: ', flag)
-            self.pub.publish(self.msg)
-        elif flag == 2:
-            if (self.first == False):
-                time.sleep(0.5)
-                self.first = True
-            print('AR Curve start - flag: ', flag)
-            self.pub.publish(self.msg)
-        elif flag == 3:
-            self.pub.publish(self.msg)
-            time.sleep(0.5)
-            print('AR Curve termination - flag: ', flag)
-            self.mode_controller.set_mode('object')
-        self.rate.sleep()
         # 다음모드 커브모드 
         # 객체인식 주차모드일 수 있음 
     # ================================================================================================#
@@ -496,26 +500,17 @@ class Xycar(object):
 
     # ================================ 미션 6 라바콘 주행 ====================================================#
     def rubbercon(self):
-        self.msg.angle, self.msg.speed, self.obstacle_status = self.rubbercon_controller(self.sensor.lidar, self.sensor.angle_increment, self.obstacle_cnt)
-        if self.obstacle_status == 1 and self.obstacle_flag == 0: # 장애물이 있을경우 1회 로그용 
-            print("장애물이 감지되었습니다. 루버콘 모드를 시작합니다.")
+            self.msg.angle, self.msg.speed, self.rubber_state_flag, self.rubber_action_flag = self.rubbercon_controller(self.sensor.lidar, self.sensor.angle_increment)
             self.pub.publish(self.msg)
-            self.obstacle_flag = 1
-            self.obstacle_cnt += 1
-        elif self.obstacle_status == 1 and self.obstacle_flag == 1: # 장애물이 있을경우
-            self.pub.publish(self.msg)
-            self.obstacle_cnt += 1
-            if self.obstacle_cnt > 300 :
-                self.obstacle_cnt = 0
-            print("루버콘 모드를 유지합니다.")
-        elif self.obstacle_status == 2 : 
-            # 루버콘 모드 종료 
-            print("루버콘 모드를 종료합니다.")
-            self.mode_controller.set_mode('long straight')
-        else :
-            # 장애물이 없는경우 
-            self.pursuit()
-        self.rate.sleep()
+            if self.rubber_state_flag == 0 and self.rubber_action_flag == 0:
+                print("장애물 인식 전, 차선을 따라갑니다.")
+            elif self.rubber_state_flag ==0 and self.rubber_action_flag == 1:
+                print("라바 콘을 회피하여 주행합니다.")
+            elif self.rubber_state_flag == 1 and self.rubber_action_flag == 0:
+                if time.time() - self.timer >= 1.5:
+                    print('obstacle 모드 종료')
+                    self.mode_controller.set_mode('short straight')
+            self.rate.sleep()
 
  
     # 메인 루프 
