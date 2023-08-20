@@ -503,13 +503,13 @@ class Xycar(object):
             self.msg.angle, self.msg.speed, self.rubber_state_flag, self.rubber_action_flag = self.rubbercon_controller(self.sensor.lidar, self.sensor.angle_increment)
             self.pub.publish(self.msg)
             if self.rubber_state_flag == 0 and self.rubber_action_flag == 0:
+                self.pursuit()
                 print("장애물 인식 전, 차선을 따라갑니다.")
             elif self.rubber_state_flag ==0 and self.rubber_action_flag == 1:
                 print("라바 콘을 회피하여 주행합니다.")
             elif self.rubber_state_flag == 1 and self.rubber_action_flag == 0:
-                if time.time() - self.timer >= 1.5:
                     print('obstacle 모드 종료')
-                    self.mode_controller.set_mode('short straight')
+                    self.mode_controller.set_mode('short straight')        #우성님...헬프
             self.rate.sleep()
 
  
@@ -521,4 +521,4 @@ class Xycar(object):
         # rospy.loginfo("current mode is %s", mode)
         
         self.control_dict[mode]()
-        # cv2.waitKey(1)
+        # cv2.waitKey(1)    
