@@ -9,7 +9,7 @@ from Detector.BEV_hough import BEV
 # colors
 red, green, blue, yellow = (0, 0, 255), (0, 255, 0), (255, 0, 0), (0, 255, 255)
 
-class LaneDetector():
+class LaneDetectorHough():
     '''
     Detects left, middle, right lane from an image and calculate angle of the lane.
     Uses canny, houghlinesP for detecting possible lane candidates.
@@ -197,7 +197,7 @@ class LaneDetector():
         cte : pixels
         '''
         canny = self.to_canny(img, show=False)
-        bev = self.bev(canny, show=False)
+        bev = self.bev(canny, show=True)
         lines = self.hough(bev, show=False)
         positions = self.filter(lines, show=False)
         lane_candidates = self.get_cluster(positions)

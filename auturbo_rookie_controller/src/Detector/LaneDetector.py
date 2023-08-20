@@ -9,7 +9,7 @@ from Detector.PreProcessor import PreProcessor
 red, green, blue, yellow = (0, 0, 255), (0, 255, 0), (255, 0, 0), (0, 255, 255)
 
 obstacle_info = "middle"
-class LineDetector(object):
+class LaneDetector(object):
     '''
     Detects rectangle shaped contour of given specification range
     '''

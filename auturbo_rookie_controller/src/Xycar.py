@@ -10,8 +10,8 @@ import time
 
 from XycarSensor import XycarSensor
 
-from Detector.LineDetector import LineDetector
-from Detector.LineDetectorHough import LaneDetector
+from Detector.LaneDetector import LaneDetector
+from Detector.LaneDetectorHough import LaneDetectorHough
 from Detector.StopLineDetector import StopLineDetector
 from Detector.ObstacleDetector import ObstacleDetector
 from Detector.ObjectDetector import ObjectDetector
@@ -50,8 +50,8 @@ class Xycar(object):
         self.stopline_detector = StopLineDetector()
 
         # 목표 차선 정보 받아오기 & 목표 각도 받아오기 
+        self.lane_detector_hough = LaneDetectorHough()
         self.lane_detector = LaneDetector()
-        self.line_detector = LineDetector()
         # rospy.Subscriber("xycar_angle", Int32, self.target_angle_callback, queue_size=10)
         # self.target_angle = 0
         # 목표 차선 정보 pub 
@@ -133,8 +133,8 @@ class Xycar(object):
 
     # 차선 컨트롤러
     def pursuit(self):
-        angle, target = self.lane_detector(self.sensor.cam, self.target_lane)
-        # self.target_angle = self.line_detector(self.sensor.cam)
+        angle, target = self.lane_detector_hough(self.sensor.cam, self.target_lane)
+        # self.target_angle = self.lane_detector(self.sensor.cam)
         self.msg.angle, self.msg.speed = self.pursuit_controller(target, self.mode_controller.get_mode())
         self.pub.publish(self.msg)
         self.rate.sleep()
