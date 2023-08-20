@@ -10,6 +10,7 @@ class ObjectDetector(object):
     '''
     def __init__(self, timer, car_target, car_rest):
         self.timer = timer
+        self.height = 30
         self.direction = 'none'
         self.car_target = car_target
         self.car_rest = car_rest
@@ -22,7 +23,8 @@ class ObjectDetector(object):
         if (detect[self.car_target]): self.x_mid[self.car_target] = x_mid[self.car_target]
         if (detect[self.car_rest]): self.x_mid[self.car_rest] = x_mid[self.car_rest]
 
-        if (y[self.car_target] > 30 or y[self.car_rest] > 30):
+        if (y[self.car_target] > self.height or y[self.car_rest] > self.height):
+            print("object: object detected in target range")
             if (self.x_mid[self.car_target] != 0 and self.x_mid[self.car_rest] != 0):
                 if (self.x_mid[self.car_target] < self.x_mid[self.car_rest]):
                     self.direction = "left"
@@ -39,5 +41,5 @@ class ObjectDetector(object):
                 elif (self.x_mid[self.car_target] >= 320):
                     self.direction = "right"
             
-        rospy.loginfo("self.direction: %s, y[self.car_target]: %f", self.direction, y[self.car_target])
+        rospy.loginfo("object: target object(%s) direction: %s", self.car_target, self.direction)
         return self.direction
