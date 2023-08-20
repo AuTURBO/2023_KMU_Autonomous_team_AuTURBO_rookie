@@ -276,7 +276,7 @@ class Xycar(object):
             self.pursuit()
 
     def verticalparking(self):
-        self.direction = 'left'
+        # self.direction = 'left'
         if self.direction == 'right' :  #direction은 Yolo를 통해 받은 변수의 값
             print("오른쪽 주차시작")
             #AR 인식 후 앞으로 직진
