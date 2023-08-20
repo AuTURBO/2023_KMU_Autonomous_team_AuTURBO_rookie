@@ -65,8 +65,9 @@ class Xycar(object):
     
         # 루버콘 컨트롤러 생성 
         self.rubbercon_controller = RubberconController(self.timer)
-
-
+        self.obstacle_status = 0
+        self.obstacle_flag = 0
+        self.obstacle_cnt = 0
     
         self.target_lane = 'middle'
         self.control_dict = {
@@ -474,12 +475,13 @@ class Xycar(object):
     # ================================ 미션 5 스탑라인(횡단보도) 정지 ===========================================#
     def stopline(self):
         if self.stopline_detector(self.sensor.cam):
+            print("정지선을 인식했습니다.")
             self.stop6s()
         else:
             self.pursuit()
     # 5초 정지 후 3초 이내에 출발 해야합니다. 
     def stop6s(self):
-        print("stop for 5s...")
+        print("5초간 정지합니다.")
         yaws = []
         for _ in range(52):
             yaws.append(self.sensor.yaw)
@@ -494,16 +496,28 @@ class Xycar(object):
 
     # ================================ 미션 6 라바콘 주행 ====================================================#
     def rubbercon(self):
-        self.msg.angle, self.msg.speed = self.rubbercon_controller(self.sensor.lidar, self.sensor.angle_increment)
-        self.pub.publish(self.msg)
-        if self.msg.speed == 0:
-            print('rubber 모드 종료')
-            self.mode_controller.set_mode('long straight')
-            self.msg.angle, self.msg.speed = -1*self.target_angle, 0
+        self.msg.angle, self.msg.speed, self.obstacle_status = self.rubbercon_controller(self.sensor.lidar, self.sensor.angle_increment, self.obstacle_cnt)
+        if self.obstacle_status == 1 and self.obstacle_flag == 0: # 장애물이 있을경우 1회 로그용 
+            print("장애물이 감지되었습니다. 루버콘 모드를 시작합니다.")
             self.pub.publish(self.msg)
+            self.obstacle_flag = 1
+            self.obstacle_cnt += 1
+        elif self.obstacle_status == 1 and self.obstacle_flag == 1: # 장애물이 있을경우
+            self.pub.publish(self.msg)
+            self.obstacle_cnt += 1
+            if self.obstacle_cnt > 300 :
+                self.obstacle_cnt = 0
+            print("루버콘 모드를 유지합니다.")
+        elif self.obstacle_status == 2 : 
+            # 루버콘 모드 종료 
+            print("루버콘 모드를 종료합니다.")
+            self.mode_controller.set_mode('long straight')
+        else :
+            # 장애물이 없는경우 
+            self.pursuit()
         self.rate.sleep()
 
-
+ 
     # 메인 루프 
     def control(self):
         # 어떤 모드인지 확인 후 해당 모드에 맞는 제어 수행

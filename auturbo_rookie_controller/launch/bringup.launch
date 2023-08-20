@@ -26,7 +26,7 @@
   <!-- <node pkg="xycar_ultrasonic" type="xycar_ultrasonic.py" name="xycar_ultrasonic" output="screen" /> -->
 
   <!-- Line Detector -->
-  <node pkg="auturbo_rookie_perception" type="line_detector.py" name="line_detector" output="screen" />
+  <!-- <node pkg="auturbo_rookie_perception" type="line_detector.py" name="line_detector" output="screen" /> -->
 
   <!-- RViz -->
   <node type="rviz" name="rviz" pkg="rviz" args="-d $(find auturbo_rookie_controller)/rviz/config_file.rviz" />
