@@ -121,9 +121,9 @@ class Xycar(object):
         print("ar_marker_pose")
         print("x : ", x, "y : ", y, "yaw : ", yaw, "id : ", id)
     
-    # cv로 차선 인식 후 목표 각도값 받아오기 
-    def target_angle_callback(self, msg):
-        self.target_angle = msg.data
+    # # cv로 차선 인식 후 목표 각도값 받아오기 
+    # def target_angle_callback(self, msg):
+    #     self.target_angle = msg.data
     
     # 차량 정지 
     def poweroff(self):
@@ -138,6 +138,7 @@ class Xycar(object):
     def pursuit(self):
         # angle, self.target_angle = self.lane_detector_hough(self.sensor.cam, self.target_lane)
         self.target_angle = self.lane_detector(self.sensor.cam)
+        print("target_angle : ", self.target_angle)
         self.msg.angle, self.msg.speed = self.pursuit_controller(self.target_angle, self.mode_controller.get_mode())
         self.pub.publish(self.msg)
         self.rate.sleep()

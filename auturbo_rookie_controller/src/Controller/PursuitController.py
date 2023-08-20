@@ -101,7 +101,7 @@ class PurePursuitController(object):
         # 여기에 Pure Pursuit 알고리즘을 구현합니다.
         # 현재 조향각인 current_angle과 목표값(0으로 가정)을 이용하여 알고리즘을 적용합니다.
         # 다음 줄을 알고리즘에 맞게 수정해주세요.
-        target_angle = 0  # -5  # 여기에 Pure Pursuit 알고리즘을 적용하여 목표 조향각을 계산합니다.
+        target_angle = 10  # -5  # 여기에 Pure Pursuit 알고리즘을 적용하여 목표 조향각을 계산합니다.
 
         # 현재 조향각과 목표 조향각과의 차이를 계산합니다.
         self.diff_angle = target_angle - current_angle
