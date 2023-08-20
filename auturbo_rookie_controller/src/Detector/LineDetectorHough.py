@@ -4,7 +4,7 @@
 import cv2
 import numpy as np
 from collections import deque
-from BEV import BEV
+from Detector.BEV_hough import BEV
 
 # colors
 red, green, blue, yellow = (0, 0, 255), (0, 255, 0), (255, 0, 0), (0, 255, 255)
@@ -34,6 +34,8 @@ class LaneDetector():
         # filtering params:
         self.angle_tolerance = np.radians(30)
         self.cluster_threshold = 25
+
+        self.frameRate = 11
 
     def to_canny(self, img, show=False):
         img = cv2.GaussianBlur(img, (7,7), 0)
@@ -202,6 +204,8 @@ class LaneDetector():
         predicted_lane = self.predict_lane()
         self.update_lane(lane_candidates, predicted_lane)
         self.mark_lane(bev)
+
+        key = cv2.waitKey(self.frameRate)
 
         if target_lane == 'middle':
             return self.angle, self.lane[1]
