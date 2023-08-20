@@ -62,7 +62,7 @@ class Xycar(object):
         # AR 컨트롤러 생성
         self.ar_controller = ARController()
         # AR 컨트롤러 생성
-        self.ar_curve_controller = ARCurveController()
+        self.ar_curve_controller = ARCurveController(self.timer)
         self.ar_start = 0
         self.ar_cnt = 0
     
@@ -207,7 +207,7 @@ class Xycar(object):
                 self.msg.angle, self.msg.speed = 50, -3
                 self.pub.publish(self.msg)
                 self.rate.sleep()
-            for _ in range(20):
+            for _ in range(35):
                 self.msg.angle, self.msg.speed = -50, 3
                 self.pub.publish(self.msg)
                 self.rate.sleep()
@@ -227,28 +227,12 @@ class Xycar(object):
     # 이 부분을 채워주세요~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     # !!!!!!!
     def ar_curve(self):
-        self.ar_cnt = 0
-        ar_flag = 0
-        self.msg.angle, ar_flag = self.ar_curve_controller(self.sensor.ar_msg)
-        self.ar_start = ar_flag
-        if self.ar_start == 1:
-            print('AR 모드 시작')
-            if ar_flag == 0: # 인식될 경우
-                self.ar_start = 1 
-                self.msg.speed = 0
-                self.pub.publish(self.msg)
-            else:
-                if self.ar_cnt > 20:
-                    # ar 모드 종료
-                    print('AR 모드 종료')
-                    self.mode_controller.set_mode('findverticalparking')
-                else:
-                    self.ar_cnt += 1
-                    self.msg.speed = 0
-                    self.pub.publish(self.msg)
-            self.rate.sleep()
-        else:
-            self.pursuit()
+        self.msg.angle, self.msg.speed = self.ar_curve_controller(self.sensor.lidar, self.sensor.angle_increment)
+        self.pub.publish(self.msg)
+        if self.msg.speed == 0:
+            print('ar_curve 모드 종료')
+            self.mode_controller.set_mode('object')
+        self.rate.sleep()
         # 다음모드 커브모드 
         # 객체인식 주차모드일 수 있음 
     # ================================================================================================#
@@ -401,19 +385,8 @@ class Xycar(object):
                 self.msg.angle, self.msg.speed = 0, 3
                 self.pub.publish(self.msg)
                 self.rate.sleep()
-            for _ in range(8):
-                self.msg.angle, self.msg.speed = 50, 3
-                self.pub.publish(self.msg)
-                self.rate.sleep()
-            for _ in range(9):
-                self.msg.angle, self.msg.speed = -50, 3
-                self.pub.publish(self.msg)
-                self.rate.sleep()                      
-            for _ in range(10):
-                self.msg.angle, self.msg.speed = 0, 3
-                self.pub.publish(self.msg)
-                self.rate.sleep()
 
+        # 계산된 조향각을 디그리 투 라디안
             for _ in range(7):
                 self.msg.angle, self.msg.speed = -50, 3
                 self.pub.publish(self.msg)

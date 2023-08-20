@@ -93,7 +93,7 @@ class PurePursuitController(object):
         delta = math.atan2(2.0 * self.WB * math.sin(self.diff_angle), self.Lf[mode])
 
         # 계산된 조향각을 디그리 투 라디안
-        delta = -1 * delta * 180 / math.pi
+        delta = -1 * delta *     180 / math.pi
         return int(delta), 3
 
          
