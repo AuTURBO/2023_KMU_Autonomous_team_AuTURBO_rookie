@@ -17,6 +17,23 @@
     <remap from="camera_info" to="/usb_cam/camera_info" />
   </node>
 
+  <!-- lidar -->
+  <node name="ydlidar_node"  pkg="ydlidar_ros"  type="ydlidar_node" output="screen" respawn="false" >
+    <param name="port"         type="string" value="/dev/ttyRPL"/>  
+    <param name="baudrate"         type="int" value="230400"/>  
+    <param name="frame_id"     type="string" value="laser_frame"/>
+    <param name="resolution_fixed"    type="bool"   value="true"/>
+    <param name="auto_reconnect"    type="bool"   value="true"/>
+    <param name="reversion"    type="bool"   value="true"/>
+    <param name="angle_min"    type="double" value="-180" />
+    <param name="angle_max"    type="double" value="180" />
+    <param name="range_min"    type="double" value="0.1" />
+    <param name="range_max"    type="double" value="16.0" />
+    <param name="ignore_array" type="string" value="" />
+    <param name="frequency"    type="double" value="10"/>
+    <param name="samp_rate"    type="int"    value="5"/>
+  </node>
+
   <!-- IMU -->
   <node pkg="xycar_imu" type="9dof_imu_node.py" name="xycar_imu" output="screen">
     <param name="rviz_mode" type="string" value="false" />
@@ -25,9 +42,10 @@
   <!-- Ultrasonic -->
   <!-- <node pkg="xycar_ultrasonic" type="xycar_ultrasonic.py" name="xycar_ultrasonic" output="screen" /> -->
 
-  <!-- Line Detector -->
-  <node pkg="auturbo_rookie_perception" type="line_detector.py" name="line_detector" output="screen" />
-
   <!-- RViz -->
   <node type="rviz" name="rviz" pkg="rviz" args="-d $(find auturbo_rookie_controller)/rviz/config_file.rviz" />
+
+  <!-- main script -->
+  <node name="auturbo-rookie" pkg="auturbo_rookie_controller" type="main.py" output="screen"/>
+
 </launch>
