@@ -12,6 +12,8 @@ from preprocessor import PreProcessor
 from std_msgs.msg import Int32
 from std_msgs.msg import String
 
+from MovingAverage import MovingAverage
+
 from utils import undistort
 
 #ack_msg = xycar_motor()
@@ -35,6 +37,8 @@ roi_width = 640
 obstacle_info = "middle"
 
 pre_module = PreProcessor(roi_height, roi_width)
+
+filter_target = MovingAverage(10)
 
 def map(x,input_min,input_max,output_min,output_max):
     return (x-input_min)*(output_max-output_min)/(input_max-input_min)+output_min #map()함수 정의.
@@ -139,11 +143,12 @@ def main(frame):
 
     target = simple_controller(filtered_lx, filtered_ly, filtered_mx, filtered_my, filtered_rx, filtered_ry)
 
+    filter_target.add_sample(target)
     #target = LowPassFilter(0.9, prev_target, target)
     prev_target = target
     #print(f"filtered_target: {target}")
 
-    angle = target - 320
+    angle = filter_target.get_mm() - 320
     angle = map(angle, -100, 100, -50, 50)
     angle = angle * 0.9
     #print(f"angle: {angle}")

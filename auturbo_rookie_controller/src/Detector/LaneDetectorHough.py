@@ -5,7 +5,7 @@ import cv2
 import numpy as np
 from collections import deque
 from Detector.BEV_hough import BEV
-from Detector.MovingAverage import MovingAverage
+from Detector.utils.MovingAverage import MovingAverage
 
 # colors
 red, green, blue, yellow = (0, 0, 255), (0, 255, 0), (255, 0, 0), (0, 255, 255)

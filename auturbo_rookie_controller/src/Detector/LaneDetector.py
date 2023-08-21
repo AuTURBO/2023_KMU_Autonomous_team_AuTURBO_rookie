@@ -3,7 +3,7 @@
 
 import cv2
 from Detector.BEV import BEV
-from Detector.MovingAverage import MovingAverage
+from Detector.utils.MovingAverage import MovingAverage
 from Detector.PreProcessor import PreProcessor
 
 # colors
