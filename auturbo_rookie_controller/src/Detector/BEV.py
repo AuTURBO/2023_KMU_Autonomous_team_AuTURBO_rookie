@@ -37,12 +37,12 @@ class BEV(object):
         frame = undistort.undistort_func(frame)
         #cv2.imshow("Undistort", frame)
 
-        # gblur_img  = cv2.GaussianBlur(frame, (3, 3), sigmaX = 0, sigmaY = 0)
-        # #cv2.imshow("gblur_img", gblur_img)
+        gblur_img  = cv2.GaussianBlur(frame, (3, 3), sigmaX = 0, sigmaY = 0)
+        #cv2.imshow("gblur_img", gblur_img)
 
-        # gray = cv2.cvtColor(gblur_img, cv2.COLOR_BGR2GRAY)
-        # adaptive_binary = threshold_binary(gray, self.lane_bin_th, "adaptive", window_name="adaptive_binary", show=False)
-        # #cv2.imshow("adaptive_binary", adaptive_binary)
+        gray = cv2.cvtColor(gblur_img, cv2.COLOR_BGR2GRAY)
+        adaptive_binary = threshold_binary(gray, self.lane_bin_th, "adaptive", window_name="adaptive_binary", show=False)
+        #cv2.imshow("adaptive_binary", adaptive_binary)
 
         warped_img = self.warp_perspect(frame)
         return warped_img
