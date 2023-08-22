@@ -38,9 +38,10 @@ class ModeController(object):
     # def __init__(self, yaw0, timer):
     def __init__(self, timer):
         # 첫 시작은 긴 직진 모드
-        self.mode = 'stopline'
+        self.mode = 'long straight'
         self.timer = timer
         self.error_list = []
+        self.error_threshold = 7
 
 
     def set_mode(self, mode):
@@ -102,27 +103,42 @@ class ModeController(object):
         # long_state : 라이다가 적정거리만큼 인지 하였는가 
         # abs(error_mean) : 편균 조향각이 어느 정도인가 
         # timer() : 타이머가 얼마나 지났는가 즉, 모드가 변경되고 얼마나 지났는가
-
         if self.mode == 'long straight': 
-            if abs(error_mean) > 10 and self.long_state == 0 and self.timer() > 5:
+            if abs(error_mean) > self.error_threshold and self.long_state == 0 and self.timer() > 5:
                 self.mode = 'curve'
                 print('long straight -> curve')
+                print(self.timer())
                 self.timer.update()
+            if self.long_state == 0:
+                self.mode = 'short straight'
+                print('long straight -> short straight')
+                print(self.timer())
+                self.timer.update()
+
         # 커브
         elif self.mode == 'curve':
-            if abs(error_mean) < 10 and self.long_state == 0 and self.timer() > 2:
+            if abs(error_mean) < self.error_threshold and self.long_state == 0 and self.timer() > 2:
                 self.mode = 'short straight'
+                print(self.timer())
                 self.timer.update()
                 print('curve -> short straight')
-            elif abs(error_mean) > 10 and self.long_state == 1:
+            elif abs(error_mean) < self.error_threshold and self.long_state == 1:
                 self.mode = 'long straight'
+                print(self.timer())
                 self.timer.update()
                 print('curve -> long straight')
         # 짧은 직진
         elif self.mode == 'short straight' and self.long_state == 0 and self.timer() > 3:
-            if abs(error_mean) > 10:
+            if abs(error_mean) > self.error_threshold:
                 self.mode = 'curve'
+                print(self.timer())
                 self.timer.update()
-            print('short straight -> curve')
+                print('short straight -> curve')
+        elif self.mode == 'short straight' and self.long_state == 1:
+            self.mode = 'long straight'
+            print(self.timer())
+            self.timer.update()
+            print('short straight -> long straight')
 
+            
         return self.mode

@@ -51,7 +51,7 @@ class Xycar(object):
         # 목표 차선 정보 받아오기 & 목표 각도 받아오기 
         self.lane_detector = LaneDetector()
         # rospy.Subscriber("xycar_angle", Int32, self.target_angle_callback, queue_size=10)
-        # self.target_angle = 0
+        self.target_angle = 0
         # 목표 차선 정보 pub 
         self.pub_target_lane = rospy.Publisher("/obstacle/info", String,queue_size=10)
 
@@ -491,8 +491,12 @@ class Xycar(object):
     def control(self):
         # 어떤 모드인지 확인 후 해당 모드에 맞는 제어 수행
         # mode = self.mode_controller(self.sensor.yaw)
-        mode = self.mode_controller()
+        mode = self.mode_controller(self.target_angle, self.sensor.lidar, self.sensor.angle_increment)
         # rospy.loginfo("current mode is %s", mode)
-        
+
+        # i) high speed mode
         self.control_dict[mode]()
+
+        # ii) mission control
+        # self.control_dict[mode]()
         # cv2.waitKey(1)    
