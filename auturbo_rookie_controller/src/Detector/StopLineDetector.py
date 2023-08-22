@@ -22,7 +22,7 @@ class StopLineDetector(object):
         self.frameRate = 11 #33
 
         # stopline detection param
-        self.stopline_threshold = 125
+        self.stopline_threshold = 180
         self.area_threshold = 2000
         self.lengh_threshold = 300
    
@@ -35,8 +35,8 @@ class StopLineDetector(object):
         blur = cv2.GaussianBlur(img, (5, 5), 0)
         L = cv2.cvtColor(blur, cv2.COLOR_BGR2GRAY)
         # _, L, _ = cv2.split(cv2.cvtColor(blur, cv2.COLOR_BGR2HLS))
-        _, lane = cv2.threshold(L, self.stopline_threshold, 255, cv2.THRESH_BINARY)
-        contours, _ = cv2.findContours(lane, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        _, stopline = cv2.threshold(L, self.stopline_threshold, 255, cv2.THRESH_BINARY)
+        contours, _ = cv2.findContours(stopline, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         # _, contours, _ = cv2.findContours(lane, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 
         detected = False
@@ -55,17 +55,17 @@ class StopLineDetector(object):
             # _, width = bev.shape
             # detected boundingRect:  133 375 245 105
             # detected boundingRect center:  (255, 427)
-            cv2.rectangle(L, (x, y), (x + w, y + h), green, 2)
+            cv2.rectangle(img, (x, y), (x + w, y + h), (0,255,0), 2)
             print("detected boundingRect (x, y, w, h): ", x, y, w, h)
             print("detected boundingRect center (x, y): ", center)
 
             if (200 <= center[0] <= (width - 200)) and (w > 400) & (h < 100):
-                cv2.rectangle(L, (x, y), (x + w, y + h), green, 2)
+                cv2.rectangle(img, (x, y), (x + w, y + h), (0,0,255), 2)
                 detected = True
                 print("detected stopline")
                 cv2.destroyWindow("stopline")
                 return detected
 
-        cv2.imshow('stopline', L)
+        cv2.imshow('stopline', img)
         key = cv2.waitKey(self.frameRate)
         return detected

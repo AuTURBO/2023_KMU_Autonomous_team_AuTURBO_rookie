@@ -45,7 +45,6 @@ class BEV(object):
         # #cv2.imshow("adaptive_binary", adaptive_binary)
 
         warped_img = self.warp_perspect(frame)
-        # warped_img = self.warp_perspect(adaptive_binary)
         return warped_img
 
     # =============================================
