@@ -30,7 +30,7 @@ class LaneDetector(object):
         self.lengh_threshold = 300
         self.pre_module = PreProcessor(roi_height, roi_width)
 
-        self.filter_target = MovingAverage(10)
+        self.filter_target = MovingAverage(50)
 
    
     def __call__(self, img):

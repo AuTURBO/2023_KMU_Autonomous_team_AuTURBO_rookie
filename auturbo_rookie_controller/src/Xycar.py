@@ -51,7 +51,7 @@ class Xycar(object):
         # 목표 차선 정보 받아오기 & 목표 각도 받아오기 
         self.lane_detector = LaneDetector()
         # rospy.Subscriber("xycar_angle", Int32, self.target_angle_callback, queue_size=10)
-        # self.target_angle = 0
+        self.target_angle = 0
         # 목표 차선 정보 pub 
         self.pub_target_lane = rospy.Publisher("/obstacle/info", String,queue_size=10)
 
@@ -119,9 +119,9 @@ class Xycar(object):
         print("ar_marker_pose")
         print("x : ", x, "y : ", y, "yaw : ", yaw, "id : ", id)
     
-    # cv로 차선 인식 후 목표 각도값 받아오기 
-    def target_angle_callback(self, msg):
-        self.target_angle = msg.data
+    # # cv로 차선 인식 후 목표 각도값 받아오기 
+    # def target_angle_callback(self, msg):
+    #     self.target_angle = msg.data
     
     # 차량 정지 
     def poweroff(self):
@@ -135,6 +135,7 @@ class Xycar(object):
     # 차선 컨트롤러
     def pursuit(self):
         self.target_angle = self.lane_detector(self.sensor.cam)
+        print("target_angle : ", self.target_angle)
         self.msg.angle, self.msg.speed = self.pursuit_controller(self.target_angle, self.mode_controller.get_mode())
         self.pub.publish(self.msg)
         self.rate.sleep()
@@ -491,7 +492,7 @@ class Xycar(object):
     def control(self):
         # 어떤 모드인지 확인 후 해당 모드에 맞는 제어 수행
         # mode = self.mode_controller(self.sensor.yaw)
-        mode = self.mode_controller()
+        mode = self.mode_controller(self.target_angle, self.sensor.lidar, self.sensor.angle_increment)
         # rospy.loginfo("current mode is %s", mode)
         
         self.control_dict[mode]()
