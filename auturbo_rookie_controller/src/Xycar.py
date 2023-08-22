@@ -135,7 +135,6 @@ class Xycar(object):
     # 차선 컨트롤러
     def pursuit(self):
         self.target_angle = self.lane_detector(self.sensor.cam)
-        print("target_angle : ", self.target_angle)
         self.msg.angle, self.msg.speed = self.pursuit_controller(self.target_angle, self.mode_controller.get_mode())
         self.pub.publish(self.msg)
         self.rate.sleep()
