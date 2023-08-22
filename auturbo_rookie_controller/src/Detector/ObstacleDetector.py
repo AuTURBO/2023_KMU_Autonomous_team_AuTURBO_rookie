@@ -40,7 +40,7 @@ class ObstacleDetector(object):
 
             # 장애물로 판단할 조건을 마스킹하여 필터링합니다.
             # 거리값에 따른 필터링 조건을 설정합니다.
-            mask = (np.abs(ranges * np.sin(deg)) < 0.35) & (0.15 < ranges * np.cos(deg)) & (ranges * np.cos(deg) < 0.35)
+            mask = (np.abs(ranges * np.sin(deg)) < 0.5) & (0.15 < ranges * np.cos(deg)) & (ranges * np.cos(deg) < 0.5)
             # 필터링 조건에 따라 데이터를 필터링합니다.
             filtered = np.where(mask, ranges, 0.0)
 

@@ -71,12 +71,9 @@ class LaneDetector(object):
 
         target = simple_controller(filtered_lx, filtered_ly, filtered_mx, filtered_my, filtered_rx, filtered_ry)
 
-        # filter_target.add_sample(target)
-        #target = LowPassFilter(0.9, prev_target, target)
-        prev_target = target
-        #print(f"filtered_target: {target}")
-
+        # self.filter_target.add_sample(target)
         angle = target - 320
+        # print("Moving Average Filter: ", target, self.filter_target.get_mm())
         angle = map(angle, -100, 100, -50, 50)
         angle = angle * 1.0 # 0.9
         #print(f"angle: {angle}")
