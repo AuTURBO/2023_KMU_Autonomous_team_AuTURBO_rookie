@@ -14,7 +14,7 @@ class ModeController(object):
     # 각 모서리의 커브 구간'curve': self.pursuit,
     
     # == 미션 1 평행주차 ===== #
-    # 주차 공간 찾기 'findparking': self.findparking,
+    # 주차 공간 찾기 'findparallelparking': self.findparallelparking,
     # 가로주차  'parallelparking': self.parallelpark,
     # AR 정밀주차 'arparking': self.arparking,
     # 차량 정지 'poweroff' : self.poweroff,
@@ -38,7 +38,7 @@ class ModeController(object):
     # def __init__(self, yaw0, timer):
     def __init__(self, timer):
         # 첫 시작은 긴 직진 모드
-        self.mode = 'long straight'
+        self.mode = 'obstacle'
         self.timer = timer
         # self.yaw0 = yaw0
         self.lap = 0
