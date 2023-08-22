@@ -23,6 +23,7 @@ class LaneDetector(object):
         self.bev = BEV(roi_height, roi_width)
 
         self.frameRate = 11 #33
+        self.lane_bin_th = 120
 
         # stopline detection param
         self.stopline_threshold = 125
@@ -37,9 +38,20 @@ class LaneDetector(object):
         '''
         return True if stopline is detected else False
         '''
-        bev = self.bev(img)
+        frame = undistort.undistort_func(img)
+        #cv2.imshow("Undistort", frame)
 
-        edge = canny(bev, 70, 210, show=False)
+        gblur_img  = cv2.GaussianBlur(frame, (3, 3), sigmaX = 0, sigmaY = 0)
+        #cv2.imshow("gblur_img", gblur_img)
+
+        gray = cv2.cvtColor(gblur_img, cv2.COLOR_BGR2GRAY)
+        adaptive_binary = threshold_binary(gray, self.lane_bin_th, "adaptive", window_name="adaptive_binary", show=False)
+        #cv2.imshow("adaptive_binary", adaptive_binary)
+
+        warped_img = self.pre_module.warp_perspect(adaptive_binary)
+        # cv2.imshow('warped_img', warped_img)	
+
+        edge = canny(warped_img, 70, 210, show=False)
 
         kernel_close = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(13,13))
         kernel_erosion = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(5,5))
@@ -48,9 +60,11 @@ class LaneDetector(object):
         # cv2.imshow('closing', closing)	# 프레임 보여주기
 
         edge_to_closing = cv2.morphologyEx(edge, cv2.MORPH_CLOSE,kernel_close)
-        #cv2.imshow('edge_to_closing', edge_to_closing)	# 프레임 보여주기
+        cv2.imshow('edge_to_closing', edge_to_closing)	# 프레임 보여주기
 
         edge_to_closing = cv2.medianBlur(edge_to_closing,5)
+
+        cv2.imshow('blur', edge_to_closing)
 
         msk, lx, ly, mx, my, rx, ry = self.pre_module.sliding_window(edge_to_closing)
 
@@ -59,8 +73,8 @@ class LaneDetector(object):
 
         target = simple_controller(filtered_lx, filtered_ly, filtered_mx, filtered_my, filtered_rx, filtered_ry)
 
-        self.filter_target.add_sample(target)
-        angle = self.filter_target.get_mm() - 320
+        # self.filter_target.add_sample(target)
+        angle = target - 320
         # print("Moving Average Filter: ", target, self.filter_target.get_mm())
         angle = map(angle, -100, 100, -50, 50)
         angle = angle * 0.9
@@ -78,6 +92,20 @@ class LaneDetector(object):
         key = cv2.waitKey(self.frameRate)
 
         return int(angle)
+    
+def threshold_binary(img, lane_bin_th, method, thresholding_type=cv2.THRESH_BINARY, window_name="threshold", show=False):
+    if method == "adaptive":
+        lane = cv2.adaptiveThreshold(img, 255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,\
+    cv2.THRESH_BINARY_INV,11,9)
+    elif method == "otsu":
+        _, lane = cv2.threshold(img, 0, 255, thresholding_type+cv2.THRESH_OTSU)
+    elif method == "basic":
+        _, lane = cv2.threshold(img, lane_bin_th, 255, thresholding_type)
+
+    if show == True:
+        cv2.imshow(window_name, lane)
+    return lane
+
 def canny(img, low_threshold, high_threshold, show=False): # Canny 알고리즘
     canny = cv2.Canny(img, low_threshold, high_threshold)
 
