@@ -454,7 +454,13 @@ class PreProcessor:
                 filtered_mx = None
                 #cv2.waitKey(0)
                 
-
+        if len(mx) > 0 and len(rx) > 0:
+            overlap_dist = abs(mx[0] - rx[0])
+            # print(f"abs: {overlap_dist}")
+            if overlap_dist < overlap_dist_threshold:
+                # print("Mid Lane Overlap Error")
+                filtered_mx = None
+                #cv2.waitKey(0)
         return filtered_lx, ly, filtered_mx, my, filtered_rx, ry
 
     def drawing_lane(self, msk, lx, ly, mx, my, rx, ry):
