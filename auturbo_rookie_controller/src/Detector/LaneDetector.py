@@ -2,6 +2,11 @@
 # -*- coding:utf-8 -*-
 
 import cv2
+from sensor_msgs.msg import Image
+from std_msgs.msg import Int32
+from std_msgs.msg import String
+from cv_bridge import CvBridge
+
 from Detector.BEV import BEV
 from Detector.utils import undistort
 from Detector.utils.MovingAverage import MovingAverage
@@ -17,7 +22,7 @@ class LaneDetector(object):
     '''
     def __init__(self):
 
-        # BEV
+        # BEVlane_bin_th
         roi_height = 200
         roi_width = 640
         self.bev = BEV(roi_height, roi_width)
@@ -25,20 +30,15 @@ class LaneDetector(object):
         self.frameRate = 11 #33
         self.lane_bin_th = 120
 
-        # stopline detection param
-        self.stopline_threshold = 125
-        self.area_threshold = 2000
-        self.lengh_threshold = 300
         self.pre_module = PreProcessor(roi_height, roi_width)
 
-        self.filter_target = MovingAverage(10)
-
    
-    def __call__(self, img):
+    def __call__(self, frame):
         '''
         return True if stopline is detected else False
         '''
-        frame = undistort.undistort_func(img)
+        frame = undistort.undistort_func(frame)
+
         #cv2.imshow("Undistort", frame)
 
         gblur_img  = cv2.GaussianBlur(frame, (3, 3), sigmaX = 0, sigmaY = 0)
@@ -60,11 +60,9 @@ class LaneDetector(object):
         # cv2.imshow('closing', closing)	# 프레임 보여주기
 
         edge_to_closing = cv2.morphologyEx(edge, cv2.MORPH_CLOSE,kernel_close)
-        cv2.imshow('edge_to_closing', edge_to_closing)	# 프레임 보여주기
+        #cv2.imshow('edge_to_closing', edge_to_closing)	# 프레임 보여주기
 
         edge_to_closing = cv2.medianBlur(edge_to_closing,5)
-
-        cv2.imshow('blur', edge_to_closing)
 
         msk, lx, ly, mx, my, rx, ry = self.pre_module.sliding_window(edge_to_closing)
 
@@ -73,9 +71,12 @@ class LaneDetector(object):
 
         target = simple_controller(filtered_lx, filtered_ly, filtered_mx, filtered_my, filtered_rx, filtered_ry)
 
-        # self.filter_target.add_sample(target)
+        # filter_target.add_sample(target)
+        #target = LowPassFilter(0.9, prev_target, target)
+        prev_target = target
+        #print(f"filtered_target: {target}")
+
         angle = target - 320
-        # print("Moving Average Filter: ", target, self.filter_target.get_mm())
         angle = map(angle, -100, 100, -50, 50)
         angle = angle * 0.9
         #print(f"angle: {angle}")
@@ -84,35 +85,19 @@ class LaneDetector(object):
 
         # ack_publisher.publish(ack_msg)
 
-        cv2.circle(img, (int(target), int(480 - 135)), 1, (120, 0, 255), 10)
+        cv2.circle(frame, (int(target), int(480 - 135)), 1, (120, 0, 255), 10)
 
         cv2.imshow("Lane Detection - Sliding Windows", msk)
-        cv2.imshow('frame', img)	# 프레임 보여주기
+        cv2.imshow('frame', frame)	# 프레임 보여주기
 
-        key = cv2.waitKey(self.frameRate)
+        key = cv2.waitKey(self.frameRate)  # frameRate msec동안 한 프레임을 보여준다
+
+        # 키 입력을 받으면 키값을 key로 저장 -> esc == 27(아스키코드)
+        if key == 27:
+            exit(0)
 
         return int(angle)
     
-def threshold_binary(img, lane_bin_th, method, thresholding_type=cv2.THRESH_BINARY, window_name="threshold", show=False):
-    if method == "adaptive":
-        lane = cv2.adaptiveThreshold(img, 255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,\
-    cv2.THRESH_BINARY_INV,11,9)
-    elif method == "otsu":
-        _, lane = cv2.threshold(img, 0, 255, thresholding_type+cv2.THRESH_OTSU)
-    elif method == "basic":
-        _, lane = cv2.threshold(img, lane_bin_th, 255, thresholding_type)
-
-    if show == True:
-        cv2.imshow(window_name, lane)
-    return lane
-
-def canny(img, low_threshold, high_threshold, show=False): # Canny 알고리즘
-    canny = cv2.Canny(img, low_threshold, high_threshold)
-
-    if show == True:
-        cv2.imshow("Canny", canny)
-    return canny
-
 def map(x,input_min,input_max,output_min,output_max):
     return (x-input_min)*(output_max-output_min)/(input_max-input_min)+output_min #map()함수 정의.
 
@@ -169,8 +154,60 @@ def simple_controller(lx, ly, mx, my, rx, ry):
         # print("Obstacle Left!!!")
 
     # print(f"target: {target}")
-    # print(target)
+    print(target)
     return int(target)
+
+# def video_read(fname):
+#     global frameWidth, frameHeight
+#     global frame
+
+#     path = '../video/'  
+#     filePath = os.path.join(path, fname)
+#     print(filePath)
+
+#     if os.path.isfile(filePath):	# 해당 파일이 있는지 확인
+#         # 영상 객체(파일) 가져오기
+#         cap = cv2.VideoCapture(filePath)
+#     else:
+#         print("파일이 존재하지 않습니다.")  
+
+#     # 프레임을 정수형으로 형 변환
+#     frameWidth = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))	# 영상의 넓이(가로) 프레임
+#     frameHeight = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))	# 영상의 높이(세로) 프레임
+    
+#     frame_size = (frameWidth, frameHeight)
+#     print('frame_size={}'.format(frame_size))
+
+#     frameRate = 11 #33
+
+#     while True:
+#         retval, frame = cap.read()
+        
+#         if not(retval):	# 프레임정보를 정상적으로 읽지 못하면
+#             break  # while문을 빠져나가기
+#         main(frame)
+        
+
+
+def threshold_binary(img, lane_bin_th, method, thresholding_type=cv2.THRESH_BINARY, window_name="threshold", show=False):
+    if method == "adaptive":
+        lane = cv2.adaptiveThreshold(img, 255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,\
+    cv2.THRESH_BINARY_INV,11,9)
+    elif method == "otsu":
+        _, lane = cv2.threshold(img, 0, 255, thresholding_type+cv2.THRESH_OTSU)
+    elif method == "basic":
+        _, lane = cv2.threshold(img, lane_bin_th, 255, thresholding_type)
+
+    if show == True:
+        cv2.imshow(window_name, lane)
+    return lane
+
+def canny(img, low_threshold, high_threshold, show=False): # Canny 알고리즘
+    canny = cv2.Canny(img, low_threshold, high_threshold)
+
+    if show == True:
+        cv2.imshow("Canny", canny)
+    return canny
 
 def obstacle_callback(msg):
     global obstacle_info

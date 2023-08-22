@@ -87,12 +87,12 @@ class PreProcessor:
         # cv2.circle(img, (int(dst[2][0]), int(dst[2][1])), 1, (0,0 ,255), 10)
         # cv2.circle(img, (int(dst[3][0]), int(dst[3][1])), 1, (255,255 ,0), 10)
 
-        roi = img[280 : (280 + self.roi_height - 60), 0 : self.roi_width]  # ROI 적용
+        roi = img[280 : (280 + self.roi_height - 50), 0 : self.roi_width]  # ROI 적용
 
         cv2.imshow("roi", roi)
 
         warped_img = cv2.warpPerspective(
-            roi, M, (self.roi_width, self.roi_height - 60), flags=cv2.INTER_LINEAR
+            roi, M, (self.roi_width, self.roi_height - 50), flags=cv2.INTER_LINEAR
         )  # 이미지 워핑으로 Bird Eye View 생성
 
         return warped_img
@@ -133,12 +133,12 @@ class PreProcessor:
 
     def hist_line_peak(self, img):
         # print(img.shape)
-        histogram = np.sum(img[100:, :], axis=0)  # X축 히스토그램 계산
+        histogram = np.sum(img[90:, :], axis=0)  # X축 히스토그램 계산
         # print(histogram.shape)
         midpoint = np.int(histogram.shape[0] / 2)  # 중앙점 계산
         # print(f"midpoint: {midpoint}")
-        hist_find_margin = 115
-        mid_hist_find_margin = 40
+        hist_find_margin = 60
+        mid_hist_find_margin = 30
 
         left_hist_result = np.argmax(
             histogram[: midpoint - hist_find_margin]
@@ -190,14 +190,14 @@ class PreProcessor:
         )  # hist_line_peak 함수로 슬라이딩 윈도우의 초기 탐색점 결정
 
         # Sliding Window
-        y = 140  # 탐색 시작 Y좌표 결정
+        y = 120  # 탐색 시작 Y좌표 결정
         lx = []  # 왼쪽 차선 X좌표 저장 리스트
         ly = []  # 왼쪽 차선 Y좌표 저장 리스트
         rx = []  # 오른쪽 차선 X좌표 저장 리스트
         ry = []  # 오른쪽 차선 Y좌표 저장 리스트
         mx = []  # 중간 차선 X좌표 저장 리스트
         my = []  # 중간 차선 Y좌표 저장 리스트
-        self.window_width = 25  # window 폭
+        self.window_width = 30  # window 폭
         self.window_height = 3  # window 높이
         self.left_window_n = 0
         self.right_window_n = 0
@@ -447,7 +447,7 @@ class PreProcessor:
 
         if len(mx) > 0 and len(lx) > 0:
             overlap_dist = abs(mx[0] - lx[0])
-            print(f"abs: {overlap_dist}")
+            # print(f"abs: {overlap_dist}")
             if overlap_dist < overlap_dist_threshold:
                 # print("Mid Lane Overlap Error")
                 filtered_mx = None
