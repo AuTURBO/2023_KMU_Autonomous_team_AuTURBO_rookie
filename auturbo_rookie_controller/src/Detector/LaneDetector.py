@@ -78,7 +78,7 @@ class LaneDetector(object):
 
         angle = target - 320
         angle = map(angle, -100, 100, -50, 50)
-        angle = angle * 0.9
+        angle = angle * 1.0 # 0.9
         #print(f"angle: {angle}")
         #ack_msg.speed = int(20)
         #ack_msg.angle = int(angle)

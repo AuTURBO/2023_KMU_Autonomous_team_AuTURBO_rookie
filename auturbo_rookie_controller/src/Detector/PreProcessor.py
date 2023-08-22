@@ -137,14 +137,15 @@ class PreProcessor:
         # print(histogram.shape)
         midpoint = np.int(histogram.shape[0] / 2)  # 중앙점 계산
         # print(f"midpoint: {midpoint}")
-        hist_find_margin = 60
-        mid_hist_find_margin = 30
+        hist_find_margin = 140 # 60
+        mid_hist_find_margin = 30 # 30
+        side_margin = 120
 
-        left_hist_result = np.argmax(
-            histogram[: midpoint - hist_find_margin]
+        left_hist_result = side_margin + np.argmax(
+            histogram[side_margin: midpoint - hist_find_margin]
         )  # 중앙점을 기준으로 히스토그램을 계산해 왼쪽 라인 시작점 구함
         right_hist_result = (
-            midpoint + hist_find_margin + np.argmax(histogram[midpoint + hist_find_margin :])
+            midpoint + hist_find_margin + np.argmax(histogram[midpoint + hist_find_margin :640-side_margin])
         )  # 중앙점을 기준으로 히스토그램을 계산해 오른쪽 라인 시작점 구함
         mid_hist_result = (
             midpoint
