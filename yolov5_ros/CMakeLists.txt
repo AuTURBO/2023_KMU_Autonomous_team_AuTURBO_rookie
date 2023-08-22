@@ -7,6 +7,8 @@ project(yolov5_ros)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
+add_subdirectory(detection_msgs)
+
 find_package(catkin REQUIRED COMPONENTS
   rospy
   sensor_msgs
@@ -205,4 +207,3 @@ catkin_install_python(PROGRAMS
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
-add_subdirectory(detection_msgs)

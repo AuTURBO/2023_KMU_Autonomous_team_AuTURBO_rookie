@@ -35,7 +35,6 @@ class BEV(object):
         frameRate = 11 #33
 
         frame = undistort.undistort_func(frame)
-
         #cv2.imshow("Undistort", frame)
 
         gblur_img  = cv2.GaussianBlur(frame, (3, 3), sigmaX = 0, sigmaY = 0)

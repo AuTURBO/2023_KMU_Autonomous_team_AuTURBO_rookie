@@ -3,6 +3,7 @@
 
 import cv2
 from Detector.BEV import BEV
+from Detector.utils import undistort
 from Detector.utils.MovingAverage import MovingAverage
 from Detector.PreProcessor import PreProcessor
 
@@ -21,7 +22,6 @@ class LaneDetector(object):
         roi_width = 640
         self.bev = BEV(roi_height, roi_width)
 
-        prev_target = 320
         self.frameRate = 11 #33
 
         # stopline detection param
@@ -60,10 +60,6 @@ class LaneDetector(object):
         target = simple_controller(filtered_lx, filtered_ly, filtered_mx, filtered_my, filtered_rx, filtered_ry)
 
         self.filter_target.add_sample(target)
-        #target = LowPassFilter(0.9, prev_target, target)
-        prev_target = target
-        #print(f"filtered_target: {target}")
-
         angle = self.filter_target.get_mm() - 320
         # print("Moving Average Filter: ", target, self.filter_target.get_mm())
         angle = map(angle, -100, 100, -50, 50)
@@ -82,7 +78,6 @@ class LaneDetector(object):
         key = cv2.waitKey(self.frameRate)
 
         return int(angle)
-    
 def canny(img, low_threshold, high_threshold, show=False): # Canny 알고리즘
     canny = cv2.Canny(img, low_threshold, high_threshold)
 

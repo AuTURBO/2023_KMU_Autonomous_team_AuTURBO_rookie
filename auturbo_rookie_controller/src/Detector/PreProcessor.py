@@ -136,7 +136,7 @@ class PreProcessor:
         # print(histogram.shape)
         midpoint = np.int(histogram.shape[0] / 2)  # 중앙점 계산
         # print(f"midpoint: {midpoint}")
-        hist_find_margin = 60
+        hist_find_margin = 50
         mid_hist_find_margin = 30
 
         left_hist_result = np.argmax(
