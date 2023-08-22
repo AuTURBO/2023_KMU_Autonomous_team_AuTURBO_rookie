@@ -8,6 +8,7 @@ import os
 #import matplotlib.pyplot as plt
 import queue
 
+
 def LowPassFilter(alpha, prev, x):
     """
     (param) alpha : weight for previous estimation
@@ -136,7 +137,7 @@ class PreProcessor:
         # print(histogram.shape)
         midpoint = np.int(histogram.shape[0] / 2)  # 중앙점 계산
         # print(f"midpoint: {midpoint}")
-        hist_find_margin = 50
+        hist_find_margin = 60
         mid_hist_find_margin = 30
 
         left_hist_result = np.argmax(
@@ -152,6 +153,18 @@ class PreProcessor:
                 histogram[midpoint - mid_hist_find_margin : midpoint + mid_hist_find_margin]
             )
         )  # 중앙점을 기준으로 히스토그램을 계산해 오른쪽 라인 시작점 구함
+
+        # print(left_hist_result, mid_hist_result, right_hist_result)
+
+        # if right_hist_result == 0: # 오른쪽 차선이 없으면 차량이 왼쪽으로 치우쳐져 있다고 판단
+        #     right_base = right_hist_result + midpoint + hist_find_margin +90 # 오른쪽 차선 탐색점을 더 오른쪽으로 설정
+        # else:
+        #     right_base = right_hist_result  # 오른쪽 차선이 존재하면 히스토그램을 찾은 좌표 그대로 사용(중앙값을 기준으로 우측 이미지에서 구했으므로 중앙값을 더해줌)
+
+        # if left_hist_result == 0: # 왼쪽 차선이 없으면 차량이 오른쪽으로 치우쳐져 있다고 판단
+        #     left_base = left_hist_result + midpoint -90 # 왼쪽 차선 탐색점을 더 왼쪽 설정
+        # else:
+        #     left_base = left_hist_result # 왼쪽 차선이 존재하면 히스토그램을 찾은 좌표 그대로 사용
 
         right_base = right_hist_result
         left_base = left_hist_result
