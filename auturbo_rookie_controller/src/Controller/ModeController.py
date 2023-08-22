@@ -38,7 +38,7 @@ class ModeController(object):
     # def __init__(self, yaw0, timer):
     def __init__(self, timer):
         # 첫 시작은 긴 직진 모드
-        self.mode = 'long straight'
+        self.mode = 'stopline'
         self.timer = timer
         self.error_list = []
 
