@@ -65,6 +65,7 @@ class Xycar(object):
         self.ar_curve_controller = ARCurveController(self.timer)
         self.ar_curve_state = 0
         self.ar_curve_action = 0
+        self.ar_curve_flag = 0
     
         # 루버콘 컨트롤러 생성 
         self.rubbercon_controller = RubberconController(self.timer)
@@ -228,21 +229,30 @@ class Xycar(object):
     def ar_curve(self):
         # self.msg.angle, self.msg.speed, self.ar_curve_state, self.ar_curve_action = self.ar_curve_controller(self.sensor.lidar, self.sensor.angle_increment)
         self.msg.angle, self.msg.speed, self.ar_curve_state, self.ar_curve_action = self.ar_curve_controller(self.sensor.lidar, self.sensor.angle_increment, self.ar_curve_state, self.ar_curve_action)
+        self.pub.publish(self.msg)
 
-        if self.ar_curve_state == 0 and self.sensor.ar_y < 0.5 :        
-            print("약간의 펄슛")
-            self.pursuit()
+        # if self.sensor.ar_id != None:
+                
+        #     if self.sensor.ar_y > 1.2 and self.ar_curve_flag == 0: 
+        #         # print("ar_y : ", self.sensor.ar_y)
+        #         # print("약간의 펄슛")
+        #         self.pursuit()
 
-        else:
-            print("커브 주행")
-            self.pub.publish(self.msg)
-        if self.msg.speed == 0  and self.ar_curve_action == 0 and self.ar_curve_state == 1:
-            print('ar_curve 모드 종료')
-            self.mode_controller.set_mode('findverticalparking')
-        self.rate.sleep()
-        # 다음모드 커브모드 
-        # 객체인식 주차모드일 수 있음 
-    # ================================================================================================#
+        #     else:
+        #         self.ar_curve_flag = 1
+        #         #print("커브 주행 시작")
+        #         self.pub.publish(self.msg)
+        #     if self.msg.speed == 0  and self.ar_curve_state == 0 and self.ar_curve_action == 1:
+        #         print('ar_curve 모드 종료')
+
+        #         self.mode_controller.set_mode('poweroff')
+        #         # self.mode_controller.set_mode('findverticalparking')
+        #     self.rate.sleep()
+        # else:
+        #     self.pursuit()
+        #     # 다음모드 커브모드 
+        #     # 객체인식 주차모드일 수 있음 
+        # # ================================================================================================#
 
     # ================================================================================================#
 
