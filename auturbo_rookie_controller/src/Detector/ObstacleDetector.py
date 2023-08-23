@@ -15,7 +15,6 @@ class ObstacleDetector(object):
         self.obstacle_counter = 0
         self.timer = timer
         # 장애물을 감지하기 위한 타이머입니다.
-        self.obs_dict = {1: 1., 2: 2.6, 3: 4}
 
     # 콜
     def __call__(self, ranges, angle_increment):

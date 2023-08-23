@@ -39,7 +39,7 @@ class ModeController(object):
     # def __init__(self, yaw0, timer):
     def __init__(self, timer, yaw0):
         # 첫 시작은 긴 직진 모드
-        self.mode = 'findverticalparking'
+        self.mode = 'long straight'
         self.timer = timer
         self.error_list = []
         self.error_threshold = 10
@@ -143,7 +143,7 @@ class ModeController(object):
 
         # 커브
         elif self.mode == 'curve':
-            if abs(error_mean) > self.error_threshold and self.long_flag == 0 and self.timer() > 1 and diff_yaw > np.deg2rad(270):
+            if abs(error_mean) > self.error_threshold and self.long_flag == 0 and self.timer() > 2: #and diff_yaw > np.deg2rad(270):
                 self.mode = 'zgzg'
                 print('curve -> zgzg')
                 print(self.timer())

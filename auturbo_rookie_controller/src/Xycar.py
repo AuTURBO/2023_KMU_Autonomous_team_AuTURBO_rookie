@@ -305,7 +305,7 @@ class Xycar(object):
             #print("x ", x, "  y ", y, " w ", yaw, " id ", id)
 
             if 0.6 < y < 2.3:      #id == 0  미포함
-                if self.direction == None:
+                if self.direction == 'none':
                     self.direction = "right"
                 print('수직주차 시작...')
                 self.msg.angle, self.msg.speed = 0, 0
