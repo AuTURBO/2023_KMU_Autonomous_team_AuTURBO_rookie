@@ -228,15 +228,36 @@ class Xycar(object):
     # !!!!!!!
     def ar_curve(self):
         # self.msg.angle, self.msg.speed, self.ar_curve_state, self.ar_curve_action = self.ar_curve_controller(self.sensor.lidar, self.sensor.angle_increment)
-        self.msg.angle, self.msg.speed, self.ar_curve_state, self.ar_curve_action = self.ar_curve_controller(self.sensor.lidar, self.sensor.angle_increment, self.ar_curve_state, self.ar_curve_action)
-        self.pub.publish(self.msg)
+        # self.msg.angle, self.msg.speed, self.ar_curve_state, self.ar_curve_action = self.ar_curve_controller(self.sensor.lidar, self.sensor.angle_increment, self.ar_curve_state, self.ar_curve_action)
+        # self.pub.publish(self.msg)  
+        if self.sensor.ar_id != None and self.sensor.ar_y > 1.2:
+            self.pursuit()
+        else:
+            
+            print(self.sensor.ar_y)
+            for _ in range(20):
+                self.msg.angle, self.msg.speed = 0, 3
+                self.pub.publish(self.msg)
+                self.rate.sleep()
+            print("ar_curve 모드 시작")
+            for _ in range(10):
+                self.msg.angle, self.msg.speed = 30, 3
+                self.pub.publish(self.msg)
+                self.rate.sleep()
+            for _ in range(40):
+                self.msg.angle, self.msg.speed = -30, 3
+                self.pub.publish()
+                self.rate.sleep()
+            for _ in range(10):
+                self.msg.angle, self.msg.speed = 0, 3
+                self.pub.publish(self.msg)
+                self.rate.sleep()
+            print ("ar_curve 모드 종료")
+            self.mode_controller.set_mode('poweroff')
 
-        # if self.sensor.ar_id != None:
-                
-        #     if self.sensor.ar_y > 1.2 and self.ar_curve_flag == 0: 
-        #         # print("ar_y : ", self.sensor.ar_y)
-        #         # print("약간의 펄슛")
-        #         self.pursuit()
+        else:
+            self.pursuit()
+            
 
         #     else:
         #         self.ar_curve_flag = 1
