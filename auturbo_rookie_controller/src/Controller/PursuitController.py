@@ -13,6 +13,7 @@ class PurePursuitController(object):
             'long straight': 0.4,
             'short straight': 0.3,
             'curve': 0.17,
+            'zgzg': 0.17,
 
             'findparallelparking': 0.20,
             'findverticalparking': 0.20,
@@ -29,6 +30,7 @@ class PurePursuitController(object):
             'long straight': 15,
             'short straight': 10,
             'curve': 7,
+            'zgzg': 5,
 
             'findparallelparking': 4,
             'findverticalparking': 4,
@@ -45,6 +47,7 @@ class PurePursuitController(object):
             'long straight': 2,
             'short straight': -0.5,
             'curve': None,
+            'zgzg': None,
 
             'findparallelparking': 0.5,
             'findverticalparking': 0.5,
@@ -61,6 +64,7 @@ class PurePursuitController(object):
             'long straight': 1,
             'short straight': 0.5,
             'curve': -1,
+            'zgzg': -1,
 
             'findparallelparking': 0.5,
             'findverticalparking': 0.5,

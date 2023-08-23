@@ -56,7 +56,7 @@ class Xycar(object):
         self.pub_target_lane = rospy.Publisher("/obstacle/info", String,queue_size=10)
 
         # 모드 컨트롤러 생성
-        self.mode_controller = ModeController(self.timer)
+        self.mode_controller = ModeController(self.timer, self.sensor.yaw)
         # 펄슛 컨트롤러 생성
         self.pursuit_controller = PurePursuitController(self.timer)
         # AR 컨트롤러 생성
@@ -75,14 +75,18 @@ class Xycar(object):
     
         self.target_lane = 'middle'
         self.control_dict = {
+            # ar tag test
+            'ar_marker_pose' : self.ar_marker_pose,
+
             # 직선 주행 findparking
             # 긴 구간 직진 -- 07.31 테스트 
-            'ar_marker_pose' : self.ar_marker_pose,
             'long straight' : self.pursuit,
             # 짧은 구간 직진 -- 07.31 테스트
             'short straight' : self.pursuit,
             # 각 모서리의 커브 구간을 뜻합니다. -- 07.31 테스트
             'curve': self.pursuit,
+            'zgzg': self.pursuit,
+
             # == 미션 1 평행주차 ===== #
             # 주차 공간 찾기 -- 07.31 테스트
             'findparallelparking': self.findparallelparking,
@@ -526,7 +530,7 @@ class Xycar(object):
     def control(self):
         # 어떤 모드인지 확인 후 해당 모드에 맞는 제어 수행
         # mode = self.mode_controller(self.sensor.yaw)
-        mode = self.mode_controller(self.target_angle, self.sensor.lidar, self.sensor.angle_increment)
+        mode = self.mode_controller(self.target_angle, self.sensor.lidar, self.sensor.angle_increment, self.sensor.yaw)
         # rospy.loginfo("current mode is %s", mode)
 
         # i) high speed mode
