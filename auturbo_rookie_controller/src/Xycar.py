@@ -186,7 +186,7 @@ class Xycar(object):
             self.pub.publish(self.msg)
             self.rate.sleep()
         print("평행 주차 시작")
-        self.mode_controller.set_mode('obstacle')
+        self.mode_controller.set_mode('ar_curve')
     #x  0.22868945620672587   y  0.91746097ObjectDetector73533844  w  0.20812997531422267  id  1
     #x  0.1765239034700272   y  0.716902588854083  w  0.24787252483351582  id  1
     #x  0.11365149612910468   y  0.39251462070955173  w  0.11461349366373742  id  1
