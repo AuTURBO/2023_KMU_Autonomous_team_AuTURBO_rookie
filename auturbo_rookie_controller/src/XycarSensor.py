@@ -69,7 +69,8 @@ class XycarSensor(object):
     def callback_lidar(self, msg):
         self.lidar = msg.ranges
         self.angle_increment = msg.angle_increment
-
+        _, _, yaw = euler_from_quaternion((0, 0, 0, 0))
+        self.yaw = yaw % (2*np.pi)
     # imu 콜백 함수
     def callback_imu(self, data):
         _, _, yaw = euler_from_quaternion((data.orientation.x, data.orientation.y, data.orientation.z, data.orientation.w))

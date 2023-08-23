@@ -24,6 +24,7 @@ class ModeController(object):
     
     # == 미션 3 객체 인식 후 주차 == # -- 07.31 테스트
     # Object detection 'object': self.object,
+    # 'findverticalparking': self.findverticalparking,
     # vertical parking 'verticalparking': self.verticalparking,
     
     # == 미션 4 장애물 회피 == # -- 07.31 테스트
@@ -38,7 +39,7 @@ class ModeController(object):
     # def __init__(self, yaw0, timer):
     def __init__(self, timer, yaw0):
         # 첫 시작은 긴 직진 모드
-        self.mode = 'obstacle'
+        self.mode = 'findverticalparking'
         self.timer = timer
         self.error_list = []
         self.error_threshold = 10

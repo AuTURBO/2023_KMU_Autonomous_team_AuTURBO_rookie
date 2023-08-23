@@ -101,7 +101,7 @@ class Xycar(object):
             ## ---- 추가 해주시면 됩니다!---------------------------------------------- ##
             # == 미션 2 ar curve 주행 == # -- 08.08 테스트
             'ar_curve': self.ar_curve, 
-            'object' : self.object,
+            # 'object' : self.object,
             'findverticalparking': self.findverticalparking,
             # == 미션 3 객체 인식 후 주차 == # -- 07.31 테스트
             'verticalparking': self.verticalparking,
@@ -296,25 +296,17 @@ class Xycar(object):
     # ================================ 미션 3 객체 인식 후 주차 ==========================================#
     # 이 부분을 채워주세요~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     # !!!!!!!
-    def object(self):
-        self.pursuit()
-        self.direction = self.objectdetector(self.sensor.detect, self.sensor.x_mid, self.sensor.y)
-        self.pub.publish(self.msg)
-        # self.direction == "right"
-        self.direction == "left"
-        if self.direction == "right" or self.direction == "left":
-            print("객체 인식 후 주차 시작")
-            self.mode_controller.set_mode('findverticalparking')
-        self.rate.sleep()
-
-#x  0.5155718232876816   y  1.4638857327161652  w  -0.09014562949153192  id  2
 
     def findverticalparking(self):
+        self.direction = self.objectdetector(self.sensor.detect, self.sensor.x_mid, self.sensor.y)
         if self.sensor.ar_id != None :
             y = self.sensor.ar_y
             print("마커 인식함")
             #print("x ", x, "  y ", y, " w ", yaw, " id ", id)
+
             if 0.6 < y < 2.3:      #id == 0  미포함
+                if self.direction == None:
+                    self.direction = "right"
                 print('수직주차 시작...')
                 self.msg.angle, self.msg.speed = 0, 0
                 self.pub.publish(self.msg)
@@ -325,6 +317,35 @@ class Xycar(object):
         else:    
             print("주차장 진입중...2")
             self.pursuit()
+#     def object(self):
+#         self.pursuit()
+#         self.direction = self.objectdetector(self.sensor.detect, self.sensor.x_mid, self.sensor.y)
+#         self.pub.publish(self.msg)
+#         # self.direction == "right"
+#         self.direction == "left"
+#         if self.direction == "right" or self.direction == "left":
+#             print("객체 인식 후 주차 시작")
+#             self.mode_controller.set_mode('findverticalparking')
+#         self.rate.sleep()
+
+# #x  0.5155718232876816   y  1.4638857327161652  w  -0.09014562949153192  id  2
+
+#     def findverticalparking(self):
+#         if self.sensor.ar_id != None :
+#             y = self.sensor.ar_y
+#             print("마커 인식함")
+#             #print("x ", x, "  y ", y, " w ", yaw, " id ", id)
+#             if 0.6 < y < 2.3:      #id == 0  미포함
+#                 print('수직주차 시작...')
+#                 self.msg.angle, self.msg.speed = 0, 0
+#                 self.pub.publish(self.msg)
+#                 self.mode_controller.set_mode('verticalparking')
+#             else:
+#                 print("주차장 진입중...")
+#                 self.pursuit()
+#         else:    
+#             print("주차장 진입중...2")
+#             self.pursuit()
 
     def verticalparking(self):
         # self.direction = 'right'
