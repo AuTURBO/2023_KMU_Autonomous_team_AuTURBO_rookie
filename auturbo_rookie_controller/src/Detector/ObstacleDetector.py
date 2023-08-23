@@ -48,7 +48,7 @@ class ObstacleDetector(object):
             nz = np.nonzero(filtered)[0]
             # print(nz)
             
-            if len(nz) > 5:
+            if len(nz) > 2:
                 # print("nz: ", nz)
                 # 만약 필터링된 데이터의 개수가 5개 이상이면, 어느 방향으로 피해야 할지 결정합니다.
 
@@ -58,7 +58,7 @@ class ObstacleDetector(object):
                 else:
                     print("left")
                     self.avoid_direction = 'left'
-
+ 
 
                 print('avoid to ' + self.avoid_direction)
 

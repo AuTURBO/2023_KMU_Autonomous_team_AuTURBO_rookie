@@ -27,7 +27,7 @@ class RubberconController(object):
         #라이다 /scan 토픽 값을 이용하여 오차 계산
         
         
-        self.kp = 25
+        self.kp = 7
         self.rotation = 0
         self.prev_rotation = 0
         self.right_quarter_min_distance = 0
@@ -49,7 +49,7 @@ class RubberconController(object):
 
         # 장애물로 판단할 조건을 마스킹하여 필터링합니다.
         # 거리값에 따른 필터링 조건을 설정합니다.
-        mask = (np.abs(ranges * np.sin(deg)) < 0.8) & (0.1 < ranges * np.cos(deg)) & (ranges * np.cos(deg) < 0.8)
+        mask = (np.abs(ranges * np.sin(deg)) < 0.5) & (0.1 < ranges * np.cos(deg)) & (ranges * np.cos(deg) < 0.5)
 
         filtered = np.where(mask, ranges, 0.0)
 
@@ -83,7 +83,7 @@ class RubberconController(object):
 
             #print("왼쪽 : ", left_filtered)
             #print("오른쪽 : ", right_filtered)
-        elif len(nz) < 10 :    #1 .flag가 0 and 장애물이 인식되지 않을 때, pursuit 하면서, 라인 따라가기
+        elif len(nz) < 3 :    #1 .flag가 0 and 장애물이 인식되지 않을 때, pursuit 하면서, 라인 따라가기
             self.error = 0
             self.action_flag = 0 #action_flag == 0 이면, pursuit 하기
 

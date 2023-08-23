@@ -435,11 +435,10 @@ class Xycar(object):
                     self.msg.angle, self.msg.speed = 50, 3
                     self.pub.publish(self.msg)
                     self.rate.sleep()
-                for _ in range(15):
-                    # self.msg.angle, self.msg.speed = 0, 3
-                    # self.pub.publish(self.msg)
-                    # self.rate.sleep()
-                     self.pursuit()
+                for _ in range(10):
+                    self.msg.angle, self.msg.speed = 0, 3
+                    self.pub.publish(self.msg)
+                    self.rate.sleep()
                 for _ in range(12):
                     self.msg.angle, self.msg.speed = 50, 3
                     self.pub.publish(self.msg)
@@ -449,10 +448,10 @@ class Xycar(object):
                     self.pub.publish(self.msg)
                     self.rate.sleep()
                 for _ in range(12):
-                    # self.msg.angle, self.msg.speed = 0, 3
-                    # self.pub.publish(self.msg)
-                    # self.rate.sleep()
-                    self.pursuit()
+                    self.msg.angle, self.msg.speed = 0, 3
+                    self.pub.publish(self.msg)
+                    self.rate.sleep()
+                    # self.pursuit()
                 for _ in range(12):
                     self.msg.angle, self.msg.speed = -50, 3
                     self.pub.publish(self.msg)
@@ -477,11 +476,11 @@ class Xycar(object):
                     self.msg.angle, self.msg.speed = -50, 3
                     self.pub.publish(self.msg)
                     self.rate.sleep()
-                for _ in range(15):
-                    # self.msg.angle, self.msg.speed = 0, 3
-                    # self.pub.publish(self.msg)
-                    # self.rate.sleep()
-                    self.pursuit()
+                for _ in range(10):
+                    self.msg.angle, self.msg.speed = 0, 3
+                    self.pub.publish(self.msg)
+                    self.rate.sleep()
+                    # self.pursuit()
                 for _ in range(12):
                     self.msg.angle, self.msg.speed = -50, 3
                     self.pub.publish(self.msg)
@@ -491,10 +490,10 @@ class Xycar(object):
                     self.pub.publish(self.msg)
                     self.rate.sleep()
                 for _ in range(12):
-                    # self.msg.angle, self.msg.speed = 0, 3
-                    # self.pub.publish(self.msg)
-                    # self.rate.sleep()
-                    self.pursuit()
+                    self.msg.angle, self.msg.speed = 0, 3
+                    self.pub.publish(self.msg)
+                    self.rate.sleep()
+                    # self.pursuit()
                 for _ in range(12):
                     self.msg.angle, self.msg.speed = 50, 3
                     self.pub.publish(self.msg)
@@ -522,7 +521,9 @@ class Xycar(object):
             print("정지선을 인식했습니다.")
             self.stop6s()
         else:
-            self.pursuit()
+            self.msg.angle, self.msg.speed = 0, 3
+            self.pub.publish(self.msg)
+            self.rate.sleep()
     # 5초 정지 후 3초 이내에 출발 해야합니다. 
     def stop6s(self):
         print("5초간 정지합니다.")
