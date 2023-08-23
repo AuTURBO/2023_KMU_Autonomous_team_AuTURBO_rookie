@@ -34,8 +34,8 @@ class StopLineDetector(object):
         return True if stopline is detected else False
         '''
         bev = self.bev(frame)
-        frame = undistort.undistort_func(frame)
-        frame = self.warp_perspect(frame)
+        # frame = undistort.undistort_func(frame)
+        # frame = self.warp_perspect(frame)
 
         blur = cv2.GaussianBlur(frame, (5, 5), 0)
         L = cv2.cvtColor(blur, cv2.COLOR_BGR2GRAY)
@@ -51,11 +51,11 @@ class StopLineDetector(object):
 
             if not ((area > self.area_threshold) and (length > self.lengh_threshold)):
                 continue
-            # if len(cv2.approxPolyDP(cont, length*0.02, True)) != 4:
-            #     continue
-            # approx_poly = cv2.approxPolyDP(cont, length*0.02, True)
-            # for approx in approx_poly:
-            #     cv2.circle(cont, tuple(approx[0]), 3, (255, 0, 0), -1)
+            if len(cv2.approxPolyDP(cont, length*0.02, True)) != 4:
+                continue
+            approx_poly = cv2.approxPolyDP(cont, length*0.02, True)
+            for approx in approx_poly:
+                cv2.circle(cont, tuple(approx[0]), 3, (255, 0, 0), -1)
             
             x, y, w, h = cv2.boundingRect(cont)
             center = (x + int(w/2), y + int(h/2))
@@ -65,8 +65,8 @@ class StopLineDetector(object):
             print("detected boundingRect (x, y, w, h): ", x, y, w, h)
             print("detected boundingRect center (x, y): ", center)
 
-            # if (200 <= center[0] <= (width - 200)) and (w > 400) & (h < 100):
-            if (200 <= center[0] <= (width - 200)) and (w > 260) & (h < 50):
+            if (200 <= center[0] <= (width - 200)) and (w > 400) & (h < 100):
+            # if (200 <= center[0] <= (width - 200)) and (w > 260) & (h < 50):
                 cv2.rectangle(frame, (x, y), (x + w, y + h), (0,255,255), 2)
 
                 cv2.imshow('stopline', frame)
