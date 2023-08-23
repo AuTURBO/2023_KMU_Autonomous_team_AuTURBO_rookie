@@ -63,8 +63,8 @@ class Xycar(object):
         self.ar_controller = ARController()
         # AR 컨트롤러 생성
         self.ar_curve_controller = ARCurveController(self.timer)
-        self.ar_start = 0
-        self.ar_cnt = 0
+        self.ar_curve_state = 0
+        self.ar_curve_action = 0
     
         # 루버콘 컨트롤러 생성 
         self.rubbercon_controller = RubberconController(self.timer)
@@ -167,13 +167,13 @@ class Xycar(object):
 
     # 가로주차 주차공간 들어가기 
     def parallelpark(self):
-        for _ in range(75):
+        for _ in range(105):
             self.pursuit()
-        for _ in range(10):
+        for _ in range(9): #12
             self.msg.angle, self.msg.speed = -50, 3     
             self.pub.publish(self.msg)
             self.rate.sleep()
-        for _ in range(27):
+        for _ in range(29):
             self.msg.angle, self.msg.speed = 50, -3
             self.pub.publish(self.msg)
             self.rate.sleep()
@@ -186,7 +186,7 @@ class Xycar(object):
             self.pub.publish(self.msg)
             self.rate.sleep()
         print("평행 주차 시작")
-        self.mode_controller.set_mode('ar_curve')
+        self.mode_controller.set_mode('arparking')
     #x  0.22868945620672587   y  0.91746097ObjectDetector73533844  w  0.20812997531422267  id  1
     #x  0.1765239034700272   y  0.716902588854083  w  0.24787252483351582  id  1
     #x  0.11365149612910468   y  0.39251462070955173  w  0.11461349366373742  id  1
@@ -200,8 +200,7 @@ class Xycar(object):
                 self.msg.angle, self.msg.speed = 0, 0
                 self.pub.publish(self.msg)
                 self.rate.sleep()
-            
-            for _ in range(15):
+            for _ in range(10): #15
                 self.msg.angle, self.msg.speed = 50, -3
                 self.pub.publish(self.msg)
                 self.rate.sleep()
@@ -225,8 +224,9 @@ class Xycar(object):
     # 이 부분을 채워주세요~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     # !!!!!!!
     def ar_curve(self):
-        self.msg.angle, self.msg.speed, self.ar_curve_state, self.ar_curve_action = self.ar_curve_controller(self.sensor.lidar, self.sensor.angle_increment)
-        
+        # self.msg.angle, self.msg.speed, self.ar_curve_state, self.ar_curve_action = self.ar_curve_controller(self.sensor.lidar, self.sensor.angle_increment)
+        self.msg.angle, self.msg.speed, self.ar_curve_state, self.ar_curve_action = self.ar_curve_controller(self.sensor.lidar, self.sensor.angle_increment, self.ar_curve_state, self.ar_curve_action)
+
         if self.ar_curve_state == 0:        
             print("약간의 펄슛")
             self.pursuit()
@@ -240,6 +240,8 @@ class Xycar(object):
         self.rate.sleep()
         # 다음모드 커브모드 
         # 객체인식 주차모드일 수 있음 
+    # ================================================================================================#
+
     # ================================================================================================#
 
     # ================================ 미션 3 객체 인식 후 주차 ==========================================#
