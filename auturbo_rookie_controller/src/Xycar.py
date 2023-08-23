@@ -423,41 +423,28 @@ class Xycar(object):
     def obstacle(self):
         self.target_lane = self.obstacle_detector(self.sensor.lidar, self.sensor.angle_increment)
         flag = 0
-        if self.target_lane == "middle":
+        print("self.target_lane : ", self.target_lane)
+        if self.target_lane == None:        #None은 장애물이 인식 안됬으므로 직진
             self.pursuit()
+            # self.msg.angle, self.msg.speed = 0, 3
+            # self.pub.publish(self.msg)
+            # self.rate.sleep()
         else:
             if self.target_lane == "left":
-                for _ in range(9):
-                    self.msg.angle, self.msg.speed = -50, 3
+                for _ in range(15):
+                    self.msg.angle, self.msg.speed = -25, 3
                     self.pub.publish(self.msg)
                     self.rate.sleep()
-                for _ in range(9):
-                    self.msg.angle, self.msg.speed = 50, 3
+                for _ in range(30):
+                    self.msg.angle, self.msg.speed = 30, 3
                     self.pub.publish(self.msg)
                     self.rate.sleep()
-                for _ in range(10):
-                    self.msg.angle, self.msg.speed = 0, 3
-                    self.pub.publish(self.msg)
-                    self.rate.sleep()
-                for _ in range(12):
-                    self.msg.angle, self.msg.speed = 50, 3
-                    self.pub.publish(self.msg)
-                    self.rate.sleep()
-                for _ in range(12):
+                for _ in range(30):
                     self.msg.angle, self.msg.speed = -50, 3
                     self.pub.publish(self.msg)
                     self.rate.sleep()
                 for _ in range(12):
-                    self.msg.angle, self.msg.speed = 0, 3
-                    self.pub.publish(self.msg)
-                    self.rate.sleep()
-                    # self.pursuit()
-                for _ in range(12):
-                    self.msg.angle, self.msg.speed = -50, 3
-                    self.pub.publish(self.msg)
-                    self.rate.sleep()
-                for _ in range(12):
-                    self.msg.angle, self.msg.speed = 50, 3
+                    self.msg.angle, self.msg.speed = 30, 3
                     self.pub.publish(self.msg)
                     self.rate.sleep()
                 for _ in range(20):
@@ -467,39 +454,20 @@ class Xycar(object):
     ####################right####################################
 
             elif self.target_lane == "right":
-
-                for _ in range(9):
-                    self.msg.angle, self.msg.speed = 50, 3
+                for _ in range(15):
+                    self.msg.angle, self.msg.speed = 25, 3
                     self.pub.publish(self.msg)
                     self.rate.sleep()
-                for _ in range(9):
-                    self.msg.angle, self.msg.speed = -50, 3
+                for _ in range(30):
+                    self.msg.angle, self.msg.speed = -38, 3
                     self.pub.publish(self.msg)
                     self.rate.sleep()
-                for _ in range(10):
-                    self.msg.angle, self.msg.speed = 0, 3
-                    self.pub.publish(self.msg)
-                    self.rate.sleep()
-                    # self.pursuit()
-                for _ in range(12):
-                    self.msg.angle, self.msg.speed = -50, 3
-                    self.pub.publish(self.msg)
-                    self.rate.sleep()              
-                for _ in range(12):
-                    self.msg.angle, self.msg.speed = 50, 3
+                for _ in range(30):
+                    self.msg.angle, self.msg.speed = 45, 3
                     self.pub.publish(self.msg)
                     self.rate.sleep()
                 for _ in range(12):
-                    self.msg.angle, self.msg.speed = 0, 3
-                    self.pub.publish(self.msg)
-                    self.rate.sleep()
-                    # self.pursuit()
-                for _ in range(12):
-                    self.msg.angle, self.msg.speed = 50, 3
-                    self.pub.publish(self.msg)
-                    self.rate.sleep()
-                for _ in range(12):
-                    self.msg.angle, self.msg.speed = -50, 3
+                    self.msg.angle, self.msg.speed = -30, 3
                     self.pub.publish(self.msg)
                     self.rate.sleep()
                 for _ in range(20):
@@ -550,7 +518,7 @@ class Xycar(object):
                 print("라바 콘을 회피하여 주행합니다.")
             elif self.rubber_state_flag == 1 and self.rubber_action_flag == 0:
                     print('obstacle 모드 종료')
-                    self.mode_controller.set_mode('short straight')        #우성님...헬프
+                    self.mode_controller.set_mode('curve')        #우성님...헬프
             self.rate.sleep()
 
  

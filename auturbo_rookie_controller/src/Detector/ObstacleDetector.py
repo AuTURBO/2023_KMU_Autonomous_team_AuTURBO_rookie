@@ -69,17 +69,7 @@ class ObstacleDetector(object):
             
             # nz 리스트 초기화
             nz = []
-        elif self.obstacle_counter != 0:
-            # 이미 장애물을 감지한 경우
-            if self.timer() > self.obs_dict[self.obstacle_counter]:
-                # 장애물에 대한 카운터 값에 해당하는 시간이 지나면 다음 단계로 넘어갑니다.
-                if self.obstacle_counter == 3:
-                    self.avoid_direction = 'middle'   
-                                     
-                else:
-                    self.avoid_direction = 'left' if self.avoid_direction == 'right' else 'right'
-                self.timer.update()
-                self.obstacle_counter += 1
-            print('avoid to ' + self.avoid_direction)
+        else:
+            self.avoid_direction = 'middle'
+            print("middle")
             return self.avoid_direction
-    
