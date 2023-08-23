@@ -16,6 +16,7 @@ class PurePursuitController(object):
 
             'findparallelparking': 0.20,
             'findverticalparking': 0.20,
+            'arparking' : 0.20,
             'verticalparking' : 0.20,
             'stopline': 0.2,
             'obstacle': 0.2,
@@ -31,6 +32,7 @@ class PurePursuitController(object):
 
             'findparallelparking': 4,
             'findverticalparking': 4,
+            'arparking' : 3,
             'verticalparking' : 4,
             'stopline': 3,
             'obstacle': 3,
@@ -46,6 +48,7 @@ class PurePursuitController(object):
 
             'findparallelparking': 0.5,
             'findverticalparking': 0.5,
+            'arparking' : 0.5,
             'verticalparking' : 0.5,
             'stopline': 0.5,
             'obstacle': 0.5,
@@ -61,6 +64,7 @@ class PurePursuitController(object):
 
             'findparallelparking': 0.5,
             'findverticalparking': 0.5,
+            'arparking' : 0.5,
             'verticalparking' : 0.5,
             'stopline': 0.5,
             'obstacle': 0.5,
@@ -81,7 +85,15 @@ class PurePursuitController(object):
         #         else:
         #             self.speed = max(self.speed+self.acc[mode], self.target_speed[mode])
 
-        self.speed = self.target_speed[mode]
+        # if self.timer() > self.delay[mode]:
+        #         if self.acc[mode] is None:
+        #             self.speed = self.target_speed[mode]
+        #         elif self.acc[mode] > 0:
+        #             self.speed = min(self.speed+self.acc[mode], self.target_speed[mode])
+        #         else:
+        #             self.speed = max(self.speed+self.acc[mode], self.target_speed[mode])
+
+
         current_angle = target
         # 여기에 Pure Pursuit 알고리즘을 구현합니다.
         # 현재 조향각인 current_angle과 목표값(0으로 가정)을 이용하여 알고리즘을 적용합니다.

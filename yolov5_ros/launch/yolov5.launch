@@ -1,6 +1,6 @@
 <launch>
     <!-- Detection configuration -->
-    <arg name="weights" default="$(find yolov5_ros)/data/best_sch.pt"/>
+    <arg name="weights" default="$(find yolov5_ros)/data/best.pt"/>
     <arg name="data" default="$(find yolov5_ros)/data/data_augment.yaml"/>
     <arg name="confidence_threshold" default="0.75"/>
     <arg name="iou_threshold" default="0.45"/>

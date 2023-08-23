@@ -40,7 +40,7 @@ class ObstacleDetector(object):
 
             # 장애물로 판단할 조건을 마스킹하여 필터링합니다.
             # 거리값에 따른 필터링 조건을 설정합니다.
-            mask = (np.abs(ranges * np.sin(deg)) < 0.35) & (0.15 < ranges * np.cos(deg)) & (ranges * np.cos(deg) < 0.35)
+            mask = (np.abs(ranges * np.sin(deg)) < 0.4) & (0.15 < ranges * np.cos(deg)) & (ranges * np.cos(deg) < 0.4)
             # 필터링 조건에 따라 데이터를 필터링합니다.
             filtered = np.where(mask, ranges, 0.0)
 
@@ -48,7 +48,7 @@ class ObstacleDetector(object):
             nz = np.nonzero(filtered)[0]
             # print(nz)
             
-            if len(nz) > 5:
+            if len(nz) > 2:
                 # print("nz: ", nz)
                 # 만약 필터링된 데이터의 개수가 5개 이상이면, 어느 방향으로 피해야 할지 결정합니다.
 
@@ -58,7 +58,7 @@ class ObstacleDetector(object):
                 else:
                     print("left")
                     self.avoid_direction = 'left'
-
+ 
 
                 print('avoid to ' + self.avoid_direction)
 
