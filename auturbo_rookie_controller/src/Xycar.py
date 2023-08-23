@@ -364,7 +364,7 @@ class Xycar(object):
                 self.rate.sleep()
             
             # 그대로 직진( 이제 차선 인식 하면 됨)
-            for _ in range(20):
+            for _ in range(50):     
                 self.pursuit()
             self.mode_controller.set_mode('obstacle')
 
@@ -407,7 +407,7 @@ class Xycar(object):
                 self.rate.sleep()
             
             # 그대로 직진( 이제 차선 인식 하면 됨)
-            for _ in range(20):
+            for _ in range(50):
                 self.pursuit()
 
             self.mode_controller.set_mode('obstacle')
@@ -460,7 +460,7 @@ class Xycar(object):
                     self.msg.angle, self.msg.speed = 50, 3
                     self.pub.publish(self.msg)
                     self.rate.sleep()
-                for _ in range(10):
+                for _ in range(20):
                     self.pursuit()
                     flag = 1
 
@@ -502,7 +502,7 @@ class Xycar(object):
                     self.msg.angle, self.msg.speed = -50, 3
                     self.pub.publish(self.msg)
                     self.rate.sleep()
-                for _ in range(10):
+                for _ in range(20):
                     self.pursuit()
                     flag = 1
 
