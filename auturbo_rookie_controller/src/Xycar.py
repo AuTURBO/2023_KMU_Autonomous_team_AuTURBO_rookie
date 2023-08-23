@@ -40,7 +40,7 @@ class Xycar(object):
         self.obstacle_detector = ObstacleDetector(self.timer)
         # 객체인식 주차
         # grandeur avante sonata
-        car_target = "avante"
+        car_target = "sonata" 
         car_rest = "grandeur"
         self.direction = "none"
         self.objectdetector = ObjectDetector(self.timer, car_target, car_rest)
@@ -245,17 +245,17 @@ class Xycar(object):
                 self.msg.angle, self.msg.speed = 25, 3
                 self.pub.publish(self.msg)
                 self.rate.sleep()
-            for _ in range(20):
+            for _ in range(25):
                 # print("왼쪽으로 꺾기")
                 self.msg.angle, self.msg.speed = -30, 3
                 self.pub.publish(self.msg)
                 self.rate.sleep()
             for _ in range(20):
                 # print("중간직진 꺾기")
-                self.msg.angle, self.msg.speed = 0, 3
+                self.msg.angle, self.msg.speed = -8, 3
                 self.pub.publish(self.msg)
                 self.rate.sleep()
-            for _ in range(30):
+            for _ in range(27):
                 # print("왼쪽으로 꺾기")
                 self.msg.angle, self.msg.speed = -30, 3
                 self.pub.publish(self.msg)
@@ -308,7 +308,7 @@ class Xycar(object):
     def findverticalparking(self):
         if self.sensor.ar_id != None :
             y = self.sensor.ar_y
-
+            print("마커 인식함")
             #print("x ", x, "  y ", y, " w ", yaw, " id ", id)
             if 0.6 < y < 2.3:      #id == 0  미포함
                 print('수직주차 시작...')
@@ -323,7 +323,7 @@ class Xycar(object):
             self.pursuit()
 
     def verticalparking(self):
-        self.direction = 'right'
+        # self.direction = 'right'
         if self.direction == 'right' :  #direction은 Yolo를 통해 받은 변수의 값
             print("오른쪽 주차시작")
             #AR 인식 후 앞으로 직진
