@@ -15,6 +15,7 @@ class PurePursuitController(object):
             'curve': 0.2,
             'findparallelparking': 0.20,
             'findverticalparking': 0.20,
+            'arparking' : 0.20,
             'verticalparking' : 0.20,
             'stopline': 0.2,
             'obstacle': 0.2,
@@ -29,6 +30,7 @@ class PurePursuitController(object):
             'curve': 3,
             'findparallelparking': 4,
             'findverticalparking': 4,
+            'arparking' : 3,
             'verticalparking' : 4,
             'stopline': 3,
             'obstacle': 3,
@@ -43,6 +45,7 @@ class PurePursuitController(object):
             'curve': 0.5,
             'findparallelparking': 0.5,
             'findverticalparking': 0.5,
+            'arparking' : 0.5,
             'verticalparking' : 0.5,
             'stopline': 0.5,
             'obstacle': 0.5,
@@ -57,6 +60,7 @@ class PurePursuitController(object):
             'curve': 0.5,
             'findparallelparking': 0.5,
             'findverticalparking': 0.5,
+            'arparking' : 0.5,
             'verticalparking' : 0.5,
             'stopline': 0.5,
             'obstacle': 0.5,
@@ -69,13 +73,13 @@ class PurePursuitController(object):
 
     def __call__(self, target, mode):
 
-        if self.timer() > self.delay[mode]:
-                if self.acc[mode] is None:
-                    self.speed = self.target_speed[mode]
-                elif self.acc[mode] > 0:
-                    self.speed = min(self.speed+self.acc[mode], self.target_speed[mode])
-                else:
-                    self.speed = max(self.speed+self.acc[mode], self.target_speed[mode])
+        # if self.timer() > self.delay[mode]:
+        #         if self.acc[mode] is None:
+        #             self.speed = self.target_speed[mode]
+        #         elif self.acc[mode] > 0:
+        #             self.speed = min(self.speed+self.acc[mode], self.target_speed[mode])
+        #         else:
+        #             self.speed = max(self.speed+self.acc[mode], self.target_speed[mode])
 
 
         current_angle = target

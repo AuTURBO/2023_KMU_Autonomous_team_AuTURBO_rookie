@@ -167,21 +167,21 @@ class Xycar(object):
 
     # 가로주차 주차공간 들어가기 
     def parallelpark(self):
-        for _ in range(105):
+        for _ in range(110):
             self.pursuit()
-        for _ in range(9): #12
+        for _ in range(7): #12 , 7
             self.msg.angle, self.msg.speed = -50, 3     
             self.pub.publish(self.msg)
             self.rate.sleep()
-        for _ in range(29):
+        for _ in range(31):
             self.msg.angle, self.msg.speed = 50, -3
             self.pub.publish(self.msg)
             self.rate.sleep()
-        for _ in range(30):
+        for _ in range(28):
             self.msg.angle, self.msg.speed = -50, -3
             self.pub.publish(self.msg)
             self.rate.sleep()
-        for _ in range(10):
+        for _ in range(12):
             self.msg.angle, self.msg.speed = 0, 3
             self.pub.publish(self.msg)
             self.rate.sleep()
@@ -200,7 +200,7 @@ class Xycar(object):
                 self.msg.angle, self.msg.speed = 0, 0
                 self.pub.publish(self.msg)
                 self.rate.sleep()
-            for _ in range(10): #15
+            for _ in range(15): #15
                 self.msg.angle, self.msg.speed = 50, -3
                 self.pub.publish(self.msg)
                 self.rate.sleep()
@@ -212,6 +212,8 @@ class Xycar(object):
                 self.msg.angle, self.msg.speed = 50, 3
                 self.pub.publish(self.msg)
                 self.rate.sleep()
+            for _ in range(20):
+                self.pursuit()
 
             print('King wang zzang AuTURBO OK?')
             # 모드 커브모드로 바꾸기
@@ -227,14 +229,14 @@ class Xycar(object):
         # self.msg.angle, self.msg.speed, self.ar_curve_state, self.ar_curve_action = self.ar_curve_controller(self.sensor.lidar, self.sensor.angle_increment)
         self.msg.angle, self.msg.speed, self.ar_curve_state, self.ar_curve_action = self.ar_curve_controller(self.sensor.lidar, self.sensor.angle_increment, self.ar_curve_state, self.ar_curve_action)
 
-        if self.ar_curve_state == 0:        
+        if self.ar_curve_state == 0 and self.sensor.ar_y < 0.5 :        
             print("약간의 펄슛")
             self.pursuit()
 
         else:
             print("커브 주행")
             self.pub.publish(self.msg)
-        if self.msg.speed == 0 and self.ar_curve_action == 0 and self.ar_curve_state == 1:
+        if self.msg.speed == 0  and self.ar_curve_action == 0 and self.ar_curve_state == 1:
             print('ar_curve 모드 종료')
             self.mode_controller.set_mode('findverticalparking')
         self.rate.sleep()
@@ -287,7 +289,7 @@ class Xycar(object):
                 self.pub.publish(self.msg)
                 self.rate.sleep()
             #핸들 오른쪽으로 꺽어서 후진
-            for _ in range(36):
+            for _ in range(38):
                 self.msg.angle, self.msg.speed = 50, -3
                 self.pub.publish(self.msg)
                 self.rate.sleep()

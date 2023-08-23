@@ -10,6 +10,11 @@ import numpy as np
 
 class ARCurveController(object):
     def __init__(self, timer):
+
+
+
+        self.ar_curve_state = 0
+        self.ar_curve_action = 0
         self.obstacle_count = 0
 
         self.timer = timer
@@ -23,9 +28,10 @@ class ARCurveController(object):
         self.rotation = 0
         self.prev_rotation = 0
 
-    def __call__(self, ranges, angle_increment):
-        state_flag = 0
-        action_flag = 0
+    def __call__(self, ranges, angle_increment, curve_state, curve_action) :
+
+        self.ar_curve_state = curve_state
+        self.ar_curve_action = curve_action
         min_filtered = 0
         right_filtered = 0
         left_filtered = 0
@@ -52,8 +58,9 @@ class ARCurveController(object):
         #필터리된 데이터중 최대값을 찾습니다.
             
         if len(nz) > 5:
-            state_flag = 1
-            action_flag = 1
+            self.ar_curve_state  = 1
+            self.ar_curve_action  = 1
+            print("obstacle_count: ", self.obstacle_count)
             # # print("nz: ", nz)
             # # 만약 필터링된 데이터의 개수가 5개 이상이면, 어느 방향으로 피해야 할지 결정합니다.
             # #  1. 1/4 구간에 장애물이 있으면, 오차값을 더해주고, 3/4 구간에 장애물이 있으면, 오차값을 빼줍니다.
@@ -76,23 +83,26 @@ class ARCurveController(object):
 
             min_filtered = filtered[int(np.median(nz))]
             if self.obstacle_count < 2 :
-                th = 0.45 
+                th = 0.45  #45
             else :
-                th = 0.55
+                th = 0.55 #55
             if min_filtered > th :
                 self.rotation = 1
             elif min_filtered < th:
                 self.rotation = -1
 
             if self.rotation == -1:
-                self.error -= th - right_filtered
+                self.error -= th - min_filtered
+                # self.error -= th - right_filtered
+
             elif self.rotation == 1:
-                self.error += th - left_filtered
+                self.error += th - min_filtered
+                # self.error += th - left_filtered
             
             # print("min_filtered: ", min_filtered)
         else:
             self.error = 0
-            action_flag = 0
+            self.ar_curve_action  = 0
 
 
 
@@ -130,8 +140,7 @@ class ARCurveController(object):
         # print("angle_steer: {} ".format(int(steer)))
         # print("obstacle_count: ", self.obstacle_count)
 
-
-        if self.obstacle_count >= 6 and action_flag == 0:
+        if self.obstacle_count >= 8 and self.ar_curve_action  == 0:
             print("수직주차 모드 변경")
-            return  0, 0
-        return  int(steer), 3   
+            return  0, 0, 1 , 0    
+        return  int(steer), 3, self.ar_curve_state , self.ar_curve_action    
