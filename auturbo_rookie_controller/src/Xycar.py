@@ -358,7 +358,7 @@ class Xycar(object):
                 self.pub.publish(self.msg)
                 self.rate.sleep()
             #오른쪽으로 나오기
-            for _ in range(45):
+            for _ in range(37):
                 self.msg.angle, self.msg.speed = 50, 3
                 self.pub.publish(self.msg)
                 self.rate.sleep()
@@ -401,7 +401,7 @@ class Xycar(object):
                 self.pub.publish(self.msg)
                 self.rate.sleep()
             #왼쪽으로 나오기
-            for _ in range(45):
+            for _ in range(37):
                 self.msg.angle, self.msg.speed = -50, 3
                 self.pub.publish(self.msg)
                 self.rate.sleep()
