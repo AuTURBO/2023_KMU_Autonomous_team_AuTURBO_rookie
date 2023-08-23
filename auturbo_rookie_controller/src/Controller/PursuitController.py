@@ -12,7 +12,7 @@ class PurePursuitController(object):
         self.Lf = {
             'long straight': 0.4,
             'short straight': 0.3,
-            'curve': 0.2,
+            'curve': 0.17,
 
             'findparallelparking': 0.20,
             'findverticalparking': 0.20,
@@ -26,9 +26,9 @@ class PurePursuitController(object):
             'rubbercon': 0.2
         }
         self.target_speed = {
-            'long straight': 5,
-            'short straight': 4,
-            'curve': 3,
+            'long straight': 15,
+            'short straight': 10,
+            'curve': 7,
 
             'findparallelparking': 4,
             'findverticalparking': 4,
@@ -42,9 +42,9 @@ class PurePursuitController(object):
             'rubbercon' : 3
         }
         self.acc = {
-            'long straight': 1,
-            'short straight': 1,
-            'curve': -1,
+            'long straight': 2,
+            'short straight': -0.5,
+            'curve': None,
 
             'findparallelparking': 0.5,
             'findverticalparking': 0.5,
@@ -58,9 +58,9 @@ class PurePursuitController(object):
             'rubbercon' : 0.5
         }
         self.delay = {
-            'long straight': 0.5,
+            'long straight': 1,
             'short straight': 0.5,
-            'curve': 0.5,
+            'curve': -1,
 
             'findparallelparking': 0.5,
             'findverticalparking': 0.5,
@@ -77,21 +77,13 @@ class PurePursuitController(object):
 
     def __call__(self, target, mode):
         # # 가속도에 의한 스피드제어... 그냥 바로 적용
-        # if self.timer() > self.delay[mode]:
-        #         if self.acc[mode] is None:
-        #             self.speed = self.target_speed[mode]
-        #         elif self.acc[mode] > 0:
-        #             self.speed = min(self.speed+self.acc[mode], self.target_speed[mode])
-        #         else:
-        #             self.speed = max(self.speed+self.acc[mode], self.target_speed[mode])
-
-        # if self.timer() > self.delay[mode]:
-        #         if self.acc[mode] is None:
-        #             self.speed = self.target_speed[mode]
-        #         elif self.acc[mode] > 0:
-        #             self.speed = min(self.speed+self.acc[mode], self.target_speed[mode])
-        #         else:
-        #             self.speed = max(self.speed+self.acc[mode], self.target_speed[mode])
+        if self.timer() > self.delay[mode]:
+            if self.acc[mode] is None:
+                self.speed = self.target_speed[mode]
+            elif self.acc[mode] > 0:
+                self.speed = min(self.speed+self.acc[mode], self.target_speed[mode])
+            else:
+                self.speed = max(self.speed+self.acc[mode], self.target_speed[mode])
 
 
         current_angle = target
@@ -110,6 +102,6 @@ class PurePursuitController(object):
 
         # 계산된 조향각을 디그리 투 라디안
         delta = -1 * delta * 180 / math.pi
-        return int(delta), int(self.speed)
+        return int(delta), int(self.target_speed[mode])
 
          

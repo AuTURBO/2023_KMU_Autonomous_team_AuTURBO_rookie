@@ -41,7 +41,12 @@ class ModeController(object):
         self.mode = 'long straight'
         self.timer = timer
         self.error_list = []
-        self.error_threshold = 7
+        self.error_threshold = 10
+        self.lab = 0
+        self.flag = 0
+        self.long_flag = 0
+        self.short_flag = 0
+        self.curve_flag = 0
 
 
     def set_mode(self, mode):
@@ -122,14 +127,14 @@ class ModeController(object):
                 print(self.timer())
                 self.timer.update()
                 print('curve -> short straight')
-            elif abs(error_mean) < self.error_threshold and self.long_state == 1:
-                self.mode = 'long straight'
-                print(self.timer())
-                self.timer.update()
-                print('curve -> long straight')
+            # elif abs(error_mean) < self.error_threshold and self.long_state == 1:
+            #     self.mode = 'long straight'
+            #     print(self.timer())
+            #     self.timer.update()
+            #     print('curve -> long straight')
         # 짧은 직진
         elif self.mode == 'short straight' and self.long_state == 0 and self.timer() > 3:
-            if abs(error_mean) > self.error_threshold:
+            if abs(error_mean) > self.error_threshold-3:
                 self.mode = 'curve'
                 print(self.timer())
                 self.timer.update()
