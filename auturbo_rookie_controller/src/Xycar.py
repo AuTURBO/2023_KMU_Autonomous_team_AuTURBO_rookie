@@ -26,7 +26,7 @@ class Xycar(object):
     Main class for AutoDriving
     '''
 
-    def __init__(self, hz=10):
+    def __init__(self, mode='long straight', hz=10):
         
         self.rate = rospy.Rate(hz)
         self.pub = rospy.Publisher('xycar_motor', xycar_motor, queue_size=1)
@@ -56,7 +56,7 @@ class Xycar(object):
         self.pub_target_lane = rospy.Publisher("/obstacle/info", String,queue_size=10)
 
         # 모드 컨트롤러 생성
-        self.mode_controller = ModeController(self.timer, self.sensor.yaw)
+        self.mode_controller = ModeController(self.timer, self.sensor.yaw, mode)
         # 펄슛 컨트롤러 생성
         self.pursuit_controller = PurePursuitController(self.timer)
         # AR 컨트롤러 생성

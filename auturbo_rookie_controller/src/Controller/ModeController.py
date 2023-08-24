@@ -23,7 +23,6 @@ class ModeController(object):
     # AR Curve 'ar_curve': self.ar_curve, 
     
     # == 미션 3 객체 인식 후 주차 == # -- 07.31 테스트
-    # Object detection 'object': self.object,
     # 'findverticalparking': self.findverticalparking,
     # vertical parking 'verticalparking': self.verticalparking,
     
@@ -37,9 +36,9 @@ class ModeController(object):
     # 라바콘 주행 'rubbercon': self.rubbercon
 
     # def __init__(self, yaw0, timer):
-    def __init__(self, timer, yaw0):
+    def __init__(self, timer, yaw0, mode):
         # 첫 시작은 긴 직진 모드
-        self.mode = 'long straight'
+        self.mode = mode
         self.timer = timer
         self.error_list = []
         self.error_threshold = 10
