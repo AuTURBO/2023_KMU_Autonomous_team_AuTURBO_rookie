@@ -42,12 +42,10 @@ class ModeController(object):
         self.timer = timer
         self.error_list = []
         self.error_threshold = 10
-        self.lab = 0
-        self.flag = 0
+        
         self.long_flag = 0
-        self.short_flag = 0
-        self.curve_flag = 0
-
+        self.realcurve_flag = 0
+        self.realcurve_cnt = 0
 
         self.yaw0 = yaw0
 
@@ -80,7 +78,7 @@ class ModeController(object):
         '''
         ranges = np.array(ranges)
             
-        # 라이다 데이터의 1/4 구간과 3/4 구간은 0으로 설정하여 로봇의 전방 및 후방을 제외합니다.
+        # 라이다 데이터의 1/4 구간과 3/4 구간은 0으로 설정하여 로봇의 후방을 제외합니다.
         ranges[:len(ranges)//4] = 0.0
         ranges[3*len(ranges)//4:] = 0.0
             
@@ -109,18 +107,23 @@ class ModeController(object):
             error_mean = sum(self.error_list) / len(self.error_list)
             self.error_list.pop(0)
         
-
-        # diff_yaw = abs(yaw - self.yaw0)
-        # if diff_yaw > np.pi:
-        #     diff_yaw = 2*np.pi - diff_yaw
         # imu 
-        diff_yaw = abs(yaw - self.yaw0)
+        degree0 = np.rad2deg(self.yaw0)
+        degree = np.rad2deg(yaw)
+        # print("yaw0: {0}, yaw: {1}".format(degree0, degree))
+
+        diff_degree = abs(degree - degree0)
+        if diff_degree > 180:
+            diff_degree = 360 - diff_degree
+        # print("diff_degree: ", diff_degree)
     
-        if self.mode == 'zgzg' and self.long_state == 1 and self.timer() > 7:
+        if self.mode == 'zgzg' and self.long_state == 1 and self.timer() > 8:
+            self.realcurve_flag = 0
+            self.realcurve_cnt = 0
             self.mode = 'long straight'
-            print('zgzg -> long straight')
             print(self.timer())
             self.timer.update()
+            print('zgzg -> long straight')
             # self.lab += 1 
             # if self.lab == 4:
             #     self.mode = 'stop   
@@ -129,11 +132,18 @@ class ModeController(object):
         # abs(error_mean) : 편균 조향각이 어느 정도인가 
         # timer() : 타이머가 얼마나 지났는가 즉, 모드가 변경되고 얼마나 지났는가
         if self.mode == 'long straight': 
-            if abs(error_mean) > self.error_threshold - 5 and self.long_state == 0 and self.timer() > 5:
-                self.mode = 'curve'
-                print('long straight -> curve')
-                print(self.timer())
-                self.timer.update()
+            if abs(error_mean) > self.error_threshold - 3 and self.long_state == 0 and self.timer() > 5:
+                if (self.realcurve_cnt >= 2):
+                    self.mode = 'zgzg'
+                    print(self.timer())
+                    self.timer.update()
+                    print('long straight -> zgzg')
+                else:
+                    self.set_yaw0(yaw)
+                    self.mode = 'curve'
+                    print(self.timer())
+                    self.timer.update()
+                    print('long straight -> curve')
             # if self.long_state == 0:
             #     self.mode = 'short straight'
             #     print('long straight -> short straight')
@@ -142,35 +152,41 @@ class ModeController(object):
 
         # 커브
         elif self.mode == 'curve':
-            if abs(error_mean) > self.error_threshold and self.long_flag == 0 and self.timer() > 2: #and diff_yaw > np.deg2rad(270):
-                self.mode = 'zgzg'
-                print('curve -> zgzg')
-                print(self.timer())
-                self.timer.update()
+            if self.realcurve_flag == 0 and diff_degree > 50 and self.timer() > 2:
+                self.realcurve_flag = 1
+                self.realcurve_cnt = self.realcurve_cnt + 1
+                print('realcurve: ', self.realcurve_cnt)
+            
+            # if abs(error_mean) > self.error_threshold and self.long_flag == 0 and self.timer() > 2: #and diff_yaw > np.deg2rad(270):
+            #     self.mode = 'zgzg'
+            #     print(self.timer())
+            #     self.timer.update()
+            #     print('curve -> zgzg')
 
-            elif abs(error_mean) < self.error_threshold and self.long_state == 0 and self.timer() > 2:
-                self.mode = 'short straight'
-                print(self.timer())
-                self.timer.update()
-                print('curve -> short straight')
-            elif abs(error_mean) < self.error_threshold and self.long_state == 1 and self.timer() > 2:
+            if abs(error_mean) < self.error_threshold and self.long_state == 1 and self.timer() > 2:
+                self.realcurve_flag = 0
                 self.mode = 'long straight'
                 print(self.timer())
                 self.timer.update()
                 print('curve -> long straight')
+            # elif abs(error_mean) < self.error_threshold anrealcurve_flagd self.long_state == 0 and self.timer() > 2:
+            #     self.mode = 'short straight'
+            #     print(self.timer())
+            #     self.timer.update()
+            #     print('curve -> short straight')
 
         # 짧은 직진
-        elif self.mode == 'short straight':
-            if self.long_state == 0 and self.timer() > 3:
-                if abs(error_mean) > self.error_threshold - 3:
-                    self.mode = 'curve'
-                    print(self.timer())
-                    self.timer.update()
-                    print('short straight -> curve')
-            elif self.long_state == 1:
-                self.mode = 'long straight'
-                print(self.timer())
-                self.timer.update()
-                print('short straight -> long straight')
+        # elif self.mode == 'short straight':
+        #     if self.long_state == 1:
+        #         self.mode = 'long straight'
+        #         print(self.timer())
+        #         self.timer.update()
+        #         print('short straight -> long straight')
+        #     elif abs(error_mean) > self.error_threshold-3 and self.long_state == 0 and self.timer() > 3:
+        #         self.set_yaw0(yaw)
+        #         self.mode = 'curve'
+        #         print(self.timer())
+        #         self.timer.update()
+        #         print('short straight -> curve')
          
         return self.mode
