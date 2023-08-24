@@ -26,7 +26,7 @@ class Xycar(object):
     Main class for AutoDriving
     '''
 
-    def __init__(self, mode='long straight', hz=10):
+    def __init__(self, mode, hz=10):
         
         self.rate = rospy.Rate(hz)
         self.pub = rospy.Publisher('xycar_motor', xycar_motor, queue_size=1)

@@ -23,8 +23,7 @@ def cleanup(signal, frame):
     rospy.loginfo("Robot controller has shut down.")
     exit(0)
 
-def main(mode):
-
+def main(mode='0'):
     rospy.init_node('AuTOBO_rookie', log_level=rospy.DEBUG)
     rospy.loginfo("Initializing robot controller...")
 
@@ -37,4 +36,7 @@ def main(mode):
         xycar.control()
 
 if __name__ == "__main__":
-    main(sys.argv[1])
+    if len(sys.argv) != 1:
+        main(sys.argv[1])
+    else:
+        main()
