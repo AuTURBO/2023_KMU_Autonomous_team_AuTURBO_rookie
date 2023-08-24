@@ -565,7 +565,7 @@ class Xycar(object):
         # 어떤 모드인지 확인 후 해당 모드에 맞는 제어 수행
         # mode = self.mode_controller(self.sensor.yaw)
         mode = self.mode_controller(self.target_angle, self.sensor.lidar, self.sensor.angle_increment, self.sensor.yaw)
-        rospy.loginfo("current mode is %s", mode)
+        # rospy.loginfo("current mode is %s", mode)
 
         # i) high speed mode
         self.control_dict[mode]()
