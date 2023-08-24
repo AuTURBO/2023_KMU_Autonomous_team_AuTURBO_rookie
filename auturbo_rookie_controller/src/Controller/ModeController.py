@@ -36,7 +36,7 @@ class ModeController(object):
     # 라바콘 주행 'rubbercon': self.rubbercon
 
     # def __init__(self, yaw0, timer):
-    def __init__(self, timer, yaw0, mode):
+    def __init__(self, timer, yaw0, mode, cnt=0):
         # 첫 시작은 긴 직진 모드
         self.mode = mode
         self.timer = timer
@@ -45,7 +45,7 @@ class ModeController(object):
         
         self.long_flag = 0
         self.realcurve_flag = 0
-        self.realcurve_cnt = 0
+        self.realcurve_cnt = int(cnt)
 
         self.yaw0 = yaw0
 
@@ -152,7 +152,7 @@ class ModeController(object):
 
         # 커브
         elif self.mode == 'curve':
-            if self.realcurve_flag == 0 and diff_degree > 50 and self.timer() > 2:
+            if self.realcurve_flag == 0 and diff_degree > 47 and self.timer() > 2:
                 self.realcurve_flag = 1
                 self.realcurve_cnt = self.realcurve_cnt + 1
                 print('realcurve: ', self.realcurve_cnt)

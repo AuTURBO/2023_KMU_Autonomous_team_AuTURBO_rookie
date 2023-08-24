@@ -21,6 +21,17 @@ from Controller.ModeController import ModeController
 from Controller.ARController import ARController
 from Controller.ARCurveController import ARCurveController
 
+mode_dict = {
+    '0': 'long straight',
+    '1': 'findparallelparking',
+    '2': 'ar_curve',
+    '3': 'findverticalparking',
+    '4': 'obstacle',
+    '5': 'stopline',
+    '6': 'rubbercon',
+    '10': 'zgzg'
+}
+
 class Xycar(object):
     '''
     Main class for AutoDriving
@@ -56,7 +67,10 @@ class Xycar(object):
         self.pub_target_lane = rospy.Publisher("/obstacle/info", String,queue_size=10)
 
         # 모드 컨트롤러 생성
-        self.mode_controller = ModeController(self.timer, self.sensor.yaw, mode)
+        if len(mode) == 1:
+            self.mode_controller = ModeController(self.timer, self.sensor.yaw, mode_dict[mode[0]])
+        if len(mode) == 2:
+            self.mode_controller = ModeController(self.timer, self.sensor.yaw, mode_dict[mode[0]], mode[1])
         # 펄슛 컨트롤러 생성
         self.pursuit_controller = PurePursuitController(self.timer)
         # AR 컨트롤러 생성
@@ -551,7 +565,7 @@ class Xycar(object):
         # 어떤 모드인지 확인 후 해당 모드에 맞는 제어 수행
         # mode = self.mode_controller(self.sensor.yaw)
         mode = self.mode_controller(self.target_angle, self.sensor.lidar, self.sensor.angle_increment, self.sensor.yaw)
-        # rospy.loginfo("current mode is %s", mode)
+        rospy.loginfo("current mode is %s", mode)
 
         # i) high speed mode
         self.control_dict[mode]()
