@@ -269,7 +269,7 @@ class Xycar(object):
                 self.pub.publish(self.msg)
                 self.rate.sleep()
             print ("ar_curve 모드 종료")
-            self.mode_controller.set_mode('object')
+            self.mode_controller.set_mode('findverticalparking')
 
         else:
             self.pursuit()
@@ -391,7 +391,6 @@ class Xycar(object):
             # 그대로 직진( 이제 차선 인식 하면 됨)
             for _ in range(50):     
                 self.pursuit()
-            self.mode_controller.set_mode('obstacle')
 
         elif self.direction == 'left':
             print("왼쪽 주차시작") 
@@ -435,7 +434,7 @@ class Xycar(object):
             for _ in range(50):
                 self.pursuit()
 
-            self.mode_controller.set_mode('obstacle')
+        self.mode_controller.set_mode('obstacle')
         # ================================================================================================#
 
 
@@ -543,7 +542,7 @@ class Xycar(object):
                 print("라바 콘을 회피하여 주행합니다.")
             elif self.rubber_state_flag == 1 and self.rubber_action_flag == 0:
                     print('obstacle 모드 종료')
-                    self.mode_controller.set_mode('curve')        #우성님...헬프
+                    self.mode_controller.set_mode('zgzg')
             self.rate.sleep()
 
  
