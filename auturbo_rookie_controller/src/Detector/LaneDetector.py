@@ -7,7 +7,6 @@ from std_msgs.msg import Int32
 from std_msgs.msg import String
 from cv_bridge import CvBridge
 
-from Detector.BEV import BEV
 from Detector.utils import undistort
 from Detector.utils.MovingAverage import MovingAverage
 from Detector.PreProcessor import PreProcessor
@@ -22,10 +21,9 @@ class LaneDetector(object):
     '''
     def __init__(self):
 
-        # BEVlane_bin_th
+        # BEV
         roi_height = 200
         roi_width = 640
-        self.bev = BEV(roi_height, roi_width)
 
         self.frameRate = 11 #33
         self.lane_bin_th = 120

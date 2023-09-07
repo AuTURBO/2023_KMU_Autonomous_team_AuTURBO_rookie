@@ -5,7 +5,6 @@ import cv2
 import numpy as np
 
 from Detector.utils import undistort
-from Detector.BEV_hough import BEV
 
 # colors
 red, green, blue, yellow = (0, 0, 255), (0, 255, 0), (255, 0, 0), (0, 255, 255)
@@ -19,7 +18,6 @@ class StopLineDetector(object):
         # BEV
         self.roi_height = 200
         self.roi_width = 640
-        self.bev = BEV(self.roi_height, self.roi_width)
 
         prev_target = 320
         self.frameRate = 11 #33
@@ -33,7 +31,6 @@ class StopLineDetector(object):
         '''
         return True if stopline is detected else False
         '''
-        bev = self.bev(frame)
         frame = undistort.undistort_func(frame)
         frame = self.warp_perspect(frame)
 
@@ -59,8 +56,8 @@ class StopLineDetector(object):
             
             x, y, w, h = cv2.boundingRect(cont)
             center = (x + int(w/2), y + int(h/2))
-            _, width, _ = bev.shape
-            # _, width = bev.shape
+            width = self.roi_width
+            
             cv2.rectangle(frame, (x, y), (x + w, y + h), (0,255,0), 2)
             print("detected boundingRect (x, y, w, h): ", x, y, w, h)
             print("detected boundingRect center (x, y): ", center)
