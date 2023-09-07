@@ -10,7 +10,6 @@ import numpy as np
 
 class ARCurveController(object):
     def __init__(self, timer):
-        
         #라바콘 회피 주행 모드 출입, 탈출 워크플로우
         #1 .state_flag 가 0 and 장애물이 인식되지 않을 때(action_flag = 0), pursuit 하면서, 라인 따라가기
         #2. state_flag 가 0이면서 and 장애물이 인식 될 때(action_flag = 1),   rubber avoidance 하면서 주행하기 -> flag를 1로 수정
@@ -60,7 +59,6 @@ class ARCurveController(object):
             # print("nz: ", nz)
             # 만약 필터링된 데이터의 개수가 5개 이상이면, 어느 방향으로 피해야 할지 결정합니다.
             #  1. 1/4 구간에 장애물이 있으면, 오차값을 더해주고, 3/4 구간에 장애물이 있으면, 오차값을 빼줍니다.
-        
                 
             min_filtered = filtered[int(np.median(nz))]
             print("장애물 최소 거리 : ", min_filtered)
@@ -72,13 +70,9 @@ class ARCurveController(object):
                 self.rotation = -1
                 print("왼쪽으로 이동")
 
-
         elif len(nz) < 5 :    #1 .flag가 0 and 장애물이 인식되지 않을 때, pursuit 하면서, 라인 따라가기
             self.error = 0
             self.ar_curve_action_flag = 0 #action_flag == 0 이면, pursuit 하기
-
-
-
 
         if self.rotation == -1:
             self.error -= 0.9 - min_filtered
@@ -93,16 +87,11 @@ class ARCurveController(object):
         self.prev_rotation = self.rotation
         print("self.error: ", self.error)
 
-
-
         if self.error == 0:
             self.error = 0
             steer = 0 
         else:
             steer = self.error * self.k
-
-    
-
 
         if steer > 30:
             steer = 30
@@ -119,6 +108,5 @@ class ARCurveController(object):
         elif self.ar_curve_state_flag == 1 and self.ar_curve_action_flag == 0:
             print("AR 커브 종료")
         print("state_Flag : {}, self.action_flag : {}".format(self.ar_curve_state_flag, self.ar_curve_action_flag))
-        
         
         return  int(steer), 3, self.ar_curve_state_flag, self.ar_curve_action_flag

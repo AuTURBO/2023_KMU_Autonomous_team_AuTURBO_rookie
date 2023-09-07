@@ -8,32 +8,6 @@ class ModeController(object):
     Detects mode based on imu sensor data
     Counts laps
     '''
-    # == 기본 주행 ===== #
-    # 긴 구간 직진 'long straight' : self.pursuit,
-    # 짧은 구간 직진 'short straight' : self.pursuit,
-    # 각 모서리의 커브 구간'curve': self.pursuit,
-    
-    # == 미션 1 평행주차 ===== #
-    # 주차 공간 찾기 'findparallelparking': self.findparallelparking,
-    # 가로주차  'parallelparking': self.parallelpark,
-    # AR 정밀주차 'arparking': self.arparking,
-    # 차량 정지 'poweroff' : self.poweroff,
-    
-    # == 미션 2 ar curve 주행 == # -- 08.08 테스트
-    # AR Curve 'ar_curve': self.ar_curve, 
-    
-    # == 미션 3 객체 인식 후 주차 == # -- 07.31 테스트
-    # 'findverticalparking': self.findverticalparking,
-    # vertical parking 'verticalparking': self.verticalparking,
-    
-    # == 미션 4 장애물 회피 == # -- 07.31 테스트
-    # 장애물 회피 'obstacle': self.obstacle,
-    
-    # == 미션 5 정지선 정지 == # -- 08.08 테스트
-    # stopline 'stopline': self.stopline,
-    
-    # == 미션 6 라바콘 주행 == # -- 07.31 테스트
-    # 라바콘 주행 'rubbercon': self.rubbercon
 
     # def __init__(self, yaw0, timer):
     def __init__(self, timer, yaw0, mode, cnt=0):
@@ -49,8 +23,6 @@ class ModeController(object):
 
         self.yaw0 = yaw0
 
-
-
     def set_mode(self, mode):
         self.mode = mode
 
@@ -59,18 +31,6 @@ class ModeController(object):
 
     def get_mode(self):
         return self.mode
-
-    # 구간인식 flowchart
-    # 1. 직진 모드(디폴트) -- 구현됨 
-    # 2. 직진 모드로 가다 평행 주차 모드로 변경 후 평행주차 -- 구현됨
-    # 아래부턴 구현해야댐 
-    # 4. 커브 모드의 lap == 1일때 ar 커브 모드로 변경 하면 되지 않을까?
-    # 5. ar 커브모드가 끝나면 직진 모드로 변경 - 이때 객체인식 주차 모드로 변경 
-
-    # 6. 객체인식 주차 모드가 끝나면 커브 모드로 면경 후 (lap == 2일때 장애물 인식 모드로 변경) -- 각도에 따른 조건문으로 구현이 되어있음 둘 중 잘되는걸로 
-    # 7. 장애물 인식 모드가 끝나면 횡단보도 인식 모드로 변경 
-    # 8. 횡단보도 인식 모드가 끝나면 커브 모드로 변경 후 lap == 3일때 정지선 라바콘 주행 모드로 변경
-    # 9. 정지선 라바콘 주행 모드가 끝나면 짧은 직진 모드로 변경 후 lap == 4일때 직진 모드로 변경
 
     def __call__(self, angle_error, ranges, angle_increment, yaw):
         '''
@@ -83,7 +43,6 @@ class ModeController(object):
         ranges[3*len(ranges)//4:] = 0.0
             
         # 각도 값들을 계산합니다.
-        # print("angle_increment: ", angle_increment)
         deg = np.arange(len(ranges)) * angle_increment - 252 * angle_increment
 
         # 장애물로 판단할 조건을 마스킹하여 필터링합니다.
@@ -91,7 +50,6 @@ class ModeController(object):
         mask = (np.abs(ranges * np.sin(deg)) < 20) & (8 < ranges * np.cos(deg)) & (ranges * np.cos(deg) < 20)
         # 필터링 조건에 따라 데이터를 필터링합니다.
         filtered = np.where(mask, ranges, 0.0)
-
         # 필터링된 데이터 중 0이 아닌 값의 인덱스를 찾습니다.
         nz = np.nonzero(filtered)[0]
         # print(nz)
@@ -124,9 +82,6 @@ class ModeController(object):
             print(self.timer())
             self.timer.update()
             print('zgzg -> long straight')
-            # self.lab += 1 
-            # if self.lab == 4:
-            #     self.mode = 'stop   
 
         # long_state : 라이다가 적정거리만큼 인지 하였는가 
         # abs(error_mean) : 편균 조향각이 어느 정도인가 
@@ -144,11 +99,6 @@ class ModeController(object):
                     print(self.timer())
                     self.timer.update()
                     print('long straight -> curve')
-            # if self.long_state == 0:
-            #     self.mode = 'short straight'
-            #     print('long straight -> short straight')
-            #     print(self.timer())
-            #     self.timer.update()
 
         # 커브
         elif self.mode == 'curve':
@@ -156,12 +106,6 @@ class ModeController(object):
                 self.realcurve_flag = 1
                 self.realcurve_cnt = self.realcurve_cnt + 1
                 print('realcurve: ', self.realcurve_cnt)
-            
-            # if abs(error_mean) > self.error_threshold and self.long_flag == 0 and self.timer() > 2: #and diff_yaw > np.deg2rad(270):
-            #     self.mode = 'zgzg'
-            #     print(self.timer())
-            #     self.timer.update()
-            #     print('curve -> zgzg')
 
             if abs(error_mean) < self.error_threshold and self.long_state == 1 and self.timer() > 2:
                 self.realcurve_flag = 0
@@ -169,24 +113,5 @@ class ModeController(object):
                 print(self.timer())
                 self.timer.update()
                 print('curve -> long straight')
-            # elif abs(error_mean) < self.error_threshold anrealcurve_flagd self.long_state == 0 and self.timer() > 2:
-            #     self.mode = 'short straight'
-            #     print(self.timer())
-            #     self.timer.update()
-            #     print('curve -> short straight')
-
-        # 짧은 직진
-        # elif self.mode == 'short straight':
-        #     if self.long_state == 1:
-        #         self.mode = 'long straight'
-        #         print(self.timer())
-        #         self.timer.update()
-        #         print('short straight -> long straight')
-        #     elif abs(error_mean) > self.error_threshold-3 and self.long_state == 0 and self.timer() > 3:
-        #         self.set_yaw0(yaw)
-        #         self.mode = 'curve'
-        #         print(self.timer())
-        #         self.timer.update()
-        #         print('short straight -> curve')
          
         return self.mode

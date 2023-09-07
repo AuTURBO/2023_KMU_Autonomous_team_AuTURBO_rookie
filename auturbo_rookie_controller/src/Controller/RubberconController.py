@@ -22,11 +22,8 @@ class RubberconController(object):
         self.angle = 0
         self.speed = 0
         self.error = 0 
-        # 비례 제어 게인
-        self.k = 30.0  
-        #라이다 /scan 토픽 값을 이용하여 오차 계산
-        
-        
+        # 비례 제어 게인: 라이다 /scan 토픽 값을 이용하여 오차 계산
+        self.k = 30.0 
         self.kp = 7
         self.rotation = 0
         self.prev_rotation = 0
@@ -34,7 +31,7 @@ class RubberconController(object):
         self.left_quarter_min_distance = 0
 
     def __call__(self, ranges, angle_increment):
-        
+
         right_filtered = 0
         left_filtered = 0
         ranges = np.array(ranges)
@@ -80,9 +77,6 @@ class RubberconController(object):
                 #self.error -= 0.5 - filtered[int(np.median(nz))]
                 #print("오른쪽", filtered[int(np.median(nz))])
             
-
-            #print("왼쪽 : ", left_filtered)
-            #print("오른쪽 : ", right_filtered)
         elif len(nz) < 3 :    #1 .flag가 0 and 장애물이 인식되지 않을 때, pursuit 하면서, 라인 따라가기
             self.error = 0
             self.action_flag = 0 #action_flag == 0 이면, pursuit 하기
@@ -93,11 +87,8 @@ class RubberconController(object):
         elif left_filtered < right_filtered:
             self.rotation = 1
 
-
-
         self.error += 0.5 - right_filtered
         self.error -= 0.5 - left_filtered
-        
 
         # 태그 설정
         if self.rotation != self.prev_rotation:
@@ -110,17 +101,10 @@ class RubberconController(object):
         else:
             steer = self.error * self.k
 
-    
-
-
         if steer > 30:
             steer = 30
         elif steer < -30:   
             steer = -30
 
-        #조향각 출력하기
-        #print("rotation : {}".format(self.rotation))
-        #print("angle_steer: {} ".format(int(steer)))
-        print("state_Flag : {}, self.action_flag : {}".format(self.state_flag, self.action_flag))
-        
+        print("state_Flag : {}, self.action_flag : {}".format(self.state_flag, self.action_flag))        
         return  int(steer), 3, self.state_flag, self.action_flag

@@ -8,16 +8,6 @@ import os
 #import matplotlib.pyplot as plt
 import queue
 
-def LowPassFilter(alpha, prev, x):
-    """
-    (param) alpha : weight for previous estimation
-            prev : previous estimation
-            x : new data
-    (return) estimation
-    """
-    return alpha * prev + (1 - alpha) * x
-
-
 # =============================================
 # 영상처리를 위한 클래스
 # Bird Eye View 변환
@@ -25,7 +15,6 @@ def LowPassFilter(alpha, prev, x):
 # 차선 시작점 검출
 # Sliding window 알고리즘(차선 검출) 등 멤버 함수 존재
 # =============================================
-
 
 class PreProcessor:
     def __init__(self, roi_height, roi_width):

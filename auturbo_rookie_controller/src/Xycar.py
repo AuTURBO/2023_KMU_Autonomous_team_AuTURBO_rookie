@@ -49,13 +49,14 @@ class Xycar(object):
 
         # 장애물 감지기 생성
         self.obstacle_detector = ObstacleDetector(self.timer)
-        # 객체인식 주차
-        # grandeur avante sonata
+
+        # 객체인식 주차: grandeur avante sonata
         car_target = "sonata" 
         car_rest = "grandeur"
         self.direction = "none"
         self.objectdetector = ObjectDetector(self.timer, car_target, car_rest)
         # self.verticalparking = VerticalParking(self.timer)
+
         # stop line 감지기 생성
         self.stopline_detector = StopLineDetector()
 
@@ -71,8 +72,10 @@ class Xycar(object):
             self.mode_controller = ModeController(self.timer, self.sensor.yaw, mode_dict[mode[0]])
         if len(mode) == 2:
             self.mode_controller = ModeController(self.timer, self.sensor.yaw, mode_dict[mode[0]], mode[1])
-        # 펄슛 컨트롤러 생성
+        
+        # PurePursuit 컨트롤러 생성
         self.pursuit_controller = PurePursuitController(self.timer)
+
         # AR 컨트롤러 생성
         self.ar_controller = ARController()
         # AR 컨트롤러 생성
@@ -83,16 +86,12 @@ class Xycar(object):
     
         # 루버콘 컨트롤러 생성 
         self.rubbercon_controller = RubberconController(self.timer)
-
         self.rubber_action_flag= 0
         self.rubber_state_flag = 0
     
         self.target_lane = 'middle'
         self.control_dict = {
-            # ar tag test
-            'ar_marker_pose' : self.ar_marker_pose,
-
-            # 직선 주행 findparking
+            # 1. High Speed Driving
             # 긴 구간 직진 
             'long straight' : self.pursuit,
             # 짧은 구간 직진 
@@ -101,19 +100,14 @@ class Xycar(object):
             'curve': self.pursuit,
             # 지그재그 구간
             'zgzg': self.pursuit,
-
-            # == 미션 1 평행주차 ===== #
-            # 주차 공간 찾기 
-            'findparallelparking': self.findparallelparking,
-            # 가로주차
-            'parallelparking': self.parallelpark,
-            # AR 정밀주차
-            'arparking': self.arparking,
-            # ===================== #
             # 차량 정지 
             'poweroff' : self.poweroff,
- 
-            ## ---- 추가 해주시면 됩니다!---------------------------------------------- ##
+
+            # 2. Mission Driving
+            # == 미션 1 평행주차 ===== #
+            'findparallelparking': self.findparallelparking,
+            'parallelparking': self.parallelpark,
+            'arparking': self.arparking,
             # == 미션 2 ar curve 주행 == # 
             'ar_curve': self.ar_curve, 
             # == 미션 3 객체 인식 후 주차 == # 
@@ -124,8 +118,10 @@ class Xycar(object):
             # == 미션 5 정지선 정지 == #
             'stopline': self.stopline,
             # == 미션 6 라바콘 주행 == # 
-            'rubbercon': self.rubbercon
-            ################################################################################# 
+            'rubbercon': self.rubbercon,
+
+            # ar tag test
+            'ar_marker_pose' : self.ar_marker_pose
         }
     def ar_marker_pose(self):
         x = self.sensor.ar_x
@@ -136,18 +132,12 @@ class Xycar(object):
         print("ar_marker_pose")
         print("x : ", x, "y : ", y, "yaw : ", yaw, "id : ", id)
     
-    # # cv로 차선 인식 후 목표 각도값 받아오기 
-    # def target_angle_callback(self, msg):
-    #     self.target_angle = msg.data
     
     # 차량 정지 
     def poweroff(self):
         self.msg.speed, self.msg.angle = 0, 0
         self.pub.publish(self.msg)
         self.rate.sleep()
-        # cnt++ 
-        # cnt = 1 모드가 커브노드 되도록 
-        # cnt = 2 모드가 커브 모드 실행 
 
     # 차선 컨트롤러
     def pursuit(self):
@@ -158,8 +148,8 @@ class Xycar(object):
 
     # ================================ 미션 1 수평주차 =======================================================#
     # 주차공간 찾기 
-# x  0.7517626732542556   y  1.1183388094957174  w  -0.26245737259726215  id  0
-# 0.5074189710992407   y  0.9376329910134537  w  -0.1507904648456464
+    # x  0.7517626732542556   y  1.1183388094957174  w  -0.26245737259726215  id  0
+    # 0.5074189710992407   y  0.9376329910134537  w  -0.1507904648456464
     def findparallelparking(self):
         # self.sensor.ar_x, self.sensor.ar_y, self.sensor.ar_yaw, self.sensor.ar_id
         if self.sensor.ar_id != None:
@@ -204,11 +194,11 @@ class Xycar(object):
             self.rate.sleep()
         print("평행 주차 시작")
         self.mode_controller.set_mode('arparking')
+
+    # 가로주차 aruco marker 인식 후 미세조정 모드 시작
     #x  0.22868945620672587   y  0.91746097ObjectDetector73533844  w  0.20812997531422267  id  1
     #x  0.1765239034700272   y  0.716902588854083  w  0.24787252483351582  id  1
     #x  0.11365149612910468   y  0.39251462070955173  w  0.11461349366373742  id  1
-
-    # 가로주차 aruco marker 인식 후 미세조정 모드 시작
     def arparking(self):
         self.msg.angle, self.msg.speed = self.ar_controller(self.sensor.ar_x, self.sensor.ar_y, self.sensor.ar_yaw)
         self.pub.publish(self.msg)
@@ -237,11 +227,9 @@ class Xycar(object):
             self.mode_controller.set_mode('ar_curve')
 
         self.rate.sleep()
-    # ================================================================================================#
+    # =====================================================================================================#
 
     # ================================ 미션 2 AR 커브 주행 =============================================#
-    # 이 부분을 채워주세요~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    # !!!!!!!
     def ar_curve(self):
         # self.msg.angle, self.msg.speed, self.ar_curve_state, self.ar_curve_action = self.ar_curve_controller(self.sensor.lidar, self.sensor.angle_increment)
         # self.msg.angle, self.msg.speed, self.ar_curve_state, self.ar_curve_action = self.ar_curve_controller(self.sensor.lidar, self.sensor.angle_increment, self.ar_curve_state, self.ar_curve_action)
@@ -285,20 +273,15 @@ class Xycar(object):
 
         else:
             self.pursuit()
-
-    # ================================================================================================#
+    # =====================================================================================================#
 
     # ================================ 미션 3 객체 인식 후 주차 ==========================================#
-    # 이 부분을 채워주세요~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    # !!!!!!!
-
     def findverticalparking(self):
         self.direction = self.objectdetector(self.sensor.detect, self.sensor.x_mid, self.sensor.y)
         if self.sensor.ar_id != None :
             y = self.sensor.ar_y
             print("마커 인식함")
             #print("x ", x, "  y ", y, " w ", yaw, " id ", id)
-
             if 0.6 < y < 2.3:      #id == 0  미포함
                 if self.direction == 'none':
                     self.direction = "right"
@@ -341,7 +324,6 @@ class Xycar(object):
                 self.pub.publish(self.msg)
                 self.rate.sleep()
 
-
             #############주차 탈출하기 ##############
             #살짝 나오기
             for _ in range(17):
@@ -354,7 +336,7 @@ class Xycar(object):
                 self.pub.publish(self.msg)
                 self.rate.sleep()
             
-            # 그대로 직진( 이제 차선 인식 하면 됨)
+            # 그대로 직진
             for _ in range(50):     
                 self.pursuit()
 
@@ -401,12 +383,7 @@ class Xycar(object):
                 self.pursuit()
 
         self.mode_controller.set_mode('obstacle')
-        # ================================================================================================#
-
-
-
-
-    # ================================================================================================#
+    # =====================================================================================================#
 
     # ================================ 미션 4 장애물 회피 ==============================================#
 
@@ -416,9 +393,6 @@ class Xycar(object):
         print("self.target_lane : ", self.target_lane)
         if self.target_lane == None:        #None은 장애물이 인식 안됬으므로 직진
             self.pursuit()
-            # self.msg.angle, self.msg.speed = 0, 3
-            # self.pub.publish(self.msg)
-            # self.rate.sleep()
         else:
             if self.target_lane == "left":
                 for _ in range(15):
@@ -440,9 +414,6 @@ class Xycar(object):
                 for _ in range(20):
                     self.pursuit()
                     flag = 1
-
-    ####################right####################################
-
             elif self.target_lane == "right":
                 for _ in range(15):
                     self.msg.angle, self.msg.speed = 25, 3
@@ -470,7 +441,6 @@ class Xycar(object):
                 # self.pursuit()
             else:
                 self.pursuit()
-    # =====================================================================================================#
     # =====================================================================================================#
 
     # ================================ 미션 5 스탑라인(횡단보도) 정지 ===========================================#
@@ -510,11 +480,11 @@ class Xycar(object):
                     print('obstacle 모드 종료')
                     self.mode_controller.set_mode('zgzg')
             self.rate.sleep()
+    # =====================================================================================================#
 
  
     # 메인 루프 
     def control(self):
-        # 어떤 모드인지 확인 후 해당 모드에 맞는 제어 수행
         # mode = self.mode_controller(self.sensor.yaw)
         mode = self.mode_controller(self.target_angle, self.sensor.lidar, self.sensor.angle_increment, self.sensor.yaw)
         # rospy.loginfo("current mode is %s", mode)

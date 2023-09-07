@@ -8,7 +8,6 @@ from std_msgs.msg import String
 from cv_bridge import CvBridge
 
 from Detector.utils import undistort
-from Detector.utils.MovingAverage import MovingAverage
 from Detector.PreProcessor import PreProcessor
 
 # colors
@@ -150,37 +149,6 @@ def simple_controller(lx, ly, mx, my, rx, ry):
 
     # print(f"target: {target}")
     return int(target)
-
-# def video_read(fname):
-#     global frameWidth, frameHeight
-#     global frame
-
-#     path = '../video/'  
-#     filePath = os.path.join(path, fname)
-#     print(filePath)
-
-#     if os.path.isfile(filePath):	# 해당 파일이 있는지 확인
-#         # 영상 객체(파일) 가져오기
-#         cap = cv2.VideoCapture(filePath)
-#     else:
-#         print("파일이 존재하지 않습니다.")  
-
-#     # 프레임을 정수형으로 형 변환
-#     frameWidth = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))	# 영상의 넓이(가로) 프레임
-#     frameHeight = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))	# 영상의 높이(세로) 프레임
-    
-#     frame_size = (frameWidth, frameHeight)
-#     print('frame_size={}'.format(frame_size))
-
-#     frameRate = 11 #33
-
-#     while True:
-#         retval, frame = cap.read()
-        
-#         if not(retval):	# 프레임정보를 정상적으로 읽지 못하면
-#             break  # while문을 빠져나가기
-#         main(frame)
-        
 
 
 def threshold_binary(img, lane_bin_th, method, thresholding_type=cv2.THRESH_BINARY, window_name="threshold", show=False):
