@@ -35,7 +35,7 @@ lane detection mode
 2. curve mode - 곡선주로 최적주행
 3. zgzg mode - 지그재그 최적주행
 
-# Mission Driving
+# 2. Mission Driving
 ![Mission Driving](./fig/driving_mission.jpg)
 
 ## **Mission 1** - Parallel Parking
