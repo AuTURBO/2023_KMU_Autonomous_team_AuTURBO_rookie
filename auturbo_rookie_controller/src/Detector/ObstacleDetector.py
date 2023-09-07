@@ -15,7 +15,6 @@ class ObstacleDetector(object):
         self.obstacle_counter = 0
         self.timer = timer
         # 장애물을 감지하기 위한 타이머입니다.
-        self.obs_dict = {1: 1., 2: 2.6, 3: 4}
 
     # 콜
     def __call__(self, ranges, angle_increment):
@@ -40,7 +39,7 @@ class ObstacleDetector(object):
 
             # 장애물로 판단할 조건을 마스킹하여 필터링합니다.
             # 거리값에 따른 필터링 조건을 설정합니다.
-            mask = (np.abs(ranges * np.sin(deg)) < 0.35) & (0.15 < ranges * np.cos(deg)) & (ranges * np.cos(deg) < 0.35)
+            mask = (np.abs(ranges * np.sin(deg)) < 0.4) & (0.15 < ranges * np.cos(deg)) & (ranges * np.cos(deg) < 0.4)
             # 필터링 조건에 따라 데이터를 필터링합니다.
             filtered = np.where(mask, ranges, 0.0)
 
@@ -48,7 +47,7 @@ class ObstacleDetector(object):
             nz = np.nonzero(filtered)[0]
             # print(nz)
             
-            if len(nz) > 5:
+            if len(nz) > 2:
                 # print("nz: ", nz)
                 # 만약 필터링된 데이터의 개수가 5개 이상이면, 어느 방향으로 피해야 할지 결정합니다.
 
@@ -58,7 +57,7 @@ class ObstacleDetector(object):
                 else:
                     print("left")
                     self.avoid_direction = 'left'
-
+ 
 
                 print('avoid to ' + self.avoid_direction)
 
@@ -69,17 +68,7 @@ class ObstacleDetector(object):
             
             # nz 리스트 초기화
             nz = []
-        elif self.obstacle_counter != 0:
-            # 이미 장애물을 감지한 경우
-            if self.timer() > self.obs_dict[self.obstacle_counter]:
-                # 장애물에 대한 카운터 값에 해당하는 시간이 지나면 다음 단계로 넘어갑니다.
-                if self.obstacle_counter == 3:
-                    self.avoid_direction = 'middle'   
-                                     
-                else:
-                    self.avoid_direction = 'left' if self.avoid_direction == 'right' else 'right'
-                self.timer.update()
-                self.obstacle_counter += 1
-            print('avoid to ' + self.avoid_direction)
+        else:
+            self.avoid_direction = 'middle'
+            print("middle")
             return self.avoid_direction
-    

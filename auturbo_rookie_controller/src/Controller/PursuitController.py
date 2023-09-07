@@ -10,12 +10,14 @@ class PurePursuitController(object):
         self.timer = timer
 
         self.Lf = {
-            'long straight': 0.2,
-            'short straight': 0.2,
-            'curve': 0.2,
+            'long straight': 0.4,
+            'short straight': 0.4,
+            'curve': 0.4,
+            'zgzg': 0.17,
 
             'findparallelparking': 0.20,
             'findverticalparking': 0.20,
+            'arparking' : 0.20,
             'verticalparking' : 0.20,
             'stopline': 0.2,
             'obstacle': 0.2,
@@ -25,13 +27,15 @@ class PurePursuitController(object):
             'rubbercon': 0.2
         }
         self.target_speed = {
-            'long straight': 7,
-            'short straight': 5,
-            'curve': 3,
+            'long straight': 15,
+            'short straight': 15,
+            'curve': 15,
+            'zgzg': 4,
 
-            'findparallelparking': 3,
-            'findverticalparking': 3,
-            'verticalparking' : 3,
+            'findparallelparking': 4,
+            'findverticalparking': 4,
+            'arparking' : 3,
+            'verticalparking' : 4,
             'stopline': 3,
             'obstacle': 3,
             'parallelparking': 3,
@@ -40,12 +44,14 @@ class PurePursuitController(object):
             'rubbercon' : 3
         }
         self.acc = {
-            'long straight': 1.,
-            'short straight': -1,
+            'long straight': 2,
+            'short straight': -0.5,
             'curve': None,
+            'zgzg': -2,
 
             'findparallelparking': 0.5,
             'findverticalparking': 0.5,
+            'arparking' : 0.5,
             'verticalparking' : 0.5,
             'stopline': 0.5,
             'obstacle': 0.5,
@@ -66,12 +72,14 @@ class PurePursuitController(object):
 
 
         self.delay = {
-            'long straight': .1,
-            'short straight': .1,
-            'curve': 0.1,
+            'long straight': 1,
+            'short straight': 0.5,
+            'curve': -1,
+            'zgzg': -1,
 
             'findparallelparking': 0.5,
             'findverticalparking': 0.5,
+            'arparking' : 0.5,
             'verticalparking' : 0.5,
             'stopline': 0.5,
             'obstacle': 0.5,
@@ -83,16 +91,14 @@ class PurePursuitController(object):
 
 
     def __call__(self, target, mode):
-
-        # 고속주행모드self
-        if mode == 'curve' or mode == 'long straight' or mode == 'short straight':   
-            if self.timer() > self.delay[mode]:
-                    if self.acc[mode] is None:
-                        self.speed = self.target_speed[mode]
-                    elif self.acc[mode] > 0:
-                        self.speed = min(self.speed+self.acc[mode], self.target_speed[mode])
-                    else:
-                        self.speed = max(self.speed+self.acc[mode], self.target_speed[mode])
+        # # 가속도에 의한 스피드제어... 그냥 바로 적용
+        if self.timer() > self.delay[mode]:
+            if self.acc[mode] is None:
+                self.speed = self.target_speed[mode]
+            elif self.acc[mode] > 0:
+                self.speed = min(self.speed+self.acc[mode], self.target_speed[mode])
+            else:
+                self.speed = max(self.speed+self.acc[mode], self.target_speed[mode])
 
         else:
              self.speed = self.target_speed[mode]
@@ -113,6 +119,6 @@ class PurePursuitController(object):
 
         # 계산된 조향각을 디그리 투 라디안
         delta = -1 * delta * 180 / math.pi
-        return int(delta), int(self.speed)
+        return int(delta), int(self.target_speed[mode])
 
          
