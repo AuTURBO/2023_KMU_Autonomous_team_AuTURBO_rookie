@@ -20,7 +20,7 @@ lane detection mode
 3. sliding window
 4. 왼쪽, 오른쪽 차선 구분
 5. 차선 각도 예외처리 && 오차값 생성
-6. 위 오차값을 이용한 조향각 PID 제어
+6. 위 오차값을 이용한 조향각 Pure Pursuit 제어
 
 ## 2) Mode Control
 > Highest speed on a straight road & optimal speed on a curve
