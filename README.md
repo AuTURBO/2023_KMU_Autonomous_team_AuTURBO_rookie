@@ -1,4 +1,7 @@
 # 2023 국민대 자율주행 경진대회: Team AuTURBO rookie
+# 예선미션 Repo
+
+![예선미션 Repo]([./fig/driving_highspeed.jpg](https://github.com/ggh-png/2023_KMU_driving_simulation-AuTURBO_rookie))
 # 1. High Speed Driving
 ![High Speed Driving](./fig/driving_highspeed.jpg)
 
